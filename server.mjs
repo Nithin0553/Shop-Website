@@ -38,7 +38,7 @@ fs.mkdirSync(DATA, { recursive:true });
 fs.mkdirSync(UPLOADS, { recursive:true });
 const dataPath = name => path.join(DATA, name);
 const defaults = { shopName:'Sri Sai Shanmukha Auto Centre', tagline:'Two-Wheeler Spare Parts & Accessories', phone:'',whatsapp:'',email:'',address:'',city:'',hours:'',mapsUrl:'',instagramUrl:'',facebookUrl:'',siteUrl:'' };
-for (const [file, defaultVal] of [['site.json', defaults], ['blogs.json', []], ['inquiries.json', []]]) {
+for (const [file, defaultVal] of [['site.json', defaults], ['blogs.json', []], ['inquiries.json', []], ['subscribers.json', []]]) {
   const dest=dataPath(file), source=path.join(ROOT,'data',file);
   if (!fs.existsSync(dest)) {
     if (fs.existsSync(source)) fs.copyFileSync(source, dest);
@@ -139,6 +139,17 @@ async function handleApi(req,res,url) {
     const enquiries=read('inquiries.json');enquiries.unshift(entry);write('inquiries.json',enquiries);
     return json(res,201,{id:entry.id,message:'Your enquiry has been received.'});
   }
+  if(pathname==='/api/subscriptions'&&req.method==='POST') {
+    if(limited(clientIP(req),'subscriptions',5,30*60*1000))return json(res,429,{error:'Too many requests. Please try again later.'});
+    const b=await body(req), email=str(b.email,160).toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>160)return json(res,400,{error:'Enter a valid email address.'});
+    const subscribers=read('subscribers.json');
+    if(!subscribers.some(x=>x.email===email)){
+      subscribers.unshift({id:crypto.randomUUID(),email,createdAt:new Date().toISOString()});
+      write('subscribers.json',subscribers);
+    }
+    return json(res,200,{message:'Thanks! Your email has been saved for future shop updates.'});
+  }
   if(pathname==='/api/admin/login'&&req.method==='POST') {
     if(!ADMIN_PASSWORD) return json(res,503,{error:'Admin login is not configured on the server.'});
     if(limited(clientIP(req),'login',8,15*60*1000)) return json(res,429,{error:'Too many login attempts; try again later.'});
@@ -172,6 +183,13 @@ async function handleApi(req,res,url) {
         return json(res,201,{filename:name,url:`/assets/${name}`});
       }
       return badMethod(res);
+    }
+    if(pathname==='/api/admin/subscribers'&&req.method==='GET') return json(res,200,read('subscribers.json'));
+    if(pathname==='/api/admin/subscribers.csv'&&req.method==='GET') {
+      const rows=read('subscribers.json');
+      const csv=['email,createdAt',...rows.map(x=>[x.email,x.createdAt].map(v=>'"'+String(v??'').replace(/^[=+@-]/,"'$&").replace(/"/g,'""')+'"').join(','))].join('\r\n');
+      res.writeHead(200,{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="shop-blog-subscribers.csv"','Cache-Control':'no-store'});
+      return res.end('\uFEFF'+csv);
     }
     if(pathname==='/api/admin/inquiries'&&req.method==='GET') return json(res,200,read('inquiries.json'));
     if(pathname==='/api/admin/inquiries.csv'&&req.method==='GET') {

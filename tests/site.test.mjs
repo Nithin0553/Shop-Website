@@ -76,3 +76,21 @@ test('SEO head title changes for blog articles',async()=>{
   assert.equal(article.res.status,200);assert.match(article.data,/<title>Essential Two-Wheeler Maintenance Tips for a Longer Life/);
   const notFound=await request('/blogs/does-not-exist');assert.equal(notFound.res.status,404);
 });
+test('blog email subscriptions validate, deduplicate and remain admin-only',async()=>{
+  const bad=await request('/api/subscriptions',{method:'POST',body:{email:'not-an-address'}});
+  assert.equal(bad.res.status,400);
+  const first=await request('/api/subscriptions',{method:'POST',body:{email:'visitor@example.com'}});
+  assert.equal(first.res.status,200);
+  const duplicate=await request('/api/subscriptions',{method:'POST',body:{email:'Visitor@Example.com'}});
+  assert.equal(duplicate.res.status,200);
+  const denied=await request('/api/admin/subscribers');
+  assert.equal(denied.res.status,401);
+  const list=await request('/api/admin/subscribers',{headers:{Cookie:cookie}});
+  assert.equal(list.res.status,200);
+  assert.equal(list.data.length,1);
+  assert.equal(list.data[0].email,'visitor@example.com');
+  const csv=await request('/api/admin/subscribers.csv',{headers:{Cookie:cookie}});
+  assert.equal(csv.res.status,200);
+  assert.ok(csv.data.includes('visitor@example.com'));
+  assert.ok(fs.existsSync(path.join(temp,'subscribers.json')));
+});

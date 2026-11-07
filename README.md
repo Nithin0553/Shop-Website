@@ -1,6 +1,6 @@
 # Sri Sai Shanmukha Auto Centre — Website
 
-A responsive, working website for a local two-wheeler spare-parts and accessories shop, based on the approved blue-and-white design. It includes a public site, blog, customer enquiry form, and protected shop dashboard.
+A responsive, working website for a local two-wheeler spare-parts and accessories shop, refined to follow the approved blue-and-white homepage, blog, and About/Contact reference mockups. It includes a public site, blog, customer enquiry form, and protected shop dashboard.
 
 **Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. No paid services, third-party packages, or build step are required.
 
@@ -40,11 +40,11 @@ The placeholder shop/storefront photography is illustrative, not a verified phot
 
 | Page | Route | Purpose |
 | --- | --- | --- |
-| Home | `/` | Promote the shop and link to parts, brands, articles, and enquiries |
+| Home | `/` | Photo hero, seven brands, eight spare-parts categories, four shop benefits, featured blogs and contact strip |
 | Spare parts | `/spare-parts` | Search categories and filter by vehicle brand; enquiry links preserve selection |
 | Brands | `/brands` | Hero, Honda, Bajaj, TVS, Yamaha, Suzuki, Royal Enfield |
-| About | `/about` | Shop introduction and store benefits |
-| Blogs | `/blogs` | Searchable/filterable article library |
+| About | `/about` | Storefront illustration, shop story, benefits, brand list and enquiry form |
+| Blogs | `/blogs` | Featured article, sidebar categories with real counts, searchable/filterable article grid and email opt-in |
 | Article | `/blogs/example-slug` | Complete individual blog article and related reading |
 | Contact | `/contact` | Shop info, phone/WhatsApp/map links, customer enquiry form |
 | Dashboard | `/admin` | Private business-management area |
@@ -54,6 +54,7 @@ The website is **not** an online ordering or inventory system. Visitors enquire 
 ## Dashboard
 
 - **Customer enquiries:** See customer name, phone, vehicle and requested part; mark enquiries New, In Progress or Closed; download CSV.
+- **Blog subscribers:** View and export opted-in email addresses. No automatic emails are sent.
 - **Blog articles:** Create, edit, delete, publish or unpublish posts; choose a category, write headings/paragraphs/lists, and upload your own JPG/PNG/WebP images (up to 1.8 MB each).
 - **Shop details:** Update the address, number, WhatsApp, email, location links, hours and site URL without editing code.
 
@@ -64,6 +65,7 @@ Enquiries are stored in `data/inquiries.json` (ignored by Git; created automatic
 - `data/site.json`: editable business details
 - `data/blogs.json`: sample blogs and new article content
 - `data/inquiries.json`: customer enquiries
+- `data/subscribers.json`: newsletter email opt-ins (private and ignored by Git)
 - `data/uploads/`: uploaded blog images
 
 Back up the **whole data directory** regularly. Files are stored on the server rather than in an external database. The app uses safe temporary-file writes for the JSON records, but this storage model is intended for a small shop and **a single running server instance**.
@@ -100,12 +102,12 @@ npm test
 npm run dev
 ```
 
-Tests cover the web pages, enquiries, admin authentication, blog CRUD, CSV, image upload, persistence, SEO metadata and sitemap. No `npm install` is necessary because the project uses only Node.js built-in modules.
+Tests cover the approved page-section structure, article content loading, responsive CSS markers, the web pages, enquiries, newsletter sign-ups, admin authentication, blog CRUD, CSV, image upload, persistence, SEO metadata and sitemap. No `npm install` is necessary because the project uses only Node.js built-in modules.
 
 ## What is not yet included
 
 - Payments, checkout, live prices or live stock tracking
-- Automatic SMS/email/WhatsApp notifications of enquiries
+- Automatic SMS/email/WhatsApp notifications of enquiries or blog updates
 - Advanced e-commerce product management and SKU-specific inventory
 - Hosting, domain registration, or Google Business Profile connection
 
@@ -113,6 +115,10 @@ These can be added in a later phase without discarding this website.
 
 ## Source control safety
 
-The repository intentionally excludes `.env`, `data/inquiries.json`, and user-uploaded blog images under `data/uploads/`. The editable starter files `data/site.json` and `data/blogs.json` are committed for new installations, but production must use a persistent `DATA_DIR` volume. Do not commit customer data, real credentials, or sensitive private contact records.
+The repository intentionally excludes `.env`, `data/inquiries.json`, `data/subscribers.json`, and user-uploaded blog images under `data/uploads/`. The editable starter files `data/site.json` and `data/blogs.json` are committed for new installations, but production must use a persistent `DATA_DIR` volume. Do not commit customer data, real credentials, or sensitive private contact records.
 
-The three large reference mockup PNGs are distributed separately in the original website ZIP and are not needed to run the website. The site's optimized production images remain in `public/assets/`.
+The approved reference mockups are saved as optimized WebP images in `design-reference/` for future design comparison, and are not loaded on the public site. The site's optimized production images remain in `public/assets/`.
+
+## Design refinement (November 2026)
+
+The revised UI uses the approved concept as its styling reference: a blue/white diagonal photo hero, compact manufacturer tiles and parts images, a four-card trust band, image-based blog cards with dates, a featured-blog/category sidebar, an email signup, and a two-column visit-us and enquiry area. Generated mockup graphics contained fictional contact information; this implementation deliberately uses blank shop details rather than fake numbers, addresses, or business hours. Add your real details in Admin before deployment. For newsletter addresses, the website only stores opt-ins; sending emails needs a future configured mailing provider.
