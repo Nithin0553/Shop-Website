@@ -61,7 +61,9 @@ const icons={
 };
 const ico=(name,size=20)=>`<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.package}</svg>`;
 const esc = v => String(v ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-const asset = img => `/assets/${encodeURIComponent(img)}`;
+// Bust old browser caches when shop imagery is refreshed. Increment this token when asset files change.
+const ASSET_VERSION = '20261107-logo-refresh';
+const asset = img => `/assets/${encodeURIComponent(img)}?v=${ASSET_VERSION}`;
 const siteDefault={shopName:'Sri Sai Shanmukha Auto Centre',tagline:'Two-Wheeler Spare Parts & Accessories',phone:'',whatsapp:'',email:'',address:'',city:'',hours:'',mapsUrl:''};
 let SITE={...siteDefault}, BLOGS=[], menuOpen=false, blogCategory='All', blogQuery='', partsBrand='All',partsQuery='',formPending=false,subscribing=false;
 const loadingArticles = new Set();

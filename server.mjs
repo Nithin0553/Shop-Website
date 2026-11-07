@@ -256,7 +256,7 @@ function serveFile(res, filename) {
   if(!(resolved===PUBLIC||resolved.startsWith(PUBLIC+path.sep)))return json(res,403,{error:'Forbidden'});
   fs.readFile(resolved,(error,content)=>{
     if(error) return json(res,404,{error:'Not found'});
-    res.writeHead(200,{'Content-Type':mime[path.extname(resolved)]||'application/octet-stream','Cache-Control':filename.startsWith('assets/')?'public, max-age=86400':'no-cache'});
+    res.writeHead(200,{'Content-Type':mime[path.extname(resolved)]||'application/octet-stream','Cache-Control':filename.startsWith('assets/')?'no-cache, must-revalidate':'no-cache'});
     res.end(content);
   });
 }
