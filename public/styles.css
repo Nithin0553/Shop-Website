@@ -440,3 +440,47 @@ body { font-size:15px; line-height:1.5; color:var(--ink) }
   .spotlight-grid .spotlight-card { grid-template-columns:1fr; gap:10px; padding:18px; }
   .spotlight-grid .spotlight-card .spotlight-art { height:238px; }
 }
+
+
+/* Featured-shop brand logos: large, readable artwork with equal-height cards. */
+.spotlight-grid .spotlight-brand-row {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  align-items:stretch;
+  width:100%;
+  margin:0 0 16px;
+}
+.spotlight-grid .spotlight-brand-pill {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  width:100%;
+  height:82px;
+  padding:8px;
+  border-radius:14px;
+  border:1px solid #d6e4f3;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 8px 18px rgba(20,43,72,.07);
+}
+.spotlight-grid .spotlight-brand-pill img {
+  display:block;
+  width:100%;
+  height:65px;
+  min-width:0;
+  max-width:100%;
+  max-height:none;
+  object-fit:contain;
+  object-position:center;
+}
+@media(max-width:650px) {
+  .spotlight-grid .spotlight-brand-row { gap:8px; }
+  .spotlight-grid .spotlight-brand-pill { height:74px; padding:6px; }
+  .spotlight-grid .spotlight-brand-pill img { height:60px; }
+}
+@media(max-width:390px) {
+  .spotlight-grid .spotlight-brand-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .spotlight-grid .spotlight-brand-pill { height:74px; }
+  .spotlight-grid .spotlight-brand-pill:last-child:nth-child(odd) { grid-column:1 / -1; width:calc(50% - 4px); justify-self:center; }
+}

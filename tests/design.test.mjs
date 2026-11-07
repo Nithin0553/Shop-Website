@@ -32,7 +32,7 @@ test('homepage follows approved design hierarchy',async()=>{
   assert.ok((html.match(/compact-category/g)||[]).length >= 9);
   assert.equal((html.match(/design-blog-card/g)||[]).length,3);
   assert.ok(html.includes('logo-card'));
-  assert.ok(html.includes('/assets/brand-card-honda.png?v=20261107-visual-polish'), 'Homepage should request refreshed logo URLs');
+  assert.ok(html.includes('/assets/brand-card-honda.png?v=20261107-featured-logos'), 'Homepage should request refreshed logo URLs');
   assert.ok(html.includes('spotlight-card'));
   assert.ok(html.indexOf('Popular Brands')<html.indexOf('Spare Parts Categories'));
   assert.ok(html.indexOf('Spare Parts Categories')<html.indexOf('Why Choose Us?'));
@@ -60,4 +60,17 @@ test('public article pages fetch and display the full article body',async()=>{
 test('responsive design breakpoints and design reference classes exist',()=>{
   const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
   for(const text of ['showcase-hero','brand-wordmark','featured-layout','shop-contact-layout','subscribe-panel','marquee-track','spotlight-grid','@media (max-width:650px)'])assert.ok(css.includes(text));
+});
+
+
+test('highlighted brand wordmarks have larger artwork and three-up layout',()=>{
+  const sheet=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
+  assert.ok(sheet.includes('.spotlight-grid .spotlight-brand-row'));
+  assert.ok(sheet.includes('grid-template-columns:repeat(3,minmax(0,1fr))'));
+  for(const name of ['logo-ceat.png','logo-tvs-tyres.png','logo-mrf.png','logo-castrol.png','logo-gs-caltex.png','logo-shell.png']){
+    const png=fs.readFileSync(path.join(root,'public/assets',name));
+    assert.equal(png.subarray(1,4).toString(),'PNG');
+    assert.equal(png.readUInt32BE(16),640);
+    assert.equal(png.readUInt32BE(20),220);
+  }
 });
