@@ -245,18 +245,21 @@ body { font-size:15px; line-height:1.5; color:var(--ink) }
 .marquee-shell:hover .marquee-track { animation-play-state:paused; }
 @keyframes scroll-x { from { transform:translateX(0); } to { transform:translateX(calc(-50% - 7px)); } }
 @media (prefers-reduced-motion:reduce) { .marquee-track { animation:none; } }
-.brand-card.logo-card { flex:0 0 178px; min-height:76px; padding:0; overflow:hidden; background:#fff; border:1px solid #dfe7f0; box-shadow:0 8px 20px rgba(19,38,66,.08); border-radius:12px; }
-.brand-card.logo-card img { display:block; width:100%; height:100%; object-fit:contain; }
+.brand-card.logo-card { flex:0 0 178px; min-height:84px; padding:10px 16px; overflow:hidden; background:#fff; border:1px solid #dfe7f0; box-shadow:0 8px 20px rgba(19,38,66,.08); border-radius:12px; }
+.brand-card.logo-card img { display:block; width:100%; height:58px; object-fit:contain; object-position:center; }
 .static-brand-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
-.static-brand-grid .brand-card.logo-card { min-height:84px; flex:auto; }
+.static-brand-grid .brand-card.logo-card { min-height:88px; flex:auto; }
 .design-categories-section { background:linear-gradient(180deg,#fff 0%,#fbfdff 100%); }
-.marquee-category { flex:0 0 156px; min-height:auto; padding:0; background:transparent; border:none; box-shadow:none; }
+.marquee-category { flex:0 0 158px; min-height:auto; padding:0; background:transparent; border:none; box-shadow:none; }
 .marquee-category:hover { transform:none; box-shadow:none; }
-.compact-card-photo { display:block; width:155px; height:166px; object-fit:contain; filter:drop-shadow(0 10px 14px rgba(40,61,92,.06)); }
+.marquee-part-frame { width:100%; min-height:172px; border-radius:14px; border:1px solid #dfe7ee; background:#fff; box-shadow:0 10px 24px rgba(26,43,70,.10); display:flex; flex-direction:column; justify-content:space-between; overflow:hidden; }
+.marquee-part-photo { display:grid; place-items:center; min-height:118px; padding:14px 12px 8px; background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%); }
+.compact-card-photo { display:block; width:100%; height:96px; object-fit:contain; object-position:center center; filter:drop-shadow(0 8px 10px rgba(40,61,92,.10)); }
+.marquee-part-title { display:block; padding:0 10px 16px; text-align:center; font-size:13px; font-weight:850; line-height:1.18; color:#122033; }
 .category-card.compact-category .category-image img,
 .part-list-photo img,
-.spotlight-art img { width:100%; height:100%; object-fit:contain; }
-.part-list-photo { background:linear-gradient(180deg,#fff,#f1f6fb); }
+.spotlight-art img { width:100%; height:100%; object-fit:contain; object-position:center; }
+.part-list-photo { background:linear-gradient(180deg,#fff,#f1f6fb); display:grid; place-items:center; padding:18px; }
 .part-list-card { align-items:center; }
 .spotlight-section { padding:22px 0 32px; background:linear-gradient(180deg,#fdfefe 0%,#eef5ff 100%); }
 .spotlight-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
@@ -284,17 +287,21 @@ body { font-size:15px; line-height:1.5; color:var(--ink) }
   .spotlight-art { height:155px; }
 }
 @media (max-width:900px) {
-  .brand-card.logo-card { flex-basis:162px; }
+  .brand-card.logo-card { flex-basis:162px; min-height:82px; }
   .marquee-category { flex-basis:148px; }
-  .compact-card-photo { width:148px; height:159px; }
+  .marquee-part-photo { min-height:112px; }
+  .compact-card-photo { height:90px; }
   .spotlight-grid { grid-template-columns:1fr; }
   .static-brand-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 @media (max-width:650px) {
   .marquee-shell::before,.marquee-shell::after { width:36px; }
-  .brand-card.logo-card { flex-basis:146px; }
+  .brand-card.logo-card { flex-basis:146px; min-height:76px; padding:9px 12px; }
   .marquee-category { flex-basis:140px; }
-  .compact-card-photo { width:140px; height:150px; }
+  .marquee-part-frame { min-height:164px; }
+  .marquee-part-photo { min-height:106px; padding:12px 10px 6px; }
+  .compact-card-photo { height:84px; }
+  .marquee-part-title { font-size:12px; padding:0 8px 14px; }
   .spotlight-card { grid-template-columns:1fr; gap:15px; padding:16px; }
   .spotlight-art { height:170px; }
   .spotlight-card h3 { font-size:24px; }
