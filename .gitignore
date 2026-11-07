@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+# Runtime customer data and uploaded images must never enter source control.
+data/inquiries.json
+data/uploads/

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "blog-maintenance",
+    "slug": "essential-two-wheeler-maintenance-tips",
+    "title": "Essential Two-Wheeler Maintenance Tips for a Longer Life",
+    "category": "Maintenance Tips",
+    "summary": "Simple habits that help your bike or scooter stay safe, smooth, and dependable.",
+    "image": "oil-care.webp",
+    "readingMinutes": 4,
+    "publishedAt": "2026-11-07",
+    "status": "published",
+    "body": "Looking after a two-wheeler does not always require complicated work. A few regular checks can make everyday riding more dependable.\n\n## Check tyres before a ride\nLook for visible damage, uneven wear, and low tyre pressure. Use the pressure recommended by the vehicle manufacturer, especially before carrying a passenger or luggage.\n\n## Keep an eye on fluids\nCheck engine oil according to your owner's manual. The correct oil grade and change interval depend on your specific vehicle. If you notice a leak, unusual smell, or warning light, ask a qualified mechanic to inspect it.\n\n## Listen for changes\nUnusual braking noises, a loose-feeling chain, or difficulty starting are good reasons to have the vehicle checked. Small problems can become more expensive if ignored.\n\n## Use the right spare part\nWhen buying a replacement, bring your bike's make, model, year, and the original part number if possible. Parts that look similar may not be interchangeable.\n\nFor help finding a compatible part, send us an enquiry with your vehicle details."
+  },
+  {
+    "id": "blog-brakes",
+    "slug": "when-to-replace-bike-brake-parts",
+    "title": "When Should You Replace Brake Parts?",
+    "category": "Spare Parts Guide",
+    "summary": "Common signs of brake wear and why choosing compatible replacements matters.",
+    "image": "brake-care.webp",
+    "readingMinutes": 3,
+    "publishedAt": "2026-11-07",
+    "status": "published",
+    "body": "Brakes are one of the most important safety systems on your motorcycle or scooter. Their condition should never be left to guesswork.\n\n## Signs to watch for\nSquealing or grinding sounds, reduced stopping performance, vibrations, or a changed brake-lever feel may indicate an issue. These symptoms can have more than one cause, so a qualified mechanic should inspect the system.\n\n## Replacement depends on your vehicle\nBrake pads, shoes, discs, and other components have model-specific specifications and wear limits. Follow the manufacturer's guidance rather than a universal replacement interval.\n\n## Bring the right details\nTell the parts shop your vehicle's brand, model, production year, and brake configuration. Front and rear components often differ.\n\nIf your brakes are not working normally, avoid riding until they have been checked and repaired by a qualified professional."
+  },
+  {
+    "id": "blog-battery",
+    "slug": "two-wheeler-battery-buying-guide",
+    "title": "Two-Wheeler Battery Buying Guide",
+    "category": "Buying Guide",
+    "summary": "What to check before buying a replacement battery for your motorcycle or scooter.",
+    "image": "battery-care.webp",
+    "readingMinutes": 4,
+    "publishedAt": "2026-11-07",
+    "status": "published",
+    "body": "A battery that fits physically is not automatically the correct battery for your bike or scooter. Checking specifications first helps avoid compatibility problems.\n\n## Confirm the specifications\nCheck the battery type, voltage, capacity, terminal orientation, and physical size specified by the vehicle or battery manufacturer.\n\n## Think about usage\nFrequent short trips and long periods without riding can affect battery life. Keep terminals clean and have the charging system inspected if batteries repeatedly fail.\n\n## Ask about care\nDifferent battery technologies have different care requirements. Follow the manufacturer's instructions and have batteries handled or installed by someone familiar with electrical safety.\n\nShare your vehicle's exact make and model when enquiring about a replacement."
+  },
+  {
+    "id": "blog-chain",
+    "slug": "chain-and-sprocket-care-guide",
+    "title": "Chain & Sprocket Care for Everyday Riders",
+    "category": "Bike Care",
+    "summary": "How routine checks and timely replacement help a chain-driven motorcycle run smoothly.",
+    "image": "chain-care.webp",
+    "readingMinutes": 3,
+    "publishedAt": "2026-11-07",
+    "status": "published",
+    "body": "Your motorcycle's chain and sprockets work together. When one component is worn, it can affect the rest of the drive system.\n\n## Look for visible wear\nInspect for corrosion, damaged teeth, irregular tight spots, and signs of poor lubrication. If the drive feels jerky or makes unusual noises, arrange a professional inspection.\n\n## Follow model-specific guidance\nChain slack, lubrication products, and maintenance intervals vary between bikes. Refer to the owner's manual for the correct values and procedures.\n\n## Check compatibility\nWhen replacing components, verify chain size, sprocket tooth counts, and vehicle fitment. A mechanic can advise when replacing a complete kit is appropriate.\n\nNever inspect or adjust a chain with the engine running."
+  },
+  {
+    "id": "blog-filters",
+    "slug": "air-filter-maintenance-guide",
+    "title": "Air Filter Care: A Small Check That Matters",
+    "category": "Maintenance Tips",
+    "summary": "Why a clean, correct-fit air filter matters for two-wheeler maintenance.",
+    "image": "filter-care.webp",
+    "readingMinutes": 3,
+    "publishedAt": "2026-11-07",
+    "status": "published",
+    "body": "The air filter helps keep dust and other particles from entering your engine. A damaged or heavily clogged filter can cause problems.\n\n## Check at the recommended interval\nYour manual will explain when the filter needs inspection or replacement. Dusty road conditions may require more frequent checks.\n\n## Not every filter can be washed\nPaper, foam, and other filter materials have different maintenance instructions. Washing a filter that is not designed to be washed can damage it.\n\n## Match the part to your model\nUse the manufacturer's recommended part number or an explicitly compatible replacement. Even small differences in fit can matter.\n\nSend us your bike or scooter model if you need help identifying the right filter."
+  },
+  {
+    "id": "blog-scooters",
+    "slug": "scooter-belt-and-cvt-care",
+    "title": "Scooter Belt & CVT: What Owners Should Know",
+    "category": "Scooter Care",
+    "summary": "A simple overview of scooter transmission wear signs and replacement considerations.",
+    "image": "scooter-care.webp",
+    "readingMinutes": 4,
+    "publishedAt": "2026-11-07",
+    "status": "published",
+    "body": "Many automatic scooters use a continuously variable transmission, often called a CVT. It contains components that wear over time, including a drive belt.\n\n## Watch how the scooter behaves\nUnusual vibration, slipping, delayed acceleration, or unfamiliar noises can signal a transmission issue. A mechanic should check the cause rather than replacing parts by guesswork.\n\n## Know the maintenance schedule\nBelt inspection and replacement intervals vary by scooter model and driving conditions. Always check the owner's manual.\n\n## Fitment is important\nBelts, rollers, and clutch components can differ even between similar-looking scooters. Use the exact make, model, and year when looking for replacement parts.\n\nCVT components should be inspected and serviced by a qualified mechanic."
+  }
+]
