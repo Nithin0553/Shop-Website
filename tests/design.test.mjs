@@ -32,7 +32,7 @@ test('homepage follows approved design hierarchy',async()=>{
   assert.ok((html.match(/compact-category/g)||[]).length >= 9);
   assert.equal((html.match(/design-blog-card/g)||[]).length,3);
   assert.ok(html.includes('logo-card'));
-  assert.ok(html.includes('/assets/brand-card-honda.png?v=20261107-logo-refresh'), 'Homepage should request refreshed logo URLs');
+  assert.ok(html.includes('/assets/brand-card-honda.png?v=20261107-parts-grid'), 'Homepage should request refreshed logo URLs');
   assert.ok(html.includes('spotlight-card'));
   assert.ok(html.indexOf('Popular Brands')<html.indexOf('Spare Parts Categories'));
   assert.ok(html.indexOf('Spare Parts Categories')<html.indexOf('Why Choose Us?'));
