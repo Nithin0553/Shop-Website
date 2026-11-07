@@ -26,11 +26,13 @@ async function renderAt(route){
 }
 test('homepage follows approved design hierarchy',async()=>{
   const html=await renderAt('/');
-  for(const text of ['Your Trusted Source for','Popular Brands','Spare Parts Categories','Why Choose Us?','Latest Blogs','Call Us','Our Address','Business Hours','Send an Enquiry'])
+  for(const text of ['Your Trusted Source for','Popular Brands','Spare Parts Categories','Highlighted In Our Shop','Helmets','Engine Oils','Activa Accessories','Why Choose Us?','Latest Blogs','Call Us','Our Address','Business Hours','Send an Enquiry'])
     assert.ok(html.includes(text),`Missing ${text}`);
-  assert.equal((html.match(/class="brand-card"/g)||[]).length,7);
-  assert.equal((html.match(/compact-category/g)||[]).length,8);
+  assert.ok((html.match(/class=\"brand-card/g)||[]).length >= 7);
+  assert.ok((html.match(/compact-category/g)||[]).length >= 9);
   assert.equal((html.match(/design-blog-card/g)||[]).length,3);
+  assert.ok(html.includes('logo-card'));
+  assert.ok(html.includes('spotlight-card'));
   assert.ok(html.indexOf('Popular Brands')<html.indexOf('Spare Parts Categories'));
   assert.ok(html.indexOf('Spare Parts Categories')<html.indexOf('Why Choose Us?'));
   assert.ok(!html.includes('98765 43210'),'No fake phone numbers should be displayed');
@@ -56,5 +58,5 @@ test('public article pages fetch and display the full article body',async()=>{
 });
 test('responsive design breakpoints and design reference classes exist',()=>{
   const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
-  for(const text of ['showcase-hero','brand-wordmark','featured-layout','shop-contact-layout','subscribe-panel','@media (max-width:650px)'])assert.ok(css.includes(text));
+  for(const text of ['showcase-hero','brand-wordmark','featured-layout','shop-contact-layout','subscribe-panel','marquee-track','spotlight-grid','@media (max-width:650px)'])assert.ok(css.includes(text));
 });

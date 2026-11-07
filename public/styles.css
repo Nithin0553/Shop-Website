@@ -232,3 +232,71 @@ body { font-size:15px; line-height:1.5; color:var(--ink) }
   .subscribe-panel{grid-template-columns:1fr;gap:15px;padding:20px 16px}.subscribe-intro{grid-column:auto}.subscribe-intro h2{font-size:19px}.subscribe-icon{width:43px;height:43px}.subscribe-form{margin-bottom:15px}.subscribe-feedback{bottom:-22px}
   .footer-main{grid-template-columns:1fr 1fr;gap:21px 13px}.footer-brand,.footer-about{grid-column:1/-1}.footer-main>div+div{border:0;padding-left:0}.footer-bottom{flex-direction:column;gap:4px}
 }
+
+/* ---- Premium marquees and highlighted catalogue refinements ---- */
+.premium-section { position:relative; }
+.premium-section::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(239,246,255,.45)); pointer-events:none; }
+.marquee-shell { position:relative; overflow:hidden; padding:4px 0 6px; }
+.marquee-shell::before,.marquee-shell::after { content:''; position:absolute; top:0; bottom:0; width:84px; z-index:3; pointer-events:none; }
+.marquee-shell::before { left:0; background:linear-gradient(90deg,#f5f8fc 8%,rgba(245,248,252,0)); }
+.marquee-shell::after { right:0; background:linear-gradient(270deg,#f5f8fc 8%,rgba(245,248,252,0)); }
+.design-categories-section .marquee-shell::before,.design-categories-section .marquee-shell::after { background:none; }
+.marquee-track { display:flex; gap:14px; width:max-content; animation:scroll-x var(--marquee-duration,32s) linear infinite; will-change:transform; }
+.marquee-shell:hover .marquee-track { animation-play-state:paused; }
+@keyframes scroll-x { from { transform:translateX(0); } to { transform:translateX(calc(-50% - 7px)); } }
+@media (prefers-reduced-motion:reduce) { .marquee-track { animation:none; } }
+.brand-card.logo-card { flex:0 0 178px; min-height:76px; padding:0; overflow:hidden; background:#fff; border:1px solid #dfe7f0; box-shadow:0 8px 20px rgba(19,38,66,.08); border-radius:12px; }
+.brand-card.logo-card img { display:block; width:100%; height:100%; object-fit:contain; }
+.static-brand-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+.static-brand-grid .brand-card.logo-card { min-height:84px; flex:auto; }
+.design-categories-section { background:linear-gradient(180deg,#fff 0%,#fbfdff 100%); }
+.marquee-category { flex:0 0 156px; min-height:auto; padding:0; background:transparent; border:none; box-shadow:none; }
+.marquee-category:hover { transform:none; box-shadow:none; }
+.compact-card-photo { display:block; width:155px; height:166px; object-fit:contain; filter:drop-shadow(0 10px 14px rgba(40,61,92,.06)); }
+.category-card.compact-category .category-image img,
+.part-list-photo img,
+.spotlight-art img { width:100%; height:100%; object-fit:contain; }
+.part-list-photo { background:linear-gradient(180deg,#fff,#f1f6fb); }
+.part-list-card { align-items:center; }
+.spotlight-section { padding:22px 0 32px; background:linear-gradient(180deg,#fdfefe 0%,#eef5ff 100%); }
+.spotlight-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.spotlight-card { display:grid; grid-template-columns:220px 1fr; gap:22px; align-items:center; background:linear-gradient(145deg,#ffffff,#f5f9ff); border:1px solid #d9e5f2; border-radius:22px; padding:18px; box-shadow:0 18px 35px rgba(19,37,63,.08); position:relative; overflow:hidden; }
+.spotlight-card::after { content:''; position:absolute; inset:auto -55px -55px auto; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle,rgba(12,88,197,.12),rgba(12,88,197,0)); }
+.spotlight-art { height:170px; display:grid; place-items:center; background:linear-gradient(180deg,#f4f8fd,#ffffff); border-radius:18px; border:1px solid #e3ebf5; padding:10px; }
+.spotlight-copy { position:relative; z-index:1; }
+.spotlight-tag { display:inline-flex; align-items:center; border-radius:999px; background:#e9f3ff; color:#0754bc; font-size:11px; font-weight:800; padding:7px 12px; margin-bottom:10px; }
+.spotlight-card h3 { font-size:28px; line-height:1.1; margin-bottom:9px; }
+.spotlight-card p { font-size:13px; color:#435166; line-height:1.55; margin-bottom:14px; max-width:560px; }
+.spotlight-list { display:flex; flex-wrap:wrap; gap:9px; margin:0 0 15px; padding:0; list-style:none; }
+.spotlight-list li { display:inline-flex; align-items:center; gap:6px; padding:8px 11px; background:#fff; border:1px solid #dbe6f1; border-radius:999px; font-size:12px; font-weight:700; color:#1d2b41; box-shadow:0 4px 10px rgba(30,61,97,.06); }
+.spotlight-brand-row { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 15px; }
+.spotlight-brand-pill { display:flex; align-items:center; justify-content:center; min-width:110px; height:52px; padding:7px 12px; border-radius:14px; background:#fff; border:1px solid #d9e6f4; box-shadow:0 8px 18px rgba(20,43,72,.08); }
+.spotlight-brand-pill img { max-width:100%; max-height:34px; object-fit:contain; }
+.spotlight-card .btn { box-shadow:0 10px 20px rgba(8,84,185,.15); }
+.spotlight-helmets { background:linear-gradient(135deg,#f7fbff,#eef4ff); }
+.spotlight-oils { background:linear-gradient(135deg,#fffefb,#eef7ff); }
+.spotlight-activa { background:linear-gradient(135deg,#fbfdff,#eef6ff); }
+.spotlight-tyres { background:linear-gradient(135deg,#ffffff,#edf5ff); }
+#our-brands .design-heading p, #categories .design-heading p { margin-bottom:6px; }
+@media (max-width:1150px) {
+  .static-brand-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .spotlight-card { grid-template-columns:190px 1fr; }
+  .spotlight-art { height:155px; }
+}
+@media (max-width:900px) {
+  .brand-card.logo-card { flex-basis:162px; }
+  .marquee-category { flex-basis:148px; }
+  .compact-card-photo { width:148px; height:159px; }
+  .spotlight-grid { grid-template-columns:1fr; }
+  .static-brand-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:650px) {
+  .marquee-shell::before,.marquee-shell::after { width:36px; }
+  .brand-card.logo-card { flex-basis:146px; }
+  .marquee-category { flex-basis:140px; }
+  .compact-card-photo { width:140px; height:150px; }
+  .spotlight-card { grid-template-columns:1fr; gap:15px; padding:16px; }
+  .spotlight-art { height:170px; }
+  .spotlight-card h3 { font-size:24px; }
+  .static-brand-grid { grid-template-columns:1fr 1fr; }
+}
