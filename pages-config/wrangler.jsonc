@@ -1,8 +1,8 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
+  "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "sri-sai-shanmukha-auto-centre",
   "compatibility_date": "2026-11-07",
-  "pages_build_output_dir": "./dist-pages",
+  "pages_build_output_dir": "../dist-pages",
   "d1_databases": [
     {
       "binding": "DB",

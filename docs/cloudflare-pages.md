@@ -8,7 +8,7 @@ This is an **additional deployment** of Sri Sai Shanmukha Auto Centre to Cloudfl
 
 Cloudflare Pages "advanced mode" runs a bundled `dist-pages/_worker.js` instead of a `/functions` directory. The bundle is built from the existing `cloudflare/worker.mjs`, so its protected admin API, inquiry form, D1-backed blog editor, image uploads, festival settings, SEO, and sitemap use the same logic as the Worker. Static pages/assets come from the existing `public/` directory through `env.ASSETS.fetch`.
 
-`wrangler.pages.jsonc` is deliberately separate from the Workers `wrangler.jsonc` file. Its `DB` binding references the **existing** `sssa-shop-data` D1 UUID `144a1bc5-c8b5-4500-b7ff-cbcaf964e255`. Shop records, saved settings, uploaded images stored in D1, and customer enquiries therefore remain in the same database when the Pages site is added.
+`pages-config/wrangler.jsonc` is deliberately kept in a separate directory from the Workers root `wrangler.jsonc` file; Pages does not allow `--config` paths. Its `DB` binding references the **existing** `sssa-shop-data` D1 UUID `144a1bc5-c8b5-4500-b7ff-cbcaf964e255`. Shop records, saved settings, uploaded images stored in D1, and customer enquiries therefore remain in the same database when the Pages site is added.
 
 The Pages project **has separate secrets**. Copying a D1 binding does *not* copy `ADMIN_PASSWORD` or `SESSION_SECRET`. Create these private secrets on Pages separately.
 
@@ -26,20 +26,22 @@ npm run cloudflare:pages:build
 
 `dist-pages/_worker.js` should exist after building. The output folder is ignored by Git and contains only deployable public assets plus the bundled Worker. Do **not** upload any private `data/inquiries.json`, `.env`, or `.dev.vars` files.
 
-Cloudflare login was already completed for the Workers deployment. Create a new Pages project (once only):
+Cloudflare login was already completed for the Workers deployment. Create a new Pages project (once only). Cloudflare Pages requires that Wrangler discover a **standard** `wrangler.jsonc` in the current directory (it rejects `--config`); so switch to the Pages configuration directory:
 
 ```powershell
-npx wrangler pages project create sri-sai-shanmukha-auto-centre --production-branch main --config wrangler.pages.jsonc
+Push-Location .\pages-config
+npx wrangler pages project create sri-sai-shanmukha-auto-centre --production-branch main
 ```
 
-If Cloudflare reports this Pages project name is already taken, choose another available name, and update **both** the `name` in `wrangler.pages.jsonc` and the `--project-name` used by the deployment script. Do not change the D1 UUID or DB binding.
+If Cloudflare reports this Pages project name is already taken, choose another available name, and update **both** the `name` in `pages-config/wrangler.jsonc` and the `--project-name` used by the deployment script. Do not change the D1 UUID or DB binding.
 
 Now add the Pages **production** secrets (separate from the old Worker). Input values only at Wrangler's private prompt; never paste them into chat or source control. You may reuse a strong unexposed Worker admin password to maintain the same login, but generating a new unique one is safer. Always use a separately generated random `SESSION_SECRET` for the Pages project.
 
 ```powershell
-npx wrangler pages secret put ADMIN_PASSWORD --project-name sri-sai-shanmukha-auto-centre --config wrangler.pages.jsonc
-npx wrangler pages secret put SESSION_SECRET --project-name sri-sai-shanmukha-auto-centre --config wrangler.pages.jsonc
-npx wrangler pages secret list --project-name sri-sai-shanmukha-auto-centre --config wrangler.pages.jsonc
+npx wrangler pages secret put ADMIN_PASSWORD --project-name sri-sai-shanmukha-auto-centre
+npx wrangler pages secret put SESSION_SECRET --project-name sri-sai-shanmukha-auto-centre
+npx wrangler pages secret list --project-name sri-sai-shanmukha-auto-centre
+Pop-Location
 ```
 
 Generate strong secret values locally (run twice for **different** values):
@@ -54,7 +56,7 @@ Deploy the Pages project:
 npm run cloudflare:pages:deploy
 ```
 
-Wrangler prints the real deployment URL. The project's canonical `.pages.dev` hostname is available if creation succeeded under the requested name; it is **not** guaranteed until Cloudflare accepts the project name.
+Run this command from the **repository root** (after `Pop-Location` above). Wrangler runs from `pages-config/` internally, so it finds that folder's standard `wrangler.jsonc` instead of the root Workers config. Wrangler prints the real deployment URL. The project's canonical `.pages.dev` hostname is available if creation succeeded under the requested name; it is **not** guaranteed until Cloudflare accepts the project name.
 
 ## Verification before switching customers
 
