@@ -9,3 +9,10 @@ data/inquiries.json
 data/uploads/
 
 data/subscribers.json
+
+# Local Cloudflare secrets, generated D1 imports and Wrangler state.
+.dev.vars
+.dev.vars.*
+.wrangler/
+.cloudflare-import.sql
+cloudflare-out/
