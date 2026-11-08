@@ -9,7 +9,7 @@ on:
       - "public/**"
       - "scripts/build-cloudflare-pages.mjs"
       - "tests/**"
-      - "wrangler.pages.jsonc"
+      - "pages-config/**"
       - "package.json"
       - ".github/workflows/cloudflare-pages.yml"
   workflow_dispatch:
