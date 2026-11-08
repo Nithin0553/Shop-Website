@@ -3,7 +3,7 @@
   'use strict';
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const empty={enabled:false,festival:'sankranti',intensity:'low',greetingVariant:'default'};
-  let catalogue=[],intensities={},settings={...empty},shopName='Sri Sai Shanmukha Auto Centre',preview=false;
+  let catalogue=[],intensities={},settings={...empty},shopName='Sri Sai Shanmukha Auto Centre',preview=false,pollOnly=false;
   let artwork=null,artworkPromise=null,source=null,pollId=null,connected=false,inFlight=false,generation=0,record=null,lastPath='';
   let manuallyPaused=false;
   try{manuallyPaused=localStorage.getItem('sssa-festival-motion')==='paused';}catch{}
@@ -194,7 +194,7 @@
   function closeResources(){if(source){source.close();source=null;}if(pollId){clearInterval(pollId);pollId=null;}}
   function resumeResources() {
     if(preview||document.hidden)return;
-    if(typeof window.EventSource!=='function'){startPolling();return;}
+    if(pollOnly||typeof window.EventSource!=='function'){startPolling();return;}
     if(source)return;
     source=new window.EventSource('/api/festivals/events');
     source.addEventListener('festival',event=>{try{accept(JSON.parse(event.data));}catch{}});
@@ -203,7 +203,7 @@
   }
   function start(data,name) {
     closeResources();
-    catalogue=Array.isArray(data?.festivals)?data.festivals:[];intensities=data?.intensities||{};settings=normalize(data?.settings);shopName=name||shopName;preview=data?.preview===true;
+    catalogue=Array.isArray(data?.festivals)?data.festivals:[];intensities=data?.intensities||{};settings=normalize(data?.settings);shopName=name||shopName;preview=data?.preview===true;pollOnly=data?.pollOnly===true;
     if(!connected) {
       connected=true;
       listen(document,'click',event=>{
