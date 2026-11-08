@@ -236,7 +236,7 @@ async function loadFullArticle(slug){
   catch(error){console.error(error);const article=document.querySelector('.article-body');if(article)article.insertAdjacentHTML('afterbegin','<p>We could not load this article. Please refresh the page.</p>');}
   finally{loadingArticles.delete(slug);}
 }
-function render(scroll=false){const r=pageRoute();const slug=location.pathname.startsWith('/blogs/')?location.pathname.slice(7):null;if(slug&&BLOGS.some(p=>p.slug===slug&&!p.body))loadFullArticle(slug);document.title=`${r.title} | ${SITE.shopName||siteDefault.shopName}`;app.innerHTML=header(r.active)+r.html+footer()+`<div id="toast" class="toast" role="status" aria-live="polite"></div>`; window.ShopFestivalEffects?.mount(); if(scroll)window.scrollTo({top:0,behavior:'instant'});}
+function render(scroll=false){const r=pageRoute();const slug=location.pathname.startsWith('/blogs/')?location.pathname.slice(7):null;if(slug&&BLOGS.some(p=>p.slug===slug&&!p.body))loadFullArticle(slug);document.title=`${r.title} | ${SITE.shopName||siteDefault.shopName}`;window.ShopFestivalEffects?.beforeRender();app.innerHTML=header(r.active)+r.html+footer()+`<div id="toast" class="toast" role="status" aria-live="polite"></div>`; window.ShopFestivalEffects?.mount(); if(scroll)window.scrollTo({top:0,behavior:'instant'});}
 function renderPageTransition(){
   const reduce=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   if(!reduce && typeof document.startViewTransition==='function'){
@@ -265,7 +265,9 @@ async function handleSubmit(e){
   if(e.target.id!=='enquiry-form')return;e.preventDefault();if(formPending)return;const form=e.target;const fd=new FormData(form), payload=Object.fromEntries(fd);const phone=(payload.phone||'').replace(/\D/g,'');const feedback=document.getElementById('form-feedback');if((payload.name||'').trim().length<2||phone.length<10||phone.length>15||(!String(payload.part||'').trim()&&!String(payload.message||'').trim())){feedback.className='form-feedback error';feedback.textContent='Please enter your name, a valid phone number, and the part you need (or a message).';return;}formPending=true;const btn=document.getElementById('submit-enquiry');btn.disabled=true;btn.textContent='Sending enquiry…';try{const response=await fetch('/api/inquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),data=await response.json();if(!response.ok)throw new Error(data.error||'Unable to send enquiry.');feedback.className='form-feedback success';feedback.innerHTML=`${ico('check',19)} Enquiry received. Your reference: <strong>${esc(data.id)}</strong>. Our team will review it.`;form.reset();}catch(error){feedback.className='form-feedback error';feedback.textContent=error.message||'Could not send enquiry. Please try again.';}finally{formPending=false;btn.disabled=false;btn.innerHTML=`Send enquiry ${ico('send',18)}`;}}
 async function start(){
   const load=async url=>{const response=await fetch(url);if(!response.ok)throw new Error(`Unable to load ${url}`);return response.json();};
-  const [site,blogs,festivals]=await Promise.allSettled([load('/api/site'),load('/api/blogs'),load('/api/festivals')]);
+  const previewParams=new URLSearchParams(location.search);
+  const festivalUrl=previewParams.get('festivalPreview')==='1'?'/api/admin/festivals/preview?'+new URLSearchParams({festival:previewParams.get('festival')||'sankranti',intensity:previewParams.get('intensity')||'low',greetingVariant:previewParams.get('greetingVariant')||'default'}):'/api/festivals';
+  const [site,blogs,festivals]=await Promise.allSettled([load('/api/site'),load('/api/blogs'),load(festivalUrl)]);
   if(site.status==='fulfilled')SITE={...SITE,...site.value};
   if(blogs.status==='fulfilled')BLOGS=blogs.value;
   window.ShopFestivalEffects?.start(festivals.status==='fulfilled'?festivals.value:null,SITE.shopName);

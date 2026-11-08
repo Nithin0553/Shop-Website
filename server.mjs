@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { FESTIVALS, DEFAULT_FESTIVAL, isFestivalId, normalizeFestivalSettings } from './lib/festivals.mjs';
+import { FESTIVALS, FESTIVAL_INTENSITIES, FESTIVAL_PALETTES, DEFAULT_FESTIVAL, normalizeFestivalSettings, validateFestivalSettings } from './lib/festivals.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 // Native, dependency-free .env support for local development. Deployed env vars win.
@@ -115,15 +115,37 @@ function normalizePost(payload, old={}) {
   const categories=['Maintenance Tips','Spare Parts Guide','Buying Guide','Bike Care','Scooter Care'];
   return { id:old.id||crypto.randomUUID(), slug, title, category:categories.includes(payload.category)?payload.category:categories[0], summary:str(payload.summary,260), image:images.includes(payload.image)||isCustomImage(payload.image)?payload.image:images[0], readingMinutes:Math.max(1,Math.min(20,Math.round(numeric(payload.readingMinutes)||Math.ceil(bodyText.split(/\s+/).length/180)))), publishedAt:old.publishedAt||new Date().toISOString().slice(0,10), status:payload.status==='draft'?'draft':'published', body:bodyText };
 }
-function securityHeaders(res) {
+function securityHeaders(res, privatePreview=false) {
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
-  res.setHeader('X-Frame-Options','DENY');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; base-uri 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-src https://maps.google.com https://www.google.com; form-action 'self'; frame-ancestors 'none'");
+  res.setHeader('X-Frame-Options',privatePreview?'SAMEORIGIN':'DENY');
+  res.setHeader('Content-Security-Policy',`default-src 'self'; base-uri 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-src https://maps.google.com https://www.google.com 'self'; form-action 'self'; frame-ancestors ${privatePreview?"'self'":"'none'"}`);
 }
+const festivalSubscribers=new Set();
+const festivalSnapshot=()=>normalizeFestivalSettings(read('festival.json'));
+const festivalPayload=()=>({festivals:FESTIVALS,intensities:FESTIVAL_INTENSITIES,settings:festivalSnapshot()});
+function broadcastFestival() {
+  const event=`event: festival\ndata: ${JSON.stringify(festivalSnapshot())}\n\n`;
+  for(const stream of festivalSubscribers) {
+    if(stream.destroyed||stream.writableLength>64000){festivalSubscribers.delete(stream);stream.destroy();continue;}
+    try{stream.write(event);}catch{festivalSubscribers.delete(stream);stream.destroy();}
+  }
+}
+const festivalHeartbeat=setInterval(()=>{
+  for(const stream of festivalSubscribers){if(stream.destroyed||stream.writableLength>64000){festivalSubscribers.delete(stream);stream.destroy();}else{try{stream.write(': keep-alive\n\n');}catch{festivalSubscribers.delete(stream);stream.destroy();}}}
+},25000);
+festivalHeartbeat.unref();
 async function handleApi(req,res,url) {
   const { pathname }=url;
-  if(pathname==='/api/festivals'&&req.method==='GET') return json(res,200,{festivals:FESTIVALS,settings:normalizeFestivalSettings(read('festival.json'))});
+  if(pathname==='/api/festivals'&&req.method==='GET') return json(res,200,festivalPayload());
+  if(pathname==='/api/festivals/events'&&req.method==='GET') {
+    res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-store, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});
+    festivalSubscribers.add(res);
+    const cleanup=()=>festivalSubscribers.delete(res);
+    res.on('close',cleanup);res.on('error',cleanup);
+    res.write(`event: festival\ndata: ${JSON.stringify(festivalSnapshot())}\n\n`);
+    return;
+  }
   if(pathname==='/api/site'&&req.method==='GET') { const settings={...defaults,...read('site.json')}; for(const key of ['phone','address','hours','mapsUrl']) if(!String(settings[key]||'').trim())settings[key]=defaults[key]; return json(res,200,settings); }
   if(pathname==='/api/blogs'&&req.method==='GET') return json(res,200,read('blogs.json').filter(b=>b.status==='published').map(({body,...rest})=>rest));
   if(pathname.startsWith('/api/blogs/')&&req.method==='GET') {
@@ -164,14 +186,20 @@ async function handleApi(req,res,url) {
   if(pathname==='/api/admin/me'&&req.method==='GET') return json(res,200,{authenticated:authenticated(req),configured:!!ADMIN_PASSWORD});
   if(pathname.startsWith('/api/admin/')) {
     if(!authRequired(req,res)) return;
+    if(pathname==='/api/admin/festivals/preview'&&req.method==='GET') {
+      const candidate={enabled:true,festival:url.searchParams.get('festival'),intensity:url.searchParams.get('intensity')||'low',greetingVariant:url.searchParams.get('greetingVariant')||'default'};
+      if(!validateFestivalSettings(candidate))return json(res,400,{error:'Choose a valid festival, greeting and intensity for the preview.'});
+      return json(res,200,{festivals:FESTIVALS,intensities:FESTIVAL_INTENSITIES,settings:normalizeFestivalSettings(candidate),preview:true});
+    }
     if(pathname==='/api/admin/festivals') {
-      if(req.method==='GET') return json(res,200,{festivals:FESTIVALS,settings:normalizeFestivalSettings(read('festival.json'))});
+      if(req.method==='GET') return json(res,200,festivalPayload());
       if(req.method==='PUT') {
         const b=await body(req);
-        if(!b || Array.isArray(b) || typeof b.enabled!=='boolean' || !isFestivalId(b.festival))
-          return json(res,400,{error:'Choose a listed festival and a valid on/off setting.'});
-        const next=normalizeFestivalSettings(b);
-        write('festival.json',next);return json(res,200,next);
+        if(!validateFestivalSettings(b))
+          return json(res,400,{error:'Choose a listed festival, a valid on/off setting, intensity and greeting.'});
+        const previous=festivalSnapshot();
+        const next=normalizeFestivalSettings({...previous,...b,greetingVariant:b.greetingVariant??(b.festival===previous.festival?previous.greetingVariant:'default')});
+        write('festival.json',next);broadcastFestival();return json(res,200,next);
       }
       return badMethod(res);
     }
@@ -243,7 +271,7 @@ async function handleApi(req,res,url) {
 function htmlEscape(s) {
   return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function serveIndex(res, pathname) {
+function serveIndex(res, pathname, privatePreview=false) {
   const site=read('site.json'), shop=site.shopName||defaults.shopName;
   const headings={'/':'Two-Wheeler Spare Parts & Accessories','/spare-parts':'Spare Parts','/brands':'Two-Wheeler Brands','/about':'About Our Shop','/blogs':'Maintenance Tips & Blog','/contact':'Contact & Enquiries'};
   let label=headings[pathname]||'Page Not Found';
@@ -261,7 +289,8 @@ function serveIndex(res, pathname) {
     .replace(/<meta property="og:description" content="[^"]*" \/>/,()=>`<meta property="og:description" content="${htmlEscape(description)}" />`);
   const base=allowHttp(site.siteUrl).replace(/\/$/,'');
   if(base) html=html.replace('</head>',`<link rel="canonical" href="${htmlEscape(base+pathname)}" />\n<meta property="og:url" content="${htmlEscape(base+pathname)}" />\n</head>`);
-  res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'});
+  if(privatePreview)html=html.replace('</head>','<meta name="robots" content="noindex,nofollow" /></head>');
+  res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':privatePreview?'no-store':'no-cache'});
   res.end(html);
 }
 function serveFile(res, filename) {
@@ -274,9 +303,11 @@ function serveFile(res, filename) {
   });
 }
 const server=http.createServer(async(req,res)=>{
-  securityHeaders(res);
   try {
     const url=new URL(req.url||'/',`http://${req.headers.host||'localhost'}`), pathname=url.pathname;
+    const privatePreview=pathname==='/'&&url.searchParams.get('festivalPreview')==='1'&&authenticated(req);
+    securityHeaders(res,privatePreview);
+    if(pathname==='/'&&url.searchParams.has('festivalPreview')&&!privatePreview)return json(res,401,{error:'Sign in to the dashboard to preview a festival.'});
     if(pathname.startsWith('/api/')) return await handleApi(req,res,url);
     if(!['GET','HEAD'].includes(req.method))return badMethod(res);
     if(pathname==='/robots.txt')return serveFile(res,'robots.txt');
@@ -291,7 +322,8 @@ const server=http.createServer(async(req,res)=>{
       }
       return serveFile(res,decodeURIComponent(pathname.slice(1)));
     }
-    if(['/styles.css','/admin.css','/festivals.css','/app.js','/admin.js','/festival-effects.js'].includes(pathname))return serveFile(res,pathname.slice(1));
+    if(pathname==='/festival-palettes.css'){res.writeHead(200,{'Content-Type':'text/css; charset=utf-8','Cache-Control':'no-cache'});return res.end(FESTIVAL_PALETTES);}
+    if(['/styles.css','/admin.css','/festivals.css','/app.js','/admin.js','/festival-effects.js','/festival-artwork.js'].includes(pathname))return serveFile(res,pathname.slice(1));
     if(pathname==='/sitemap.xml') {
       const config=read('site.json'); const base=allowHttp(config.siteUrl).replace(/\/$/,'');
       if(!base)return json(res,404,{error:'Set the site URL in Admin to enable the sitemap.'});
@@ -299,7 +331,7 @@ const server=http.createServer(async(req,res)=>{
       res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});
       return res.end('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+routes.map(r=>`<url><loc>${base}${r}</loc></url>`).join('')+'</urlset>');
     }
-    return serveIndex(res,pathname.replace(/\/$/,'')||'/');
+    return serveIndex(res,pathname.replace(/\/$/,'')||'/',privatePreview);
   } catch(error) {
     console.error(error);
     const msg=['Invalid JSON','Request too large'].includes(error.message)?error.message:error.message?.startsWith('Provide a title')?error.message:'Something went wrong. Please try again.';

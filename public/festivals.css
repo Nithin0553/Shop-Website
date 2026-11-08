@@ -1,145 +1,128 @@
-/* All palettes are scoped. Removing data-festival restores the peacock brand. */
-:is(body,.festival-preview)[data-festival] {
-  --festival-deep:#603b18;--festival-accent:#945322;--festival-tint:#fff4d8;
-  --festival-gold:#f7ce70;--festival-petal:#f69d63;--festival-leaf:#95c575;
-}
-:is(body,.festival-preview)[data-festival="sankranti"] {--festival-deep:#603b18;--festival-accent:#945322;--festival-tint:#fff4d8;--festival-gold:#f7ce70;--festival-petal:#f69d63;--festival-leaf:#95c575}
-:is(body,.festival-preview)[data-festival="bhogi"] {--festival-deep:#48221d;--festival-accent:#9d3e26;--festival-tint:#fff0e6;--festival-gold:#ffca70;--festival-petal:#ff8754;--festival-leaf:#9ab77b}
-:is(body,.festival-preview)[data-festival="pongal"] {--festival-deep:#234832;--festival-accent:#376741;--festival-tint:#f2f7df;--festival-gold:#f4d67c;--festival-petal:#e39355;--festival-leaf:#a4cd78}
-:is(body,.festival-preview)[data-festival="kanuma"] {--festival-deep:#3e4824;--festival-accent:#64702d;--festival-tint:#f7f5e4;--festival-gold:#e8c976;--festival-petal:#df9467;--festival-leaf:#9bc36b}
-:is(body,.festival-preview)[data-festival="maha-shivaratri"] {--festival-deep:#272347;--festival-accent:#5e4a88;--festival-tint:#f3effb;--festival-gold:#dbd4f3;--festival-petal:#bba2dd;--festival-leaf:#a6c2b5}
-:is(body,.festival-preview)[data-festival="holi"] {--festival-deep:#54234c;--festival-accent:#8c306f;--festival-tint:#fff0f7;--festival-gold:#f6d572;--festival-petal:#ef95ba;--festival-leaf:#8ad3bd}
-:is(body,.festival-preview)[data-festival="ugadi"] {--festival-deep:#294833;--festival-accent:#446b36;--festival-tint:#f0f6e8;--festival-gold:#f1d37b;--festival-petal:#edaa78;--festival-leaf:#a9cf79}
-:is(body,.festival-preview)[data-festival="sri-rama-navami"] {--festival-deep:#613324;--festival-accent:#a35429;--festival-tint:#fff3e4;--festival-gold:#f8d285;--festival-petal:#edac72;--festival-leaf:#a9c889}
-:is(body,.festival-preview)[data-festival="hanuman-jayanti"] {--festival-deep:#652d21;--festival-accent:#a34224;--festival-tint:#fff0e8;--festival-gold:#ffd281;--festival-petal:#ed996b;--festival-leaf:#b7c878}
-:is(body,.festival-preview)[data-festival="akshaya-tritiya"] {--festival-deep:#4e3b16;--festival-accent:#80601e;--festival-tint:#fff8df;--festival-gold:#f9d679;--festival-petal:#caa24c;--festival-leaf:#acbe78}
-:is(body,.festival-preview)[data-festival="raksha-bandhan"] {--festival-deep:#62283b;--festival-accent:#9d3855;--festival-tint:#fff0f1;--festival-gold:#f1d095;--festival-petal:#e493a9;--festival-leaf:#b6c98a}
-:is(body,.festival-preview)[data-festival="krishna-janmashtami"] {--festival-deep:#183e55;--festival-accent:#216a71;--festival-tint:#edf7f4;--festival-gold:#ead081;--festival-petal:#e8b16e;--festival-leaf:#69b9a5}
-:is(body,.festival-preview)[data-festival="ganesh-chaturthi"] {--festival-deep:#66332f;--festival-accent:#a34c3a;--festival-tint:#fff1e9;--festival-gold:#f7d199;--festival-petal:#edaa80;--festival-leaf:#aac58c}
-:is(body,.festival-preview)[data-festival="dussehra"] {--festival-deep:#54301e;--festival-accent:#8f4b22;--festival-tint:#fff1dc;--festival-gold:#f2ce78;--festival-petal:#d99c57;--festival-leaf:#a2b56f}
-:is(body,.festival-preview)[data-festival="bonalu"] {--festival-deep:#5c2631;--festival-accent:#a23645;--festival-tint:#fff0ec;--festival-gold:#f7cc71;--festival-petal:#dc8c74;--festival-leaf:#9dc475}
-:is(body,.festival-preview)[data-festival="bathukamma"] {--festival-deep:#632744;--festival-accent:#99335f;--festival-tint:#fff0f5;--festival-gold:#f8d75b;--festival-petal:#ed91b1;--festival-leaf:#9fbf6d}
-:is(body,.festival-preview)[data-festival="diwali"] {--festival-deep:#382248;--festival-accent:#754478;--festival-tint:#faf0fa;--festival-gold:#ffcf77;--festival-petal:#ed9c67;--festival-leaf:#b4c17b}
-:is(body,.festival-preview)[data-festival="onam"] {--festival-deep:#2d4b37;--festival-accent:#476c3e;--festival-tint:#f5f6e5;--festival-gold:#f5d370;--festival-petal:#e9976e;--festival-leaf:#9cbe75}
-:is(body,.festival-preview)[data-festival="ramzan"] {--festival-deep:#163e48;--festival-accent:#24655e;--festival-tint:#edf6ef;--festival-gold:#efd699;--festival-petal:#92beb1;--festival-leaf:#9ac9ac}
-:is(body,.festival-preview)[data-festival="christmas"] {--festival-deep:#173c32;--festival-accent:#9e3340;--festival-tint:#f2f6ed;--festival-gold:#f2d494;--festival-petal:#e89395;--festival-leaf:#79ad8f}
+/* Seasonal accents preserve the white storefront, original font stack and shop imagery. */
+body[data-festival] {background:#fff;--festival-accent:#8f6b36;--festival-deep:#24384b;--festival-tint:#fffaf2;--festival-gold:#d4ae63;--festival-petal:#d98b66;--festival-leaf:#82a16b}
+body[data-festival] main,body[data-festival] :is(.site-header,.showcase-hero,.hero,.page-hero,.section-muted,.design-brand-section,.design-categories-section,.design-why-section,.spotlight-section,.design-home-blogs,.design-about-section,.parts-section,.premium-section,.featured-blog-section,.design-blogs-list,.subscribe-section,.blog-section,.shop-contact-section) {background:#fff;background-image:none}
+body[data-festival] :is(.spotlight-card,.brand-card.logo-card,.marquee-part-frame,.part-list-photo,.design-feature,.blog-card.design-blog-card,.featured-post,.subscribe-panel,.design-contact-list,.design-enquiry-panel,.spotlight-brand-pill,.spotlight-list li,.category-filter-row,.search-control,.select-wrap select) {background:#fff;background-image:none}
+body[data-festival] .premium-section::before,body[data-festival] .spotlight-card::after {display:none}
+body[data-festival] .primary-nav>a.active {box-shadow:inset 0 -2px var(--festival-gold)}
+body[data-festival] .showcase-image {box-shadow:none}
+body[data-festival] .design-heading h2::before,body[data-festival] .design-heading h2::after {background:linear-gradient(90deg,var(--festival-gold),var(--festival-accent))}
+body[data-festival] .brand-marquee::before {background:linear-gradient(90deg,#fff,transparent)}
+body[data-festival] .brand-marquee::after {background:linear-gradient(270deg,#fff,transparent)}
+body[data-festival] .design-feature>span {color:#21834d}
+body[data-festival] :is(.btn-primary,.read-more-button) {background:#e9aa55;background-image:none}
+body[data-festival] :is(.btn-primary,.read-more-button):hover {background:#d99436;background-image:none}
+body[data-festival] .footer {border-top-color:var(--festival-gold)}
 
-body[data-festival] {--blue:var(--festival-accent);--blue-dark:var(--festival-deep);--blue-ink:var(--festival-accent);--pale:var(--festival-tint);--surface:var(--festival-tint)}
-body[data-festival] .site-header {border-bottom-color:var(--festival-gold)}
-body[data-festival] .primary-nav>a:is(.active,:hover) {background:var(--festival-deep);color:#fff8e9}
-body[data-festival] :is(.btn-primary,.read-more-button) {background:var(--festival-accent);border-color:var(--festival-accent);color:#fff;box-shadow:0 7px 18px #1c24351c}
-body[data-festival] :is(.btn-primary,.read-more-button):hover {background:var(--festival-deep);border-color:var(--festival-deep);color:#fff}
-body[data-festival] :is(.showcase-hero,.hero,.page-hero) {background:linear-gradient(110deg,var(--festival-tint),#fffdf8 78%)}
-body[data-festival] :is(.showcase-copy h1 span,.hero h1 span,.showcase-kicker,.hero-tag,.text-link,.inline-link) {color:var(--festival-accent)}
-body[data-festival] :is(.showcase-kicker i,.tag-dot) {background:var(--festival-accent)}
-body[data-festival] .design-heading h2::before,body[data-festival] .design-heading h2::after {background:linear-gradient(90deg,var(--festival-accent),var(--festival-gold))}
-body[data-festival] :is(.design-categories-section,.spotlight-section,.design-why-section) {background:linear-gradient(120deg,#fffdf8,var(--festival-tint))}
-body[data-festival] :is(.spotlight-card,.design-feature,.blog-card.design-blog-card) {border-color:var(--festival-gold)}
-body[data-festival] .spotlight-card {background:linear-gradient(145deg,#fffdf8,var(--festival-tint))}
-body[data-festival] :is(.spotlight-tag,.pill,.category-filter-row.selected,.subscribe-panel) {background:var(--festival-tint);color:var(--festival-accent);border-color:var(--festival-gold)}
-body[data-festival] :is(.design-feature>span,.feature-card>span,.category-filter-row>span:first-child .icon) {color:var(--festival-accent)}
-body[data-festival] :is(.contact-strip,.footer) {background:linear-gradient(115deg,var(--festival-deep),var(--festival-accent));border-color:var(--festival-gold)}
-body[data-festival] :is(input,textarea,select,button,a):focus-visible {outline-color:var(--festival-accent)}
+/* The original photograph stays fully visible below a compact greeting in the same visual. */
+.showcase-home .showcase-image.festival-visual-host {height:465px;background:#fff}
+.festival-visual-host>img {height:100%;width:100%;object-fit:contain;object-position:center bottom;padding:108px 8px 7px 24px}
+.festival-hero {position:absolute;inset:0;pointer-events:none;isolation:isolate}
+.festival-hero-sky {position:absolute;top:0;left:0;right:0;height:116px;overflow:hidden;background:radial-gradient(ellipse at 90% 25%,var(--festival-tint),#fff 78%);z-index:-1}
+.festival-hero-copy {position:absolute;top:19px;left:17%;right:135px;color:var(--festival-deep)}
+.festival-hero-from {color:#6b6b63;font-size:8px;font-weight:650;letter-spacing:.09em;line-height:1.4;text-transform:uppercase;margin:0 0 6px}
+.festival-hero-copy h2 {color:var(--festival-deep);font-family:inherit;font-size:clamp(18px,1.8vw,26px);font-weight:750;letter-spacing:-.035em;line-height:1.18;margin:0;text-wrap:balance}
+.festival-hero-telugu {font-family:'Noto Sans Telugu','Nirmala UI','Gautami',system-ui,sans-serif;font-size:14px;font-weight:500;color:var(--festival-accent);line-height:1.75;margin:5px 0 0;letter-spacing:0}
+.festival-hero-art {position:absolute;right:9px;top:7px;width:126px;height:105px;opacity:.92}
+.festival-art {display:block;width:100%;height:100%;overflow:visible}
+.festival-art [data-entrance] {transform-box:fill-box;transform-origin:center}
+.festival-art [data-entrance="leaf"],.festival-art [data-entrance="overflow"] {transform-origin:center top}
+.festival-art :is([data-entrance="lotus-petal"],[data-entrance="diya-light"],[data-entrance="flame"]) {transform-origin:center bottom}
+.festival-art [data-entrance="flute"] {transform-origin:left center}
+.festival-art [data-entrance="tree"] {transform-origin:center bottom}
+.festival-powder {filter:blur(2px)}
+.festival-sway,.festival-float {transform-box:fill-box;transform-origin:center;animation:festival-sway 12s ease-in-out infinite}
+.festival-float {animation-name:festival-float;animation-duration:14s}
+.festival-leaf {transform-box:fill-box;transform-origin:center top;animation:festival-sway 14s ease-in-out infinite}
+.festival-leaf:nth-child(2n) {animation-delay:-6s}
+.festival-flame {transform-box:fill-box;transform-origin:center bottom;animation:festival-flame 8s ease-in-out infinite}
+.festival-glow {animation:festival-soft-glow 12s ease-in-out infinite}
+.festival-steam {animation:festival-steam 14s ease-in-out infinite}
+.festival-lantern {transform-box:fill-box;transform-origin:center top;animation:festival-sway 15s ease-in-out infinite}
+.festival-hero[data-phase="settled"] .festival-fireworks {opacity:0;transform-box:fill-box;transform-origin:center;animation:festival-rare-firework 44s ease-in-out infinite}
+.festival-hero-particles {position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.festival-particle {position:absolute;width:3px;height:3px;border-radius:50%;background:var(--festival-gold);opacity:.24;animation:festival-drift 18s ease-in-out infinite}
+.festival-particle-0 {left:20%;top:18%}.festival-particle-1 {left:74%;top:63%;animation-delay:-8s}.festival-particle-2 {left:90%;top:15%;animation-delay:-13s}.festival-particle-3 {left:39%;top:7%;animation-delay:-4s}.festival-particle-4 {left:63%;top:80%;animation-delay:-10s}.festival-particle-5 {left:50%;top:40%;animation-delay:-2s}.festival-particle-6 {left:8%;top:65%;animation-delay:-7s}.festival-particle-7 {left:95%;top:84%;animation-delay:-16s}
+body[data-festival="holi"] .festival-particle:nth-child(2n) {background:#ba729f}
+body[data-festival="christmas"] .festival-particle {background:#94aaa4;animation-name:festival-snow;animation-duration:18s}
 
-/* Artwork stays inside the greeting, never over products, forms or navigation. */
-.festival-banner,.festival-preview-band {position:relative;isolation:isolate;overflow:hidden;background:var(--festival-deep);color:#fff8ee;border-bottom:3px solid var(--festival-gold)}
-.festival-banner::before,.festival-preview-band::before {content:'';position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 85% 0%,#ffffff14,transparent 65%),repeating-linear-gradient(135deg,transparent 0 26px,#ffffff03 26px 27px)}
-.festival-banner-inner {position:relative;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:30px;align-items:center;min-height:212px;padding-top:19px;padding-bottom:19px}
-.festival-copy {position:relative;z-index:1;min-width:0}
-.festival-from {color:var(--festival-gold);font-size:10px;font-weight:750;letter-spacing:.07em;text-transform:uppercase;line-height:1.6;margin:0 0 9px;overflow-wrap:anywhere}
-.festival-copy h2 {color:#fff8ee;font-size:clamp(26px,3.1vw,38px);line-height:1.14;letter-spacing:-.035em;font-weight:800;margin:0 0 10px}
-.festival-message {color:#fff3e1;font-size:13px;line-height:1.6;max-width:540px;margin:0 0 15px}
-.festival-motion {display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid #ffffff70;color:#fff5df;font:inherit;font-size:10px;font-weight:650;padding:6px 11px;border-radius:30px;min-height:30px;cursor:pointer}
-.festival-motion::before {content:'';width:7px;height:8px;box-sizing:border-box;border-left:2px solid currentColor;border-right:2px solid currentColor}
-.festival-motion[aria-pressed="true"]::before {content:'';width:0;height:0;border-right:0;border-left:6px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent}
-.festival-motion:hover {background:#ffffff15;border-color:var(--festival-gold)}
-.festival-motion:focus-visible {outline:2px solid var(--festival-gold);outline-offset:4px}
-.festival-motion:disabled {opacity:.8;cursor:default}
-.festival-scene {height:190px;width:320px;position:relative;pointer-events:none;user-select:none;justify-self:end}
-.festival-art {height:100%;width:100%;display:block;overflow:visible}
-.festival-art :is(.festival-sway,.festival-float,.festival-flame,.festival-flower-ring,.festival-colour-cloud,.festival-leaf,.festival-lantern) {transform-box:fill-box;transform-origin:center}
-.festival-sway {animation:festival-sway 6s ease-in-out infinite}
-.festival-float {animation:festival-float 7s ease-in-out infinite}
-.festival-leaf {transform-origin:50% 0!important;animation:festival-leaf 6s ease-in-out infinite}
-.festival-leaf:nth-child(even) {animation-delay:-3s}
-.festival-flame {transform-origin:50% 100%!important;animation:festival-flame 4s ease-in-out infinite}
-.festival-glow {animation:festival-glow 5s ease-in-out infinite}
-.festival-steam,.festival-embers,.festival-notes {animation:festival-rise 6s ease-in-out infinite}
-.festival-colour-cloud {animation:festival-colours 9s ease-in-out infinite}
-.festival-radiance {animation:festival-glow 7s ease-in-out infinite}
-.festival-thread {animation:festival-float 8s ease-in-out infinite}
-.festival-fireworks {animation:festival-fireworks 8s ease-in-out infinite}
-.festival-flower-ring {animation:festival-turn 70s linear infinite}
-.festival-lantern {transform-origin:50% 0!important;transform-box:fill-box;animation:festival-lantern 7s ease-in-out infinite}
-.festival-lantern:nth-child(3) {animation-delay:-3s}
-.festival-particles {position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.festival-particle {position:absolute;display:block;width:5px;height:9px;background:var(--festival-gold);border-radius:70% 10% 70% 10%;opacity:.65;animation:festival-petal-drift 12s linear infinite}
-.festival-particle-1 {left:8%;top:16%;animation-delay:-2s}
-.festival-particle-2 {left:20%;top:58%;animation-delay:-7s}
-.festival-particle-3 {left:30%;top:8%;animation-delay:-4s}
-.festival-particle-4 {left:44%;top:72%;animation-delay:-9s}
-.festival-particle-5 {left:56%;top:15%;animation-delay:-1s}
-.festival-particle-6 {left:66%;top:54%;animation-delay:-6s}
-.festival-particle-7 {left:79%;top:8%;animation-delay:-10s}
-.festival-particle-8 {left:89%;top:40%;animation-delay:-3s}
-.festival-particle-9 {left:12%;top:87%;animation-delay:-8s}
-.festival-particle-10 {left:39%;top:39%;animation-delay:-5s}
-.festival-particle-11 {left:75%;top:83%;animation-delay:-11s}
-.festival-particle-12 {left:92%;top:79%;animation-delay:-.5s}
-.festival-particle:nth-child(3n) {background:var(--festival-petal);width:7px;height:7px}
-.festival-scene--bonfire .festival-particle {animation-name:festival-ember-drift;width:3px;height:3px;border-radius:50%}
-.festival-scene--colours .festival-particle {border-radius:50%;width:9px;height:9px;animation-name:festival-colour-drift}
-.festival-scene--colours .festival-particle:nth-child(3n) {background:#87cfc3}
-.festival-scene--colours .festival-particle:nth-child(3n+1) {background:#f69daf}
-:is(.festival-scene--lanterns,.festival-scene--trident,.festival-scene--diya,.festival-scene--lotus) .festival-particle {width:3px;height:3px;border-radius:50%;animation:festival-glow 6s ease-in-out infinite}
-.festival-scene--tree .festival-particle {width:4px;height:4px;background:#fff;border-radius:50%;animation-name:festival-snow}
-.festival-scene--tree .festival-particle:nth-child(3n) {width:6px;height:6px;background:#fff}
-.festival-scene--cattle .festival-particle,.festival-scene--toran .festival-particle {background:var(--festival-leaf)}
-:is(.festival-banner,.festival-preview)[data-paused="true"] * {animation-play-state:paused!important}
-
-/* The preview uses exactly the public artwork and the selected palette. */
-.festival-preview {border:1px solid #e7dccb;border-radius:16px;overflow:hidden;background:#fffdf8}
-.festival-preview .festival-banner-inner {width:100%;padding:24px;grid-template-columns:minmax(0,1fr) 200px;gap:5px;min-height:230px}
-.festival-preview .festival-scene {width:210px;height:170px}
-.festival-preview .festival-copy h2 {font-size:27px}
-.festival-preview .festival-from {font-size:9px;letter-spacing:.025em}
-.festival-preview .festival-message {font-size:12px}
-.festival-preview-shop {padding:28px;background:linear-gradient(125deg,var(--festival-tint),#fffdf8);color:#14293a}
-.festival-preview-shop>span:first-child {display:block;font-size:9px;font-weight:800;letter-spacing:.12em;color:var(--festival-accent);margin-bottom:12px}
-.festival-preview-shop h3 {font-size:27px;line-height:1.15;margin:0 0 10px;color:var(--festival-accent)}
-.festival-preview-shop p {font-size:12px;line-height:1.7;margin:0 0 18px;max-width:340px}
-.festival-preview-cta {display:inline-flex;align-items:center;gap:15px;background:var(--festival-accent);color:#fff;border-radius:8px;padding:10px 15px;font-size:11px;font-weight:750}
-
-@keyframes festival-sway {0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
-@keyframes festival-float {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@keyframes festival-leaf {0%,100%{transform:rotate(-5deg)}50%{transform:rotate(8deg)}}
-@keyframes festival-flame {0%,100%{transform:scale(.96,1)}50%{transform:scale(1.03,.92)}}
-@keyframes festival-glow {0%,100%{opacity:.55}50%{opacity:1}}
-@keyframes festival-rise {0%,100%{transform:translateY(3px);opacity:.4}50%{transform:translateY(-8px);opacity:1}}
-@keyframes festival-colours {0%,100%{transform:scale(.95) rotate(-3deg)}50%{transform:scale(1.04) rotate(3deg)}}
-@keyframes festival-fireworks {0%,100%{opacity:.3;transform:translateY(2px)}50%{opacity:.95;transform:translateY(-2px)}}
-@keyframes festival-turn {to{transform:rotate(360deg)}}
-@keyframes festival-lantern {0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
-@keyframes festival-petal-drift {from{transform:translate(0,-25px) rotate(0)}to{transform:translate(15px,65px) rotate(150deg)}}
-@keyframes festival-ember-drift {from{transform:translateY(50px);opacity:.8}to{transform:translateY(-70px);opacity:.05}}
-@keyframes festival-colour-drift {0%,100%{transform:translate(0,-6px) scale(.8)}50%{transform:translate(8px,7px) scale(1.15)}}
-@keyframes festival-snow {from{transform:translate(0,-60px)}to{transform:translate(16px,120px)}}
-@media(max-width:760px) {
-  .festival-banner-inner {grid-template-columns:minmax(0,1fr) 210px;gap:10px;min-height:206px}
-  .festival-scene {width:220px;height:170px}
+/* All page scenery is decorative and cannot intercept links, focus, or touch. */
+.festival-decoration,.festival-edge-rail {pointer-events:none!important;user-select:none}
+.festival-decoration {display:block;position:absolute;line-height:0}
+.festival-decoration>svg {display:block;width:100%;height:100%;overflow:visible}
+.festival-logo-host {position:relative}
+.festival-decoration--logo {width:24px;height:24px;left:-14px;top:9px;opacity:.55;rotate:-12deg}
+.header-inner {position:relative}
+.festival-decoration--header {right:3px;top:6px;width:23px;height:23px;opacity:.25}
+.festival-decorated-section {position:relative;isolation:isolate}
+.festival-decorated-section>.container {position:relative;z-index:1}
+.festival-decoration--heading {height:19px;width:19px;right:5%;top:5px;opacity:.44}
+.festival-decoration--wash {width:88px;height:88px;right:2.5%;top:10px;opacity:.07;z-index:0;rotate:12deg}
+.festival-decoration--wash[data-pattern="threads"] {width:160px;height:55px;rotate:0deg}
+.festival-decoration--wash[data-pattern="kolam"],.festival-decoration--wash[data-pattern="floral-rings"] {width:98px;height:98px;rotate:0deg}
+.festival-decoration--wash[data-pattern="leaves"],.festival-decoration--wash[data-pattern="telangana"] {right:3%;top:20px;rotate:-18deg}
+.festival-decoration--footer {width:108px;height:108px;right:18px;bottom:38px;opacity:.12;z-index:0}
+.festival-decoration--footer-small {width:28px;height:28px;left:20px;bottom:20px;opacity:.3;z-index:0}
+.festival-edge-rail {position:fixed;top:0;bottom:0;width:31px;z-index:2;overflow:hidden}
+.festival-edge-rail--left {left:0}.festival-edge-rail--right {right:0}
+.festival-decoration--edge {width:24px;height:24px;left:4px;opacity:.25;animation:festival-drift 19s ease-in-out infinite}
+.festival-edge-0 {top:24%}.festival-edge-1 {top:53%;animation-delay:-8s}.festival-edge-2 {top:79%;animation-delay:-13s}
+body[data-festival="bhogi"] .festival-decoration--edge {width:13px;height:17px;left:9px;animation-name:festival-ember}
+body[data-festival="christmas"] .festival-decoration--edge {width:13px;height:13px;animation-name:festival-snow}
+body[data-festival="diwali"] .festival-decoration--edge {width:24px;height:24px;animation-name:festival-soft-glow;animation-duration:16s}
+body[data-festival="ramzan"] .festival-decoration--edge {animation-name:festival-sway;animation-duration:19s}
+.festival-motion {flex:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:29px;border:1px solid #e4e4df;border-radius:30px;background:#fff;color:#5a665f;font:inherit;font-size:9px;font-weight:600;padding:5px 9px;cursor:pointer;white-space:nowrap}
+.festival-motion i {display:block;width:6px;height:8px;border-left:2px solid currentColor;border-right:2px solid currentColor;box-sizing:border-box}
+.festival-motion[aria-pressed="true"] i {width:0;height:0;border-right:0;border-left:6px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent}
+.festival-motion:hover {background:var(--festival-tint);border-color:var(--festival-gold)}
+.festival-motion:focus-visible {outline:2px solid var(--festival-accent);outline-offset:3px}
+.festival-motion:disabled {opacity:.7;cursor:default}
+.header-inner:has(#festival-header-motion) {gap:12px}
+#festival-preview-state {position:fixed;bottom:8px;left:50%;translate:-50% 0;padding:6px 12px;background:#fffef6ef;border:1px solid #d9cba5;border-radius:30px;color:#735f32;font:600 10px/1.3 system-ui;z-index:70;pointer-events:none;white-space:nowrap}
+body[data-festival-motion="paused"] :is(.festival-hero,.festival-decoration,.festival-edge-rail) *,body[data-festival-motion="paused"] .festival-decoration {animation-play-state:paused!important}
+@keyframes festival-sway {0%,100%{rotate:-2deg}50%{rotate:2deg}}
+@keyframes festival-float {0%,100%{translate:0 0}50%{translate:0 -3px}}
+@keyframes festival-flame {0%,100%{scale:1 1}50%{scale:.98 .95}}
+@keyframes festival-soft-glow {0%,100%{opacity:.72}50%{opacity:1}}
+@keyframes festival-steam {0%,100%{translate:0 2px;opacity:.35}50%{translate:0 -4px;opacity:.6}}
+@keyframes festival-rare-firework {0%,88%,100%{opacity:0;scale:.85}94%{opacity:.28;scale:1}}
+@keyframes festival-drift {0%,100%{translate:0 -4px;rotate:-4deg}50%{translate:0 6px;rotate:4deg}}
+@keyframes festival-ember {0%,100%{translate:0 5px;opacity:.14}50%{translate:0 -15px;opacity:.3}}
+@keyframes festival-snow {0%{translate:0 -20px;opacity:.1}50%{opacity:.25}100%{translate:4px 28px;opacity:.1}}
+@media(max-width:1100px) {.festival-edge-rail {display:none}.festival-hero-copy {right:114px;left:18%}.festival-hero-art {width:105px;height:100px}.showcase-home .showcase-image.festival-visual-host {height:440px}.festival-visual-host>img {padding-top:120px}}
+@media(max-width:900px) {.festival-motion>span {display:none}.festival-motion {width:29px;padding:5px}.festival-decoration--wash {width:70px;height:70px;opacity:.055}.festival-decoration--heading {right:1%;width:16px;height:16px}.festival-hero-copy h2 {font-size:19px}.festival-hero-telugu {font-size:12px}}
+@media(max-width:650px) {
+  .showcase-home .showcase-image.festival-visual-host {height:330px;clip-path:none}
+  .festival-visual-host>img {padding:113px 5px 5px;object-fit:contain;object-position:center bottom}
+  .festival-hero-sky {height:113px}
+  .festival-hero-copy {left:20px;right:112px;top:16px}
+  .festival-hero-copy h2 {font-size:20px;line-height:1.2}
+  .festival-hero-from {font-size:7px;letter-spacing:.06em;margin-bottom:5px}
+  .festival-hero-telugu {font-size:12px;margin-top:4px}
+  .festival-hero-art {top:9px;right:6px;width:104px;height:96px}
+  .festival-decoration--logo {width:17px;height:17px;left:-10px;top:4px}
+  .festival-decoration--header,.festival-decoration--footer-small {display:none}
+  .festival-decoration--wash {width:58px;height:58px;opacity:.05}
+  .festival-decoration--footer {width:65px;height:65px;opacity:.1}
+  .festival-particle:nth-child(n+3) {display:none}
+  .header-inner:has(#festival-header-motion) {gap:6px}
 }
-@media(max-width:560px) {
-  .festival-banner-inner,.festival-preview .festival-banner-inner {display:block;width:100%;padding:23px 100px 23px 22px;min-height:220px}
-  .festival-copy h2,.festival-preview .festival-copy h2 {font-size:27px}
-  .festival-from {font-size:8px;letter-spacing:.03em;max-width:255px}
-  .festival-message {font-size:12px;max-width:240px}
-  .festival-scene,.festival-preview .festival-scene {position:absolute;width:174px;height:150px;right:-16px;top:40px;opacity:.68}
-  .festival-particle:nth-child(n+7) {display:none}
-  .festival-preview-shop {padding:23px}
+@media(max-width:360px) {.festival-hero-copy {left:16px;right:98px}.festival-hero-copy h2 {font-size:18px}.festival-hero-art {width:90px;right:2px}.festival-hero-telugu {font-size:11px}.festival-motion {width:25px;min-height:26px}}
+@media(prefers-reduced-motion:reduce) {body[data-festival] :is(.festival-hero,.festival-decoration,.festival-edge-rail) *,body[data-festival] .festival-decoration {animation:none!important;transition:none!important}.festival-hero[data-phase="settled"] .festival-fireworks {opacity:.15}}
+@media print {.festival-hero,[data-festival-decoration],#festival-header-motion,#festival-preview-state {display:none!important}.showcase-home .showcase-image.festival-visual-host {height:385px}.festival-visual-host>img {padding:0}}
+/* Long English and Telugu greetings need a little more room beside tablet artwork. */
+@media(min-width:651px) and (max-width:900px) {
+  .festival-hero-copy {left:14%;right:88px;top:15px}
+  .festival-hero-copy h2 {font-size:18px}
+  .festival-hero-telugu {font-size:11px;line-height:1.65}
+  .festival-hero-art {width:82px;height:80px;right:4px;top:12px}
+  .festival-visual-host>img {padding-top:134px}
+  .festival-hero-sky {height:136px}
 }
-@media(prefers-reduced-motion:reduce) {
-  :is(.festival-banner,.festival-preview) * {animation:none!important;transition:none!important}
-}
-@media print {
-  .festival-banner {display:none}
+@media(max-width:360px) {
+  .showcase-home .showcase-image.festival-visual-host {height:350px}
+  .festival-visual-host>img {padding-top:137px}
+  .festival-hero-sky {height:139px}
+  .festival-hero-copy {right:92px}
+  .festival-hero-copy h2 {font-size:17px}
+  .festival-hero-telugu {line-height:1.65}
 }

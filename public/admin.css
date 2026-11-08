@@ -63,3 +63,26 @@
 @media(max-width:1150px) {.festival-admin-grid {grid-template-columns:1fr;max-width:720px}.festival-control-body {padding-top:0}.festival-preview-column {margin-top:4px}}
 @media(max-width:650px) {.festival-admin-grid {gap:24px}.festival-controls .admin-card-head {padding:20px}.festival-control-body {padding:0 20px 22px}.festival-admin-intro>p {font-size:22px}}
 @media(prefers-reduced-motion:reduce) {.festival-switch-track,.festival-switch-track>span {transition:none}}
+
+/* The live website preview shares the production renderer and keeps drafts private. */
+.festival-manager {max-width:1320px}
+.festival-manager-grid {display:grid;grid-template-columns:320px minmax(0,1fr);gap:26px;align-items:start}
+.festival-manager .festival-controls {min-width:0}
+.festival-manager .festival-preview-column {min-width:0}
+.festival-manager .festival-preview-heading {align-items:flex-start;gap:12px}
+.festival-manager .festival-preview-heading h2 {font-size:15px;line-height:1.4}
+.festival-manager .festival-preview-heading p {font-size:11px;color:#65737a;line-height:1.6;margin:4px 0 0}
+.festival-manager .festival-preview-heading .btn {flex:none;font-size:10px;padding:8px 11px}
+.festival-preview-tools {display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin:15px 0 12px}
+.festival-preview-tools [role="group"] {display:flex;border:1px solid #deded8;border-radius:8px;padding:3px;background:#fff}
+.festival-preview-tools button {border:0;border-radius:5px;background:transparent;font:inherit;font-size:10px;font-weight:650;padding:6px 10px;color:#66746c;cursor:pointer}
+.festival-preview-tools button[aria-pressed="true"] {background:#153f37;color:#fff}
+.festival-preview-tools a {font-size:10px;font-weight:650;color:#7b5b29;cursor:pointer}
+.festival-preview-surface {position:relative;width:100%;height:440px;overflow:hidden;background:#fff;border:1px solid #d9d9d2;border-radius:12px;box-shadow:0 9px 28px #183b2e08}
+.festival-preview-surface iframe {position:absolute;left:0;top:0;border:0;transform-origin:top left;max-width:none;display:block;background:#fff}
+.festival-publish {width:100%;justify-content:center;font-size:12px}
+.festival-publish:disabled {opacity:.55;cursor:default;box-shadow:none}
+.festival-admin-telugu {font-family:'Noto Sans Telugu','Nirmala UI',system-ui,sans-serif;font-size:12px!important;line-height:1.8!important}
+.festival-manager .festival-admin-note {margin-bottom:0}
+@media(max-width:1150px) {.festival-manager-grid {grid-template-columns:1fr;max-width:950px}.festival-manager .festival-preview-column {margin-top:5px}.festival-manager .festival-control-body {display:grid;grid-template-columns:1fr 1fr;column-gap:25px}.festival-manager :is(.festival-switch-row,.festival-effect-note,.festival-display-status,.festival-save-error,.festival-publish,.festival-admin-note) {grid-column:1/-1}}
+@media(max-width:650px) {.festival-manager .festival-control-body {display:block}.festival-manager-grid {gap:24px}.festival-manager .festival-preview-heading {flex-direction:column}.festival-preview-tools {gap:8px}.festival-preview-tools button {padding:6px 9px}}

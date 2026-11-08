@@ -1,4 +1,6 @@
 {
   "enabled": false,
-  "festival": "sankranti"
+  "festival": "sankranti",
+  "intensity": "low",
+  "greetingVariant": "default"
 }

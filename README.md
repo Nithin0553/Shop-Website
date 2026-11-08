@@ -57,17 +57,17 @@ The website is **not** an online ordering or inventory system. Visitors enquire 
 - **Blog subscribers:** View and export opted-in email addresses. No automatic emails are sent.
 - **Blog articles:** Create, edit, delete, publish or unpublish posts; choose a category, write headings/paragraphs/lists, and upload your own JPG/PNG/WebP images (up to 1.8 MB each).
 - **Shop details:** Update the address, number, WhatsApp, email, location links, hours and site URL without editing code.
-- **Festival themes:** Pick any of the 20 festivals, preview its artwork and colours, and switch the public theme on or off. Changes save automatically for every visitor. New visits reflect changes immediately; open pages refresh the festival setting within 30 seconds or when the visitor returns to the tab. Turning the theme off restores the normal peacock branding and retains the selected festival.
+- **Festival Theme Manager:** Privately preview all 20 festivals in the real product hero, choose an intensity and optional Eid greeting, then enable and publish. The master switch ends a live theme immediately.
 
-### Festival themes
+### Festival Theme Manager
 
-Open **Dashboard → Festival themes**. Choose a festival in the dropdown, then turn **Show festival theme** on. The preview lets you inspect a theme while the public switch is off. Switching festivals while on updates the live selection; turning it off restores the usual website. Changes are manual, so no festival dates or automatic scheduling need to be maintained.
+Open **Dashboard → Festival Theme Manager**, select a festival and intensity, inspect the Desktop/Tablet/Mobile preview, turn **Festival mode** on and select **Enable & publish**. Draft selections and previews stay private until published. Turning the master switch off immediately restores the normal white storefront for visitors.
 
-All 20 choices have their own locally drawn SVG illustration, palette, greeting and CSS animations: Sankranti, Bhogi, Pongal, Kanuma, Maha Shivaratri, Holi, Ugadi, Sri Rama Navami, Hanuman Jayanti, Akshaya Tritiya, Raksha Bandhan, Krishna Janmashtami, Ganesh Chaturthi / Vinayaka Chavithi, Dussehra / Vijayadashami, Bonalu, Bathukamma, Diwali, Onam, Ramzan and Christmas.
+Each festival has distinct local SVG artwork, page decorations, a palette, and an entrance that lasts about four seconds and plays once per relevant visit or activation. Telugu greetings are included where appropriate; Ramzan offers **Ramzan Mubarak!** or **Eid Mubarak!**. The motorcycle, scooter and spare-parts photograph stays recognizable beneath the greeting within the existing hero visual. Header/logo, heading, section and footer accents remain restrained. Visitors can pause effects; reduced-motion settings and mobile decoration limits are respected.
 
-The selected theme appears across public pages, including navigation, hero accents, cards and the footer. Decorations stay inside the greeting rather than covering forms or products. Visitors can pause festival animations; the preference is remembered on their device, and system reduced-motion preferences are respected. There are no external animation dependencies or festival asset downloads.
+Published settings remain in the existing `DATA_DIR/festival.json` and survive restarts. Authenticated preview routes never write settings; public server-sent events apply published changes immediately, with a polling fallback. No new database, video, external animation service or package dependency is introduced.
 
-The server stores settings separately in `DATA_DIR/festival.json`, so business-detail edits do not reset the festival. Existing installations initialize safely with festival mode off. Keep the file with your normal data backup; no password or customer data is stored in it. Authenticated `PUT /api/admin/festivals` validates both the selected ID and the boolean switch before an atomic write; public `GET /api/festivals` exposes only festival choices and the current display setting.
+See [Festival Theme Manager architecture and administrator guide](docs/festival-theme-manager.md) for all 20 entrance designs, registry fields, preview security, API routes and lifecycle behavior.
 
 Enquiries are stored in `data/inquiries.json` (ignored by Git; created automatically if missing). The admin needs to **check the dashboard for new requests**; automatic email, SMS, and WhatsApp notifications have **not** been configured.
 
