@@ -37,6 +37,8 @@ const update=body=>request('/api/admin/festivals',{method:'PUT',admin:true,body}
 before(async()=>{
   // Simulate an existing installation: no festival.json and no private fixtures.
   fs.copyFileSync(path.join(root,'data/site.json'),path.join(temp,'site.json'));
+  // Use explicit test fixtures so locally edited festival settings never affect tests.
+  fs.writeFileSync(path.join(temp,'festival.json'),JSON.stringify(DEFAULT_FESTIVAL,null,2)+'\n');
   await startServer();
   const response=await fetch(base+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});
   assert.equal(response.status,200);cookie=response.headers.get('set-cookie').split(';')[0];
