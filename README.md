@@ -2,7 +2,7 @@
 
 A responsive, working website for a local two-wheeler spare-parts and accessories shop, refined to follow the approved blue-and-white homepage, blog, and About/Contact reference mockups. It includes a public site, blog, customer enquiry form, and protected shop dashboard.
 
-**Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. No paid services, third-party packages, or build step are required.
+**Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. The local Node.js server needs no third-party packages or build step; the optional Cloudflare Pages deployment uses an esbuild build step.
 
 ## Cloudflare Workers Free deployment
 
