@@ -26,13 +26,13 @@ async function renderAt(route){
 }
 test('homepage follows approved design hierarchy',async()=>{
   const html=await renderAt('/');
-  for(const text of ['Your Trusted Source for','Popular Brands','Spare Parts Categories','Highlighted In Our Shop','Helmets','Engine Oils','Activa Accessories','Why Choose Us?','Latest Blogs','Call Us','Our Address','Business Hours','Send an Enquiry'])
+  for(const text of ['Your Trusted Source for','Popular Brands','Spare Parts Categories','Helmets','Engine Oils','Activa Accessories','Why Choose Us?','Latest Blogs','Call Us','Our Address','Business Hours','Need Help?'])
     assert.ok(html.includes(text),`Missing ${text}`);
   assert.ok((html.match(/class=\"brand-card/g)||[]).length >= 7);
   assert.ok((html.match(/compact-category/g)||[]).length >= 9);
   assert.equal((html.match(/design-blog-card/g)||[]).length,3);
   assert.ok(html.includes('logo-card'));
-  assert.ok(html.includes('/assets/brand-card-honda.png?v=20261107-peacock-brand'), 'Homepage should request refreshed logo URLs');
+  assert.ok(html.includes('/assets/brand-card-honda.png?v=20261107-site-content-v4'), 'Homepage should request refreshed logo URLs');
   assert.ok(html.includes('spotlight-card'));
   assert.ok(html.indexOf('Popular Brands')<html.indexOf('Spare Parts Categories'));
   assert.ok(html.indexOf('Spare Parts Categories')<html.indexOf('Why Choose Us?'));
@@ -47,7 +47,7 @@ test('blog page features article, sidebar, filters and working subscribe form',a
 test('about and contact mockup sections include real enquiry form',async()=>{
   for(const route of ['/about','/contact']){
     const html=await renderAt(route);
-    for(const text of ['Get in Touch / Visit Our Store','Send an Inquiry','enquiry-form','customer-phone','customer-brand','Required Part','contact-map']) assert.ok(html.includes(text),`${route}: missing ${text}`);
+    for(const text of ['Get in Touch / Visit Our Store','Need Help?','enquiry-form','customer-phone','customer-brand','Required Part','contact-map']) assert.ok(html.includes(text),`${route}: missing ${text}`);
     assert.ok(!html.includes('[object Object]'), 'Enquiry brands should be readable names');
     for(const brand of ['Hero','Honda','Bajaj','TVS','Yamaha','Suzuki','Royal Enfield'])
       assert.ok(html.includes(`<option value="${brand}"`),`${route}: missing enquiry brand ${brand}`);

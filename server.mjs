@@ -38,7 +38,7 @@ if (!process.env.SESSION_SECRET) console.warn('SESSION_SECRET missing; admin ses
 fs.mkdirSync(DATA, { recursive:true });
 fs.mkdirSync(UPLOADS, { recursive:true });
 const dataPath = name => path.join(DATA, name);
-const defaults = { shopName:'Sri Sai Shanmukha Auto Centre', tagline:'Two-Wheeler Spare Parts & Accessories', phone:'',whatsapp:'',email:'',address:'',city:'',hours:'',mapsUrl:'',instagramUrl:'',facebookUrl:'',siteUrl:'' };
+const defaults = { shopName:'Sri Sai Shanmukha Auto Centre', tagline:'Two-Wheeler Spare Parts & Accessories', phone:"+91 9030084872",whatsapp:'',email:'',address:"Kaman Chowrasta, Opp: Bank of India, Kaman, to, Busstand Rd, Boiwada, Karimnagar, Telangana 505001, India",city:'',hours:"Mon–Sun: 8:30 AM – 9:30 PM",mapsUrl:"https://www.google.com/maps/search/?api=1&query=Kaman%20Chowrasta%2C%20Opp%3A%20Bank%20of%20India%2C%20Kaman%2C%20to%2C%20Busstand%20Rd%2C%20Boiwada%2C%20Karimnagar%2C%20Telangana%20505001%2C%20India",instagramUrl:'',facebookUrl:'',siteUrl:'' };
 for (const [file, defaultVal] of [['site.json', defaults], ['festival.json', DEFAULT_FESTIVAL], ['blogs.json', []], ['inquiries.json', []], ['subscribers.json', []]]) {
   const dest=dataPath(file), source=path.join(ROOT,'data',file);
   if (!fs.existsSync(dest)) {
@@ -119,12 +119,12 @@ function securityHeaders(res) {
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
   res.setHeader('X-Frame-Options','DENY');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; base-uri 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'");
+  res.setHeader('Content-Security-Policy',"default-src 'self'; base-uri 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; script-src 'self'; style-src 'self'; connect-src 'self'; frame-src https://maps.google.com https://www.google.com; form-action 'self'; frame-ancestors 'none'");
 }
 async function handleApi(req,res,url) {
   const { pathname }=url;
   if(pathname==='/api/festivals'&&req.method==='GET') return json(res,200,{festivals:FESTIVALS,settings:normalizeFestivalSettings(read('festival.json'))});
-  if(pathname==='/api/site'&&req.method==='GET') return json(res,200,{...defaults,...read('site.json')});
+  if(pathname==='/api/site'&&req.method==='GET') { const settings={...defaults,...read('site.json')}; for(const key of ['phone','address','hours','mapsUrl']) if(!String(settings[key]||'').trim())settings[key]=defaults[key]; return json(res,200,settings); }
   if(pathname==='/api/blogs'&&req.method==='GET') return json(res,200,read('blogs.json').filter(b=>b.status==='published').map(({body,...rest})=>rest));
   if(pathname.startsWith('/api/blogs/')&&req.method==='GET') {
     const post=read('blogs.json').find(b=>b.slug===decodeURIComponent(pathname.slice('/api/blogs/'.length))&&b.status==='published');

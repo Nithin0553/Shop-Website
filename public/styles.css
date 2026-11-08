@@ -605,3 +605,72 @@ input:focus,textarea:focus,select:focus,button:focus-visible,a:focus-visible {ou
  .brand-mobile-copy small {font-size:11px}
  .footer-logo.peacock-footer-logo {width:230px}
 }
+
+
+/* November 2026 content refinement — clean headings, contact CTA and section transitions. */
+.design-brand-section .design-heading h2,
+.design-categories-section .design-heading h2 { color:#101010 !important; }
+.design-brand-section .design-heading,
+.design-categories-section .design-heading { margin-bottom:20px; }
+.spotlight-section { padding-top:29px; }
+.showcase-home .showcase-copy h1 { margin-top:0; }
+.contact-band .strip-whatsapp {
+  background:#0a1a33 !important;
+  color:#ffffff !important;
+  border:2px solid #0a1a33 !important;
+  box-shadow:0 12px 22px rgba(10,26,51,.24);
+  font-weight:800;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.contact-band .strip-whatsapp:hover,
+.contact-band .strip-whatsapp:focus-visible { background:#bb6528 !important; border-color:#bb6528 !important; color:#ffffff !important; }
+.contact-strip .strip-detail a { overflow-wrap:anywhere; }
+.shop-contact-section .contact-map.design-map {
+  position:relative;
+  min-height:260px;
+  padding:0;
+  overflow:hidden;
+  border:1px solid #dccbb5;
+  border-radius:15px;
+  background:#f3eadc;
+}
+.shop-contact-section .store-map-frame {
+  display:block;
+  width:100%;
+  height:260px;
+  border:0;
+}
+.shop-contact-section .store-map-directions {
+  position:absolute;
+  bottom:12px;
+  right:12px;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  background:#0a1a33;
+  color:#ffffff;
+  border-radius:10px;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  box-shadow:0 5px 16px rgba(0,0,0,.18);
+}
+.shop-contact-section .store-map-directions:hover { background:#b9672d; color:#fff; }
+#app > main { view-transition-name:shop-page; }
+::view-transition-old(shop-page) { animation:shopFadeOut .19s ease-in both; }
+::view-transition-new(shop-page) { animation:shopFadeIn .3s ease-out both; }
+@keyframes shopFadeOut {to {opacity:0;transform:translateY(-6px);}}
+@keyframes shopFadeIn {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.page-enter { animation:shopFadeIn .3s ease-out both; }
+@media (prefers-reduced-motion:reduce) {
+  ::view-transition-old(shop-page),::view-transition-new(shop-page),.page-enter { animation:none !important; }
+  html { scroll-behavior:auto !important; }
+}
+@media(max-width:650px) {
+  .contact-band .strip-whatsapp { width:100%; justify-content:center; }
+  .shop-contact-section .store-map-frame { height:250px; }
+  .shop-contact-section .contact-map.design-map { min-height:250px; }
+}

@@ -31,7 +31,7 @@ test('website pages and public articles load',async()=>{
   for(const route of ['/','/spare-parts','/about','/brands','/blogs','/blogs/essential-two-wheeler-maintenance-tips','/contact','/admin','/styles.css','/admin.css','/app.js','/assets/hero-shop.webp']){
     const {res}=await request(route);assert.equal(res.status,200,route);
   }
-  const updatedLogo=await request('/assets/brand-card-honda.png?v=20261107-peacock-brand');
+  const updatedLogo=await request('/assets/brand-card-honda.png?v=20261107-site-content-v4');
   assert.equal(updatedLogo.res.status,200);
   assert.match(updatedLogo.res.headers.get('cache-control')||'',/no-cache/,'Brand images must revalidate after updates');
   const {res,data}=await request('/api/blogs');assert.equal(res.status,200);assert.equal(data.length,6);assert.ok(data.every(p=>!('body' in p)));

@@ -12,7 +12,7 @@ test('peacock artwork replaces the previous bike icon in public branding',()=>{
   assert.match(js,/class="brand-mobile"/);
   assert.match(js,/class="footer-logo peacock-footer-logo"/);
   assert.ok(!js.includes('class="logo-icon">${ico(\'bike\''));
-  assert.ok(js.includes('20261107-peacock-brand'));
+  assert.ok(js.includes('20261107-site-content-v4'));
   const index=get('public/index.html');
   assert.match(index,/shop-favicon\.png/);
   assert.match(get('public/admin.html'),/shop-favicon\.png/);
