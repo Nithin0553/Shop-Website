@@ -62,7 +62,7 @@ const icons={
 const ico=(name,size=20)=>`<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.package}</svg>`;
 const esc = v => String(v ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 // Bust old browser caches when shop imagery is refreshed. Increment this token when asset files change.
-const ASSET_VERSION = '20261107-featured-logos';
+const ASSET_VERSION = '20261107-peacock-brand';
 const asset = img => `/assets/${encodeURIComponent(img)}?v=${ASSET_VERSION}`;
 const siteDefault={shopName:'Sri Sai Shanmukha Auto Centre',tagline:'Two-Wheeler Spare Parts & Accessories',phone:'',whatsapp:'',email:'',address:'',city:'',hours:'',mapsUrl:''};
 let SITE={...siteDefault}, BLOGS=[], menuOpen=false, blogCategory='All', blogQuery='', partsBrand='All',partsQuery='',formPending=false,subscribing=false;
@@ -86,7 +86,7 @@ function spotlightSection(){const cards=SPOTLIGHT_SECTIONS.map(section=>`<articl
 function header(active) {
   const nav=[['/','Home'],['/about','About'],['/spare-parts','Spare Parts'],['/brands','Brands'],['/blogs','Blogs'],['/contact','Contact']];
   return `<header class="site-header"><div class="container header-inner">
-    <a class="logo" href="/" aria-label="Sri Sai Shanmukha Auto Centre home"><span class="logo-icon">${ico('bike',47)}</span><span class="logo-text"><strong>${shopMark()}</strong><small>${esc(SITE.tagline||siteDefault.tagline)}</small></span></a>
+    <a class="logo site-brand" href="/" aria-label="Sri Sai Shanmukha Auto Centre home"><img class="header-full-logo" src="${asset('shop-logo-full.webp')}" alt="Sri Sai Shanmukha Auto Centre peacock logo" fetchpriority="high"/><span class="brand-mobile" aria-hidden="true"><img src="${asset('shop-logo-mark.webp')}" alt=""/><span class="brand-mobile-copy">Sri Sai Shanmukha<small>Auto Centre</small></span></span></a>
     <nav id="primary-nav" class="primary-nav ${menuOpen?'is-open':''}" aria-label="Main navigation">${nav.map(([href,label])=>`<a href="${href}" class="${active===href?'active':''}" ${active===href?'aria-current="page"':''}>${label}${href==='/spare-parts'?ico('chevron',13):''}</a>`).join('')}</nav>
     <button class="menu-toggle" id="menu-toggle" aria-label="${menuOpen?'Close':'Open'} menu" aria-expanded="${menuOpen}" aria-controls="primary-nav">${ico(menuOpen?'close':'menu',25)}</button>
   </div></header>`;
@@ -94,7 +94,7 @@ function header(active) {
 function footer() {
   const socials=[['Facebook',SITE.facebookUrl,'facebook'],['Instagram',SITE.instagramUrl,'instagram']].filter(x=>x[1]);
   return `<footer class="footer"><div class="container footer-main">
-    <div class="footer-brand"><a class="footer-logo" href="/">${ico('bike',44)}<span>${shopMark()}<small>${esc(SITE.tagline||siteDefault.tagline)}</small></span></a></div>
+    <div class="footer-brand"><a class="footer-logo peacock-footer-logo" href="/" aria-label="Sri Sai Shanmukha Auto Centre home"><img src="${asset('shop-logo-full.webp')}" alt="Sri Sai Shanmukha Auto Centre logo" loading="lazy"/></a></div>
     <div class="footer-about"><p>Your trusted local shop for quality two-wheeler spare parts, accessories and helpful support.</p><span class="telugu">శ్రీ సాయి షణ్ముఖ ఆటో సెంటర్</span></div>
     <div class="footer-links"><h4>Quick Links</h4><div><a href="/">Home</a><a href="/about">About</a><a href="/spare-parts">Spare Parts</a><a href="/brands">Brands</a><a href="/blogs">Blogs</a><a href="/contact">Contact</a></div></div>
     <div class="footer-social"><h4>Follow Us</h4>${socials.length?`<div class="social-icons">${socials.map(([name,href,key])=>`<a class="social-icon social-${key}" href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${name}">${key==='facebook'?'f':'◎'}</a>`).join('')}</div>`:'<p>Connect with our shop for updates and enquiries.</p>'}<a class="footer-reach" href="/contact">Get in touch ${ico('arrow',14)}</a></div>

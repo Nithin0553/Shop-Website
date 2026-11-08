@@ -484,3 +484,124 @@ body { font-size:15px; line-height:1.5; color:var(--ink) }
   .spotlight-grid .spotlight-brand-pill { height:74px; }
   .spotlight-grid .spotlight-brand-pill:last-child:nth-child(odd) { grid-column:1 / -1; width:calc(50% - 4px); justify-self:center; }
 }
+
+
+/* Sri Sai Shanmukha Auto Centre — peacock logo brand palette.
+   Gold #ec9936 · amber #d76d1b · navy #0a1a33 · teal #267884. */
+:root {
+  --gold:#e8a047;
+  --gold-deep:#b86a19;
+  --gold-soft:#fff0d7;
+  --navy:#0a1a33;
+  --navy-mid:#173149;
+  --teal:#267884;
+  --teal-soft:#e8f5f2;
+  --ivory:#fffbf4;
+  --blue:#b66a17;
+  --blue-dark:#935013;
+  --blue-ink:#8a5016;
+  --ink:#0a1a33;
+  --muted:#566574;
+  --line:#e9dfce;
+  --pale:#fff1dd;
+  --surface:#fffbf5;
+  --shadow:0 9px 26px rgba(18,33,48,.10);
+  --shadow-soft:0 4px 14px rgba(18,33,48,.07);
+}
+body {background:var(--ivory);color:var(--navy)}
+input:focus,textarea:focus,select:focus,button:focus-visible,a:focus-visible {outline-color:#d69a4b}
+.site-header {height:108px;background:rgba(255,252,246,.98);border-bottom:1px solid #f0e1c9;box-shadow:0 4px 22px rgba(40,30,14,.055)}
+.header-inner {height:100%}
+.logo.site-brand {display:flex;align-items:center;gap:0;min-width:280px;flex:0 0 280px}
+.header-full-logo {display:block;width:260px;height:106px;object-fit:contain;object-position:left center}
+.brand-mobile {display:none}
+.primary-nav>a {color:#18263b}
+.primary-nav>a.active,.primary-nav>a:hover {background:var(--navy);color:#ffe5b3;border-radius:8px}
+.primary-nav>a.nav-cta {background:var(--gold-deep);color:white}
+.primary-nav>a.nav-cta:hover {background:#975214}
+.menu-toggle {color:var(--navy);background:#fff8eb;border-color:#e7cfad}
+.btn-primary,.read-more-button {background:linear-gradient(115deg,#c57b24,#f0b85f);color:#111f32;border:1px solid #cf8b35;box-shadow:0 8px 21px rgba(159,90,18,.17)}
+.btn-primary:hover,.read-more-button:hover {background:linear-gradient(115deg,#ae6217,#e9a24b);color:#101e31;box-shadow:0 10px 23px rgba(159,90,18,.22)}
+.btn-outline {color:var(--navy);background:rgba(255,255,255,.8);border-color:#c69d61}
+.btn-outline:hover {background:#fff1db;border-color:#b77220}
+.btn-white {background:#fff8e9;color:#15243a}
+.text-link,.inline-link {color:var(--gold-deep)}
+.text-link:hover,.inline-link:hover {color:#85501c}
+.showcase-hero,.hero {background:linear-gradient(105deg,#fff0d6 0%,#fff9ed 45%,#fffdf8 74%,#e9f4f0 100%)}
+.showcase-kicker,.hero-tag {color:#965714}
+.showcase-kicker i,.tag-dot {background:#d4872b}
+.showcase-copy h1,.page-hero h1 {color:var(--navy)}
+.showcase-copy h1 span,.hero h1 span {color:#b96d21}
+.showcase-copy p,.hero-copy>p {color:#455468}
+.showcase-image {box-shadow:-20px 0 35px rgba(129,85,36,.07)}
+.page-hero {background:linear-gradient(118deg,#ffecd1,#fff8e9 65%,#e9f3ed);border-color:#f3e0c4}
+.design-heading h2,.section-heading h2 {color:var(--navy)}
+.design-heading h2:before,.design-heading h2:after {background:linear-gradient(90deg,#b96c19,#e9ae58)}
+.design-heading p {color:#5c6974}
+.design-brand-section {background:#fffbf4}
+.design-categories-section {background:linear-gradient(180deg,#fffaf2,#fffdf8)}
+.premium-section::before {background:linear-gradient(180deg,rgba(255,247,231,.34),rgba(238,247,242,.14))}
+.brand-marquee .brand-card.logo-card,.static-brand-grid .brand-card.logo-card {background:linear-gradient(150deg,#fffefb,#fff8ec);border-color:#eadac3;box-shadow:0 9px 22px rgba(51,43,35,.075)}
+.parts-marquee .marquee-part-frame {background:linear-gradient(158deg,#fffefb,#fbf3e7);border-color:#eadfcd;box-shadow:0 11px 25px rgba(33,46,52,.08)}
+.parts-marquee .marquee-part-frame:hover {border-color:#d1a567}
+.spotlight-section {background:linear-gradient(180deg,#fffdf9,#f8f3e8 62%,#eaf2ed)}
+.spotlight-card,.spotlight-tyres,.spotlight-helmets,.spotlight-oils,.spotlight-activa {background:linear-gradient(140deg,#fffdf8 2%,#f8f2e6 55%,#edf5ef 100%);border-color:#e9ddcb;box-shadow:0 14px 33px rgba(26,43,49,.075)}
+.spotlight-card::after {background:radial-gradient(circle,rgba(38,120,132,.11),transparent 70%)}
+.spotlight-card h3 {color:var(--navy)}
+.spotlight-tag {background:var(--teal-soft);color:#12606a}
+.spotlight-list li {background:rgba(255,253,245,.9);border-color:#e9ddc9;color:#183246}
+.spotlight-grid .spotlight-brand-pill {background:#fffdf8;border-color:#ead8bf;box-shadow:0 7px 15px rgba(71,48,23,.055)}
+.spotlight-grid .spotlight-card .spotlight-art {background:transparent}
+.design-why-section {background:linear-gradient(105deg,#e8f4f0,#f3f7ed 55%,#fff1dd)}
+.design-feature {background:#fffdf8;border-color:#e1deca}
+.design-feature>span,.feature-card>span {color:#b36b1e}
+.design-home-blogs {background:#fffdf8}
+.blog-card.design-blog-card,.featured-post {background:#fffefa;border-color:#ebddc8;box-shadow:0 6px 19px rgba(39,39,26,.065)}
+.blog-card .pill,.design-blog-card .pill,.pill {background:#fff0d9;color:#92561c}
+.blog-card h3 a:hover {color:#af671b}
+.category-filter-row {border-color:#e8decc;background:#fffdf8}
+.category-filter-row.selected {background:#fff0da;border-color:#d3a464}
+.category-filter-row>span:first-child .icon {color:#b46b1a}
+.featured-post-image {background:#f8efe1}
+.subscribe-panel {background:linear-gradient(115deg,#fff0d8,#e9f5ef);border:1px solid #ead6b9}
+.subscribe-icon {background:#176a70}
+.subscribe-form {border-color:#d2aa71}
+.contact-band {background:transparent}
+.contact-strip {background:linear-gradient(108deg,#0a1a33,#184759 69%,#267884);border:1px solid rgba(219,162,76,.6);box-shadow:0 11px 25px rgba(21,38,48,.13)}
+.strip-whatsapp {background:#177c65;color:#fff}
+.strip-whatsapp:hover {background:#126b56}
+.design-contact-list {background:#fffcf7;border-color:#eadfcb}
+.design-contact-list .contact-item-icon {background:#b87125}
+.design-contact-list .contact-item-icon.whatsapp-icon {background:#177c65}
+.design-enquiry-panel .field input,.design-enquiry-panel .field select,.design-enquiry-panel .field textarea,.search-control,.select-wrap select {border-color:#d9c9ae;background:#fffdf9}
+.design-map {border:1px solid #e5d9c6}
+.footer {background:linear-gradient(115deg,#0a1a33,#142f42);border-top:3px solid #c78b36;color:#fff9ec}
+.footer-main>div+div {border-left-color:rgba(224,178,109,.26)}
+.footer-logo.peacock-footer-logo {display:inline-flex;align-items:center;width:260px;max-width:100%;padding:10px 14px;background:#fffbf1;border:1px solid rgba(233,178,88,.55);border-radius:14px}
+.peacock-footer-logo img {width:100%;height:auto;object-fit:contain}
+.footer-links a {color:#e9e4dc}
+.footer-links a:hover,.footer-social .footer-reach {color:#f2bd70}
+.social-icon {background:#267884}
+.footer-bottom {border-top-color:rgba(225,181,115,.25)}
+@media(max-width:1150px) {
+ .site-header {height:92px}
+ .logo.site-brand {flex-basis:238px;min-width:238px}
+ .header-full-logo {height:88px;width:230px}
+}
+@media(max-width:760px) {
+ .site-header {height:78px}
+ .logo.site-brand {flex-basis:auto;min-width:0}
+ .header-full-logo {display:none}
+ .brand-mobile {display:flex;align-items:center;gap:8px}
+ .brand-mobile img {display:block;height:57px;width:47px;object-fit:contain}
+ .brand-mobile-copy {display:flex;flex-direction:column;color:#a9641c;line-height:1.08;font-size:16px;font-weight:850;letter-spacing:-.03em}
+ .brand-mobile-copy small {color:#0a1a33;font-size:12px;letter-spacing:.01em;margin-top:4px;font-weight:800}
+ .primary-nav {background:#fffcf6}
+ .primary-nav>a {color:#13253c}
+ .primary-nav>a.active {background:#0a1a33;color:#ffe4b4}
+}
+@media(max-width:420px) {
+ .brand-mobile-copy {font-size:14px}
+ .brand-mobile-copy small {font-size:11px}
+ .footer-logo.peacock-footer-logo {width:230px}
+}

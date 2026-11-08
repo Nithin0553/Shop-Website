@@ -3,3 +3,19 @@
 @media(max-width:690px){.admin-shell{display:block}.admin-sidebar{height:auto;min-height:0;position:static;padding:15px}.sidebar-logo{padding:0 0 13px}.sidebar-label{margin:16px 4px 6px}.admin-sidebar nav{flex-direction:row;overflow:auto;gap:6px}.sidebar-link{font-size:11px;white-space:nowrap;min-width:max-content;padding:10px}.sidebar-bottom{position:absolute;right:16px;top:16px;border:none;padding:0;margin:0}.sidebar-bottom>a{display:none}.sidebar-bottom button{font-size:11px}.admin-main{padding:23px 14px 50px}.admin-topbar h1{font-size:25px}.admin-topright{display:none}.admin-stat-row{gap:8px}.admin-stat{padding:14px}.admin-stat strong{font-size:26px}.admin-card-head{padding:19px;align-items:start;flex-direction:column}.admin-actions{flex-wrap:wrap}.settings-card form,.blog-editor form{padding:19px}.settings-grid{grid-template-columns:1fr}.settings-wide{grid-column:auto}.post-admin-item img{height:76px;width:94px}.post-admin-actions{width:100%;margin:0}.login-shell{grid-template-columns:1fr}.login-panel{padding:36px 28px}.login-art{display:none}}
 
 .upload-area{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.upload-area input{font-size:11px;min-height:0;max-width:240px;flex:1;padding:7px!important}.upload-area .btn{flex-shrink:0}.blog-editor .field>small{font-size:11px;color:#718099}
+
+
+/* Match the public peacock brand palette in the private shop dashboard. */
+.admin-body {background:#fffaf1}
+.admin-sidebar {background:linear-gradient(180deg,#0a1a33,#163b45)}
+.sidebar-label {color:#d2aa79}
+.sidebar-link.selected,.sidebar-link:hover {background:#8d581f;color:#fff5e6}
+.sidebar-count {background:#ca8730;color:#101f34}
+.admin-stat,.admin-card {border-color:#eadfcd;background:#fffdf8}
+.admin-topline {color:#a5641a}
+.login-shell {background:#fffbf4}
+.sidebar-logo {border-color:rgba(234,181,101,.28)}
+.sidebar-logo>span {color:#e9a749}
+.admin-sidebar .sidebar-logo img {width:44px;height:56px;object-fit:contain;flex:none}
+.admin-sidebar .sidebar-logo strong {color:#fff5e6}
+.login-brand .login-brand-mark {display:inline-block;width:34px;height:43px;object-fit:contain;vertical-align:middle;margin-right:8px}
