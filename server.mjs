@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { FESTIVALS, DEFAULT_FESTIVAL, isFestivalId, normalizeFestivalSettings } from './lib/festivals.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 // Native, dependency-free .env support for local development. Deployed env vars win.
@@ -38,7 +39,7 @@ fs.mkdirSync(DATA, { recursive:true });
 fs.mkdirSync(UPLOADS, { recursive:true });
 const dataPath = name => path.join(DATA, name);
 const defaults = { shopName:'Sri Sai Shanmukha Auto Centre', tagline:'Two-Wheeler Spare Parts & Accessories', phone:'',whatsapp:'',email:'',address:'',city:'',hours:'',mapsUrl:'',instagramUrl:'',facebookUrl:'',siteUrl:'' };
-for (const [file, defaultVal] of [['site.json', defaults], ['blogs.json', []], ['inquiries.json', []], ['subscribers.json', []]]) {
+for (const [file, defaultVal] of [['site.json', defaults], ['festival.json', DEFAULT_FESTIVAL], ['blogs.json', []], ['inquiries.json', []], ['subscribers.json', []]]) {
   const dest=dataPath(file), source=path.join(ROOT,'data',file);
   if (!fs.existsSync(dest)) {
     if (fs.existsSync(source)) fs.copyFileSync(source, dest);
@@ -122,6 +123,7 @@ function securityHeaders(res) {
 }
 async function handleApi(req,res,url) {
   const { pathname }=url;
+  if(pathname==='/api/festivals'&&req.method==='GET') return json(res,200,{festivals:FESTIVALS,settings:normalizeFestivalSettings(read('festival.json'))});
   if(pathname==='/api/site'&&req.method==='GET') return json(res,200,{...defaults,...read('site.json')});
   if(pathname==='/api/blogs'&&req.method==='GET') return json(res,200,read('blogs.json').filter(b=>b.status==='published').map(({body,...rest})=>rest));
   if(pathname.startsWith('/api/blogs/')&&req.method==='GET') {
@@ -162,6 +164,17 @@ async function handleApi(req,res,url) {
   if(pathname==='/api/admin/me'&&req.method==='GET') return json(res,200,{authenticated:authenticated(req),configured:!!ADMIN_PASSWORD});
   if(pathname.startsWith('/api/admin/')) {
     if(!authRequired(req,res)) return;
+    if(pathname==='/api/admin/festivals') {
+      if(req.method==='GET') return json(res,200,{festivals:FESTIVALS,settings:normalizeFestivalSettings(read('festival.json'))});
+      if(req.method==='PUT') {
+        const b=await body(req);
+        if(!b || Array.isArray(b) || typeof b.enabled!=='boolean' || !isFestivalId(b.festival))
+          return json(res,400,{error:'Choose a listed festival and a valid on/off setting.'});
+        const next=normalizeFestivalSettings(b);
+        write('festival.json',next);return json(res,200,next);
+      }
+      return badMethod(res);
+    }
     if(pathname==='/api/admin/site') {
       if(req.method==='GET') return json(res,200,{...defaults,...read('site.json')});
       if(req.method==='PUT') {
@@ -278,7 +291,7 @@ const server=http.createServer(async(req,res)=>{
       }
       return serveFile(res,decodeURIComponent(pathname.slice(1)));
     }
-    if(pathname==='/styles.css'||pathname==='/admin.css'||pathname==='/app.js'||pathname==='/admin.js')return serveFile(res,pathname.slice(1));
+    if(['/styles.css','/admin.css','/festivals.css','/app.js','/admin.js','/festival-effects.js'].includes(pathname))return serveFile(res,pathname.slice(1));
     if(pathname==='/sitemap.xml') {
       const config=read('site.json'); const base=allowHttp(config.siteUrl).replace(/\/$/,'');
       if(!base)return json(res,404,{error:'Set the site URL in Admin to enable the sitemap.'});

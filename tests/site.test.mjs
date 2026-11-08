@@ -19,7 +19,8 @@ async function request(endpoint,opts={}) {
  return {res:response,data:type.includes('application/json')?await response.json():await response.text()};
 }
 before(async()=>{
-  for(const f of ['site.json','blogs.json','inquiries.json'])fs.copyFileSync(path.join(root,'data',f),path.join(temp,f));
+  // Private runtime records must never be required as committed test fixtures.
+  for(const f of ['site.json','blogs.json'])fs.copyFileSync(path.join(root,'data',f),path.join(temp,f));
   server=spawn(process.execPath,['server.mjs'],{cwd:root,env:{...process.env,PORT:String(port),DATA_DIR:temp,ADMIN_PASSWORD:password,SESSION_SECRET:'test-secret-with-at-least-forty-characters'},stdio:'ignore'});
   let ready=false;
   for(let i=0;i<90;i++){try{const r=await fetch(base+'/api/site');if(r.ok){ready=true;break;}}catch{} await new Promise(r=>setTimeout(r,60));}

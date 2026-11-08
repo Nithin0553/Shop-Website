@@ -19,3 +19,47 @@
 .admin-sidebar .sidebar-logo img {width:44px;height:56px;object-fit:contain;flex:none}
 .admin-sidebar .sidebar-logo strong {color:#fff5e6}
 .login-brand .login-brand-mark {display:inline-block;width:34px;height:43px;object-fit:contain;vertical-align:middle;margin-right:8px}
+
+/* Festival controls and a preview isolated from the dashboard branding. */
+.festival-admin-intro {margin:0 0 25px;max-width:690px}
+.festival-admin-intro>p {font-size:24px;font-weight:800;color:#142b3e;letter-spacing:-.035em;margin:0 0 8px}
+.festival-admin-intro>span {font-size:13px;line-height:1.8;color:#596974}
+.festival-admin-grid {display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.3fr);gap:28px;align-items:start;max-width:1200px}
+.festival-controls {margin:0}
+.festival-controls .admin-card-head {padding:24px}
+.festival-controls .admin-card-head h2 {font-size:18px}
+.festival-control-body {padding:0 24px 25px}
+.festival-switch-row {display:flex;align-items:center;justify-content:space-between;gap:15px;padding:23px 0 25px;margin-bottom:6px;border-bottom:1px solid #ebdfce}
+.festival-switch-row strong {font-size:13px;color:#142b3e}
+.festival-switch-row p {font-size:11px;margin:4px 0 0;color:#64717c}
+.festival-switch {display:flex;align-items:center;gap:8px;background:transparent;border:0;padding:6px 0 6px 6px;font:inherit;font-size:12px;font-weight:750;color:#53636d;cursor:pointer;flex-shrink:0}
+.festival-switch-track {display:block;width:44px;height:26px;border-radius:30px;background:#71818c;padding:3px;transition:background .18s}
+.festival-switch-track>span {display:block;width:20px;height:20px;background:white;border-radius:50%;box-shadow:0 1px 4px #0003;transition:transform .18s}
+.festival-switch[aria-checked="true"] {color:#176a4e}
+.festival-switch[aria-checked="true"] .festival-switch-track {background:#26785c}
+.festival-switch[aria-checked="true"] .festival-switch-track>span {transform:translateX(18px)}
+.festival-switch:disabled {opacity:.6;cursor:wait}
+.festival-control-body .field {margin-top:24px}
+.festival-control-body select {width:100%;max-width:100%;font-size:13px;background:#fffdf7}
+.festival-control-body .field>small {font-size:11px;color:#62737e;line-height:1.7;margin-top:8px;display:block}
+.festival-display-status {display:flex;align-items:flex-start;gap:10px;margin:24px 0 20px;border:1px solid #e4ddd0;background:#f7f4ed;border-radius:11px;padding:16px}
+.festival-status-dot {flex:none;width:7px;height:7px;border-radius:50%;background:#77848c;margin-top:5px}
+.festival-display-status strong {display:block;font-size:12px;color:#364854;overflow-wrap:anywhere}
+.festival-display-status p {font-size:11px;line-height:1.7;color:#5d6f7b;margin:5px 0 0}
+.festival-display-status.is-live {background:#eef8f0;border-color:#c4deca}
+.festival-display-status.is-live .festival-status-dot {background:#24744e}
+.festival-display-status.is-live strong {color:#21613f}
+.festival-display-status.is-saving .festival-status-dot {background:#a96b26}
+.festival-effect-note {display:flex;align-items:start;gap:10px;margin-top:22px}
+.festival-effect-note>span {color:#b27227;font-size:20px;line-height:1.1}
+.festival-effect-note strong {font-size:11px;color:#344c58}
+.festival-effect-note p {font-size:12px;line-height:1.7;color:#526776;margin:5px 0 0}
+.festival-admin-note {font-size:11px;line-height:1.8;margin:20px 0;color:#61727d}
+.festival-save-error {font-size:12px;line-height:1.7;color:#a32e3d;background:#fff0f0;border-radius:8px;padding:12px}
+.festival-preview-heading {display:flex;justify-content:space-between;align-items:center;margin:0 0 14px}
+.festival-preview-heading h2 {font-size:16px;color:#193344;margin:0}
+.festival-preview-heading>span {font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.06em;color:#8d5d24;padding:5px 9px;border:1px solid #e5ccaa;border-radius:5px;background:#fff8eb}
+.festival-preview-caption {font-size:11px;line-height:1.8;color:#647480;margin:15px 0 0}
+@media(max-width:1150px) {.festival-admin-grid {grid-template-columns:1fr;max-width:720px}.festival-control-body {padding-top:0}.festival-preview-column {margin-top:4px}}
+@media(max-width:650px) {.festival-admin-grid {gap:24px}.festival-controls .admin-card-head {padding:20px}.festival-control-body {padding:0 20px 22px}.festival-admin-intro>p {font-size:22px}}
+@media(prefers-reduced-motion:reduce) {.festival-switch-track,.festival-switch-track>span {transition:none}}

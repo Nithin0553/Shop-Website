@@ -48,6 +48,9 @@ test('about and contact mockup sections include real enquiry form',async()=>{
   for(const route of ['/about','/contact']){
     const html=await renderAt(route);
     for(const text of ['Get in Touch / Visit Our Store','Send an Inquiry','enquiry-form','customer-phone','customer-brand','Required Part','contact-map']) assert.ok(html.includes(text),`${route}: missing ${text}`);
+    assert.ok(!html.includes('[object Object]'), 'Enquiry brands should be readable names');
+    for(const brand of ['Hero','Honda','Bajaj','TVS','Yamaha','Suzuki','Royal Enfield'])
+      assert.ok(html.includes(`<option value="${brand}"`),`${route}: missing enquiry brand ${brand}`);
   }
 });
 test('public article pages fetch and display the full article body',async()=>{
