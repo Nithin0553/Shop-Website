@@ -4,6 +4,10 @@ A responsive, working website for a local two-wheeler spare-parts and accessorie
 
 **Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. No paid services, third-party packages, or build step are required.
 
+## Cloudflare Workers Free deployment
+
+A Cloudflare Workers + D1 version of the same website is available in this repository. It preserves public pages, the protected admin dashboard, enquiry collection, blog management, uploaded images and festival themes, while moving durable records to D1 and using polling for festival updates. See [the Cloudflare deployment and data migration guide](docs/cloudflare-workers.md). Existing Railway/local data is **not** automatically transferred; keep backups and the current host until the Cloudflare version is verified.
+
 ## Quick start on Windows (or Mac/Linux)
 
 1. Install [Node.js](https://nodejs.org/) version 20 or later.
