@@ -50,3 +50,17 @@ test('Why Choose Us symbols use peacock green',()=>{
   assert.match(style,/color:#21834d;/);
   assert.match(style,/\.design-why-section \.design-feature > span \.icon/);
 });
+
+test('public storefront uses white backgrounds while retaining brand headings and festival themes',()=>{
+  const css=get('public/styles.css');
+  const area='body:not(.admin-body):not([data-festival])';
+  assert.ok(css.includes('Clean white storefront — remove the warm orange/ivory page gradients'));
+  for(const selector of ['.showcase-hero','.design-brand-section','.design-categories-section','.spotlight-section','.design-why-section','.design-home-blogs','.page-hero','.shop-contact-section'])
+    assert.ok(css.includes(area+' '+selector),selector);
+  assert.ok(css.includes('background:#ffffff;'));
+  assert.ok(css.includes(area+' .premium-section::before'));
+  assert.ok(css.includes(area+' .spotlight-card::after'));
+  assert.ok(css.includes('background-image:none;'));
+  assert.ok(css.includes('color:#21834d;'),'green symbols remain unchanged');
+  assert.ok(css.includes('.design-heading h2:before,.design-heading h2:after {background:linear-gradient'),'gold title accents remain');
+});

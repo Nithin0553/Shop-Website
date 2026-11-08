@@ -702,3 +702,95 @@ body,.admin-body {
   color:#21834d;
   stroke:currentColor;
 }
+
+
+/* Clean white storefront — remove the warm orange/ivory page gradients.
+   Keep the peacock-gold headings and brand accents; do not affect the admin
+   dashboard or festival-specific themes when a festival is activated. */
+body:not(.admin-body):not([data-festival]) {
+  background:#ffffff;
+}
+body:not(.admin-body):not([data-festival]) main,
+body:not(.admin-body):not([data-festival]) .site-header,
+body:not(.admin-body):not([data-festival]) .hero,
+body:not(.admin-body):not([data-festival]) .showcase-hero,
+body:not(.admin-body):not([data-festival]) .page-hero,
+body:not(.admin-body):not([data-festival]) .section-muted,
+body:not(.admin-body):not([data-festival]) .design-brand-section,
+body:not(.admin-body):not([data-festival]) .design-categories-section,
+body:not(.admin-body):not([data-festival]) .design-why-section,
+body:not(.admin-body):not([data-festival]) .spotlight-section,
+body:not(.admin-body):not([data-festival]) .design-home-blogs,
+body:not(.admin-body):not([data-festival]) .design-about-section,
+body:not(.admin-body):not([data-festival]) .parts-section,
+body:not(.admin-body):not([data-festival]) .premium-section,
+body:not(.admin-body):not([data-festival]) .featured-blog-section,
+body:not(.admin-body):not([data-festival]) .design-blogs-list,
+body:not(.admin-body):not([data-festival]) .subscribe-section,
+body:not(.admin-body):not([data-festival]) .blog-section,
+body:not(.admin-body):not([data-festival]) .shop-contact-section {
+  background:#ffffff;
+  background-image:none;
+}
+body:not(.admin-body):not([data-festival]) .premium-section::before,
+body:not(.admin-body):not([data-festival]) .spotlight-card::after {
+  display:none;
+}
+body:not(.admin-body):not([data-festival]) .spotlight-grid .spotlight-card,
+body:not(.admin-body):not([data-festival]) .spotlight-card,
+body:not(.admin-body):not([data-festival]) .spotlight-tyres,
+body:not(.admin-body):not([data-festival]) .spotlight-helmets,
+body:not(.admin-body):not([data-festival]) .spotlight-oils,
+body:not(.admin-body):not([data-festival]) .spotlight-activa,
+body:not(.admin-body):not([data-festival]) .brand-marquee .brand-card.logo-card,
+body:not(.admin-body):not([data-festival]) .static-brand-grid .brand-card.logo-card,
+body:not(.admin-body):not([data-festival]) .parts-marquee .marquee-part-frame,
+body:not(.admin-body):not([data-festival]) .part-list-photo,
+body:not(.admin-body):not([data-festival]) .design-feature,
+body:not(.admin-body):not([data-festival]) .blog-card.design-blog-card,
+body:not(.admin-body):not([data-festival]) .featured-post,
+body:not(.admin-body):not([data-festival]) .subscribe-panel,
+body:not(.admin-body):not([data-festival]) .design-contact-list,
+body:not(.admin-body):not([data-festival]) .design-enquiry-panel {
+  background:#ffffff;
+  background-image:none;
+}
+body:not(.admin-body):not([data-festival]) .spotlight-grid .spotlight-brand-pill,
+body:not(.admin-body):not([data-festival]) .spotlight-list li,
+body:not(.admin-body):not([data-festival]) .category-filter-row,
+body:not(.admin-body):not([data-festival]) .featured-post-image,
+body:not(.admin-body):not([data-festival]) .design-enquiry-panel .field input,
+body:not(.admin-body):not([data-festival]) .design-enquiry-panel .field select,
+body:not(.admin-body):not([data-festival]) .design-enquiry-panel .field textarea,
+body:not(.admin-body):not([data-festival]) .search-control,
+body:not(.admin-body):not([data-festival]) .select-wrap select {
+  background:#ffffff;
+  background-image:none;
+}
+/* Make the hero photo sit against the clean white background. */
+body:not(.admin-body):not([data-festival]) .showcase-image {
+  box-shadow:none;
+}
+/* White fade at the two edges of the continuously scrolling logo strip. */
+body:not(.admin-body):not([data-festival]) .brand-marquee::before {
+  background:linear-gradient(90deg,#fff 6%,rgba(255,255,255,0));
+}
+body:not(.admin-body):not([data-festival]) .brand-marquee::after {
+  background:linear-gradient(270deg,#fff 6%,rgba(255,255,255,0));
+}
+/* Orange/gold belongs in the title, dividers and accents, not section fills.
+   Keep primary actions solid instead of adding another orange gradient. */
+body:not(.admin-body):not([data-festival]) .btn-primary,
+body:not(.admin-body):not([data-festival]) .read-more-button {
+  background:#e9aa55;
+  background-image:none;
+}
+body:not(.admin-body):not([data-festival]) .btn-primary:hover,
+body:not(.admin-body):not([data-festival]) .read-more-button:hover {
+  background:#d99436;
+  background-image:none;
+}
+/* The navigation flyout also remains white on narrow screens. */
+@media(max-width:760px) {
+  body:not(.admin-body):not([data-festival]) .primary-nav { background:#ffffff; }
+}
