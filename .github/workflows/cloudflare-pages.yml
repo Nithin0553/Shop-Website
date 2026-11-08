@@ -1,0 +1,37 @@
+name: Cloudflare Pages build checks
+
+on:
+  pull_request:
+    paths:
+      - "cloudflare/**"
+      - "data/**"
+      - "lib/**"
+      - "public/**"
+      - "scripts/build-cloudflare-pages.mjs"
+      - "tests/**"
+      - "wrangler.pages.jsonc"
+      - "package.json"
+      - ".github/workflows/cloudflare-pages.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install build tools
+        run: npm install --no-audit --no-fund
+      - name: Run application and Pages configuration tests
+        run: npm test
+      - name: Build Pages advanced-mode Worker
+        run: npm run cloudflare:pages:build
+      - name: Check deployable Pages output
+        run: |
+          test -s dist-pages/_worker.js
+          test -s dist-pages/index.html
+          test ! -e dist-pages/.assetsignore
+          test ! -e dist-pages/data/inquiries.json
