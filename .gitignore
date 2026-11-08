@@ -16,3 +16,6 @@ data/subscribers.json
 .wrangler/
 .cloudflare-import.sql
 cloudflare-out/
+
+# Cloudflare Pages production build; do not commit generated Worker bundle.
+dist-pages/

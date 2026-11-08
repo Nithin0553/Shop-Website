@@ -2,11 +2,15 @@
 
 A responsive, working website for a local two-wheeler spare-parts and accessories shop, refined to follow the approved blue-and-white homepage, blog, and About/Contact reference mockups. It includes a public site, blog, customer enquiry form, and protected shop dashboard.
 
-**Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. No paid services, third-party packages, or build step are required.
+**Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. The local Node.js server needs no third-party packages or build step; the optional Cloudflare Pages deployment uses an esbuild build step.
 
 ## Cloudflare Workers Free deployment
 
 A Cloudflare Workers + D1 version of the same website is available in this repository. It preserves public pages, the protected admin dashboard, enquiry collection, blog management, uploaded images and festival themes, while moving durable records to D1 and using polling for festival updates. See [the Cloudflare deployment and data migration guide](docs/cloudflare-workers.md). Existing Railway/local data is **not** automatically transferred; keep backups and the current host until the Cloudflare version is verified.
+
+## Shorter free Cloudflare Pages URL
+
+The existing Cloudflare Worker can also run on Pages at a `*.pages.dev` address, while **reusing the same live D1 database** (no copying or resetting shop records). Use [the Pages migration guide](docs/cloudflare-pages.md) to build and deploy. The original Workers and Railway deployments remain intact until the Pages deployment is tested.
 
 ## Quick start on Windows (or Mac/Linux)
 

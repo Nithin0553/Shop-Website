@@ -12,9 +12,15 @@
     "cloudflare:dev": "npx wrangler dev",
     "cloudflare:deploy": "npx wrangler deploy",
     "cloudflare:db:local": "npx wrangler d1 migrations apply sssa-shop-data --local",
-    "cloudflare:db:remote": "npx wrangler d1 migrations apply sssa-shop-data --remote"
+    "cloudflare:db:remote": "npx wrangler d1 migrations apply sssa-shop-data --remote",
+    "cloudflare:pages:build": "node scripts/build-cloudflare-pages.mjs",
+    "cloudflare:pages:dev": "npm run cloudflare:pages:build && npx wrangler pages dev ./dist-pages --config wrangler.pages.jsonc",
+    "cloudflare:pages:deploy": "npm run cloudflare:pages:build && npx wrangler pages deploy ./dist-pages --project-name sri-sai-shanmukha-auto-centre --branch main --config wrangler.pages.jsonc"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
   }
 }
