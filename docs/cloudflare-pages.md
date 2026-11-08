@@ -26,10 +26,10 @@ npm run cloudflare:pages:build
 
 `dist-pages/_worker.js` should exist after building. The output folder is ignored by Git and contains only deployable public assets plus the bundled Worker. Do **not** upload any private `data/inquiries.json`, `.env`, or `.dev.vars` files.
 
-Cloudflare login was already completed for the Workers deployment. Create a new Pages project (once only). Cloudflare Pages requires that Wrangler discover a **standard** \`wrangler.jsonc\` in the current directory (it rejects \`--config\`); so switch to the Pages configuration directory:
+Cloudflare login was already completed for the Workers deployment. Create a new Pages project (once only). Cloudflare Pages requires that Wrangler discover a **standard** `wrangler.jsonc` in the current directory (it rejects `--config`); so switch to the Pages configuration directory:
 
 ```powershell
-Push-Location .\\pages-config
+Push-Location .\pages-config
 npx wrangler pages project create sri-sai-shanmukha-auto-centre --production-branch main
 ```
 
