@@ -119,7 +119,7 @@ function securityHeaders(res) {
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
   res.setHeader('X-Frame-Options','DENY');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; base-uri 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; script-src 'self'; style-src 'self'; connect-src 'self'; frame-src https://maps.google.com https://www.google.com; form-action 'self'; frame-ancestors 'none'");
+  res.setHeader('Content-Security-Policy',"default-src 'self'; base-uri 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-src https://maps.google.com https://www.google.com; form-action 'self'; frame-ancestors 'none'");
 }
 async function handleApi(req,res,url) {
   const { pathname }=url;

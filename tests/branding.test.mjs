@@ -29,3 +29,17 @@ test('homepage and dashboard use the peacock gold, navy and teal design tokens',
     assert.ok(css.includes(declaration),`Missing ${declaration}`);
   assert.match(get('public/admin.css'),/admin-sidebar \{background:linear-gradient/);
 });
+
+test('San Francisco is prioritized across storefront and dashboard',()=>{
+  const style=get('public/styles.css');
+  assert.match(style,/--shop-font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text"/);
+  assert.match(style,/--shop-font-heading:-apple-system,BlinkMacSystemFont,"SF Pro Display"/);
+  assert.match(style,/html,body,button,input,textarea,select,option/);
+  assert.match(style,/\.admin-topbar h1,\.panel-head h2/);
+  assert.match(style,/font-family:var\(--shop-font-heading\)/);
+  for(const page of ['public/index.html','public/admin.html'])
+    assert.match(get(page),/fonts\.googleapis\.com\/css2\?family=Inter/);
+  const backend=get('server.mjs');
+  assert.match(backend,/style-src 'self' https:\/\/fonts\.googleapis\.com/);
+  assert.match(backend,/font-src 'self' https:\/\/fonts\.gstatic\.com/);
+});
