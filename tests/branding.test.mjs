@@ -43,3 +43,10 @@ test('San Francisco is prioritized across storefront and dashboard',()=>{
   assert.match(backend,/style-src 'self' https:\/\/fonts\.googleapis\.com/);
   assert.match(backend,/font-src 'self' https:\/\/fonts\.gstatic\.com/);
 });
+
+test('Why Choose Us symbols use peacock green',()=>{
+  const style=get('public/styles.css');
+  assert.match(style,/\.design-why-section \.design-feature > span/);
+  assert.match(style,/color:#21834d;/);
+  assert.match(style,/\.design-why-section \.design-feature > span \.icon/);
+});

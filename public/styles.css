@@ -695,3 +695,10 @@ body,.admin-body {
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
+
+/* Why Choose Us: peacock-green symbols, with all other card styling preserved. */
+.design-why-section .design-feature > span,
+.design-why-section .design-feature > span .icon {
+  color:#21834d;
+  stroke:currentColor;
+}
