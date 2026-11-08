@@ -35,7 +35,7 @@ async function request(route,options={}) {
 const update=body=>request('/api/admin/festivals',{method:'PUT',admin:true,body});
 
 before(async()=>{
-  // Simulate an existing installation: no festival.json and no private fixtures.
+  // Seed a clean, isolated festival test installation; never depend on edited shop data.
   fs.copyFileSync(path.join(root,'data/site.json'),path.join(temp,'site.json'));
   // Use explicit test fixtures so locally edited festival settings never affect tests.
   fs.writeFileSync(path.join(temp,'festival.json'),JSON.stringify(DEFAULT_FESTIVAL,null,2)+'\n');
@@ -45,7 +45,7 @@ before(async()=>{
 });
 after(async()=>{await stopServer();fs.rmSync(temp,{recursive:true,force:true});});
 
-test('old installations start with festival mode off and all 20 requested choices',async()=>{
+test('clean festival settings start with mode off and all 20 requested choices',async()=>{
   const result=await request('/api/festivals');
   assert.equal(result.status,200);
   assert.deepEqual(result.data.settings,{...DEFAULT_FESTIVAL});
