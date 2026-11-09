@@ -2,7 +2,7 @@
 
 ## Mobile carousels
 
-The homepage's brand and spare-parts marquees now use two equal-width groups: one visible group and an inert, `aria-hidden` duplicate. CSS moves the track by exactly half its width, so the next cycle begins without a visible gap or jump. Mobile scrolling is faster (brands 15.5 seconds; categories 18.5 seconds). The hover pause is now limited to fine-pointer/hover devices, so taps on smartphones do not leave the strip paused. `prefers-reduced-motion: reduce` disables animation for visitors who request less motion.
+The homepage's brand and spare-parts marquees now use two equal-width groups: one visible group and an `aria-hidden` duplicate whose links stay clickable by touch but leave the keyboard tab order. CSS moves the track by exactly half its width, so the next cycle begins without a visible gap or jump. Mobile scrolling is faster (brands 15.5 seconds; categories 18.5 seconds). The hover pause is now limited to fine-pointer/hover devices, so taps on smartphones do not leave the strip paused. `prefers-reduced-motion: reduce` disables animation for visitors who request less motion.
 
 ## Automatic WhatsApp alerts: separate Meta setup required
 
