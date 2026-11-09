@@ -1,5 +1,6 @@
 import { FESTIVALS, FESTIVAL_INTENSITIES, FESTIVAL_PALETTES, DEFAULT_FESTIVAL, normalizeFestivalSettings, validateFestivalSettings } from '../lib/festivals.mjs';
 import initialSite from '../data/site.json' with { type: 'json' };
+import { whatsappConfigured, sendEnquiryWhatsAppNotification } from '../lib/whatsapp-notifications.mjs';
 import initialBlogs from '../data/blogs.json' with { type: 'json' };
 
 const MAX_BODY = 100_000;
@@ -146,7 +147,7 @@ async function normalizePost(env, payload, old = {}) {
   };
 }
 
-async function api(req, env, url) {
+async function api(req, env, url, ctx) {
   const path = url.pathname, method = req.method;
   if (path === '/api/festivals' && method === 'GET') return json(await festivalPayload(env));
   // The Cloudflare edition uses 15-second polling instead of keeping long-lived SSE connections open.
@@ -176,6 +177,13 @@ async function api(req, env, url) {
     const entry = { id: 'INQ-' + Date.now().toString(36).toUpperCase() + '-' + crypto.randomUUID().slice(0, 4).toUpperCase(), name, phone, brand, model, part, message, status: 'new', createdAt: new Date().toISOString() };
     await env.DB.prepare('INSERT INTO inquiries (id, created_at, status, name, phone, brand, model, part, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
       .bind(entry.id, entry.createdAt, entry.status, name, phone, brand, model, part, message).run();
+    // Notify the shop only AFTER D1 confirms the enquiry was stored.
+    // Never make an accepted customer enquiry depend on WhatsApp delivery.
+    if (whatsappConfigured(env)) {
+      const notification = sendEnquiryWhatsAppNotification(env, entry);
+      if (ctx?.waitUntil) ctx.waitUntil(notification);
+      else await notification;
+    }
     return json({ id: entry.id, message: 'Your enquiry has been received.' }, 201);
   }
   if (path === '/api/subscriptions' && method === 'POST') {
@@ -352,12 +360,12 @@ function security(response, preview = false) {
   headers.set('Content-Security-Policy', "default-src 'self'; base-uri 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-src https://maps.google.com https://www.google.com 'self'; form-action 'self'; frame-ancestors " + (preview ? "'self'" : "'none'"));
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
-async function route(req, env) {
+async function route(req, env, ctx) {
   const url = new URL(req.url), path = url.pathname;
   const previewRequested = path === '/' && url.searchParams.has('festivalPreview');
   const privatePreview = previewRequested && url.searchParams.get('festivalPreview') === '1' && await authenticated(req, env);
   if (previewRequested && !privatePreview) return json({ error: 'Sign in to the dashboard to preview a festival.' }, 401);
-  if (path.startsWith('/api/')) return api(req, env, url);
+  if (path.startsWith('/api/')) return api(req, env, url, ctx);
   if (!['GET', 'HEAD'].includes(req.method)) return methodError();
   if (path === '/festival-palettes.css') return new Response(FESTIVAL_PALETTES, { headers: { 'Content-Type': 'text/css; charset=utf-8', 'Cache-Control': 'no-cache' } });
   if (path === '/sitemap.xml') return sitemap(env);
@@ -375,10 +383,10 @@ async function route(req, env) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     try {
       if (!env.DB || !env.ASSETS) return json({ error: 'Cloudflare D1 or asset binding is not configured.' }, 503);
-      return security(await route(request, env), new URL(request.url).searchParams.has('festivalPreview'));
+      return security(await route(request, env, ctx), new URL(request.url).searchParams.has('festivalPreview'));
     } catch (error) {
       console.error('Shop worker error:', error);
       const message = error?.message || '';
