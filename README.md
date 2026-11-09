@@ -12,6 +12,10 @@ A Cloudflare Workers + D1 version of the same website is available in this repos
 
 The existing Cloudflare Worker can also run on Pages at a `*.pages.dev` address, while **reusing the same live D1 database** (no copying or resetting shop records). Use [the Pages migration guide](docs/cloudflare-pages.md) to build and deploy. The original Workers and Railway deployments remain intact until the Pages deployment is tested.
 
+## Mobile scrolling and WhatsApp enquiry alerts
+
+The homepage brand/logo and spare-parts strips scroll seamlessly on mobile with touch-safe timing and reduced-motion support. The Cloudflare Pages and Workers enquiry API can send an optional **WhatsApp message to the shop owner** after saving an enquiry to D1, using Meta's official WhatsApp Business API and a pre-approved message template. **WhatsApp alerts are not enabled automatically:** the owner must configure a separate sending number, Meta API credentials, approved template and receiving shop WhatsApp number. See [mobile scrolling and WhatsApp setup](docs/mobile-carousel-whatsapp.md). Railway's standalone Node server does not use this Cloudflare notification hook.
+
 ## Quick start on Windows (or Mac/Linux)
 
 1. Install [Node.js](https://nodejs.org/) version 20 or later.

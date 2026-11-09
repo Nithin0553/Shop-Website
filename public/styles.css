@@ -241,9 +241,17 @@ body { font-size:15px; line-height:1.5; color:var(--ink) }
 .marquee-shell::before { left:0; background:linear-gradient(90deg,#f5f8fc 8%,rgba(245,248,252,0)); }
 .marquee-shell::after { right:0; background:linear-gradient(270deg,#f5f8fc 8%,rgba(245,248,252,0)); }
 .design-categories-section .marquee-shell::before,.design-categories-section .marquee-shell::after { background:none; }
-.marquee-track { display:flex; gap:14px; width:max-content; animation:scroll-x var(--marquee-duration,32s) linear infinite; will-change:transform; }
-.marquee-shell:hover .marquee-track { animation-play-state:paused; }
-@keyframes scroll-x { from { transform:translateX(0); } to { transform:translateX(calc(-50% - 7px)); } }
+.marquee-track { display:flex; gap:0; width:max-content; animation:scroll-x var(--marquee-duration,32s) linear infinite; will-change:transform; }
+.marquee-group { display:flex; flex:0 0 auto; gap:14px; padding-right:14px; }
+/* Each group has exactly the same width, so -50% joins the copies without a jump. */
+@keyframes scroll-x { from { transform:translate3d(0,0,0); } to { transform:translate3d(-50%,0,0); } }
+@media (hover:hover) and (pointer:fine) {
+  .marquee-shell:hover .marquee-track { animation-play-state:paused; }
+}
+/* Touch devices can retain a synthetic hover after a tap; never pause the moving strips there. */
+@media (hover:none) {
+  .marquee-shell .marquee-track { animation-play-state:running; }
+}
 @media (prefers-reduced-motion:reduce) { .marquee-track { animation:none; } }
 .brand-card.logo-card { flex:0 0 178px; min-height:84px; padding:10px 16px; overflow:hidden; background:#fff; border:1px solid #dfe7f0; box-shadow:0 8px 20px rgba(19,38,66,.08); border-radius:12px; }
 .brand-card.logo-card img { display:block; width:100%; height:58px; object-fit:contain; object-position:center; }
@@ -793,4 +801,18 @@ body:not(.admin-body):not([data-festival]) .read-more-button:hover {
 /* The navigation flyout also remains white on narrow screens. */
 @media(max-width:760px) {
   body:not(.admin-body):not([data-festival]) .primary-nav { background:#ffffff; }
+}
+
+
+/* Mobile: steady, faster, seamless marquees for the actual card widths (7 brands, 9 categories). */
+@media (max-width:900px) {
+  .brand-marquee .marquee-track { animation-duration:19.5s; }
+  .parts-marquee .marquee-track { animation-duration:22.5s; }
+}
+@media (max-width:650px) {
+  .brand-marquee .marquee-track { animation-duration:15.5s; }
+  .parts-marquee .marquee-track { animation-duration:18.5s; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .marquee-shell .marquee-track { animation:none; transform:none; }
 }
