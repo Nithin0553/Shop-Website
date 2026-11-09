@@ -29,9 +29,10 @@ const env = {
 test('brand and category marquees have identical grouped copies and accessible clones', () => {
   const js = fs.readFileSync(path.join(root, 'public/app.js'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'public/styles.css'), 'utf8');
-  assert.match(js, /class="marquee-group" aria-hidden="true" inert/);
+  assert.match(js, /class="marquee-group" aria-hidden="true"/);
   assert.match(js, /items\.map\(\(item,index\)=>renderer\(item,index,false\)\)/);
   assert.match(js, /items\.map\(\(item,index\)=>renderer\(item,index,true\)\)/);
+  assert.match(js, /clone\?'tabindex="-1" '/);
   assert.match(css, /\.marquee-group\s*\{[^}]*gap:14px;[^}]*padding-right:14px;/);
   assert.match(css, /@keyframes scroll-x\s*\{[^}]*translate3d\(0,0,0\)[^}]*\}[^}]*translate3d\(-50%,0,0\)/);
   assert.match(css, /@media \(hover:hover\) and \(pointer:fine\)/);
