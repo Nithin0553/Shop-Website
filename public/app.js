@@ -106,7 +106,29 @@ function whatsappUrl(message='Hello, I would like to enquire about two-wheeler s
   return digits ? `https://wa.me/${digits}?text=${encodeURIComponent(message)}`:'';
 }
 function phoneUrl(){return SITE.phone ? `tel:${SITE.phone.replace(/[^+\d]/g,'')}`:'';}
-function mapsUrl(){if(SITE.mapsUrl)return SITE.mapsUrl;if(SITE.address)return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address+(SITE.city?', '+SITE.city:''))}`;return '';}
+// An actual Google Maps Share URL takes priority: it points to the shop's chosen pin.
+// Upgrade only the original address-only link; do not replace owner-set place links.
+function specificShopMapsSearch(){
+  const query=[SITE.shopName||siteDefault.shopName,SITE.address||siteDefault.address,SITE.city].filter(Boolean).join(', ');
+  return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : '';
+}
+function mapsUrl(){
+  const saved=String(SITE.mapsUrl||'').trim();
+  if(saved){
+    try {
+      const url=new URL(saved);
+      if(url.protocol==='https:'||url.protocol==='http:'){
+        const oldQuery=url.searchParams.get('query');
+        const isLegacyAddressSearch=/^(www\.)?google\.[a-z.]+$/i.test(url.hostname) &&
+          url.pathname.replace(/\/$/,'')==='/maps/search' &&
+          url.searchParams.get('api')==='1' &&
+          oldQuery?.trim()===siteDefault.address;
+        return isLegacyAddressSearch ? specificShopMapsSearch() : url.href;
+      }
+    } catch {}
+  }
+  return specificShopMapsSearch();
+}
 function shopMark(){return esc(SITE.shopName||siteDefault.shopName).replace(/\s+Auto Centre$/i,'<br/>Auto Centre');}
 function brandName(brand){return brand==='Royal Enfield'?'ROYAL ENFIELD':brand.toUpperCase();}
 function marquee(items, renderer, className='', duration='32s'){const original=items.map((item,index)=>renderer(item,index,false)).join('');const repeated=items.map((item,index)=>renderer(item,index,true)).join('');return `<div class="marquee-shell ${className}" style="--marquee-duration:${duration}"><div class="marquee-track"><div class="marquee-group">${original}</div><div class="marquee-group" aria-hidden="true">${repeated}</div></div></div>`;}

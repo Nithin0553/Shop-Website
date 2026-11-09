@@ -16,6 +16,10 @@ The existing Cloudflare Worker can also run on Pages at a `*.pages.dev` address,
 
 The homepage brand/logo and spare-parts strips scroll seamlessly on mobile with touch-safe timing and reduced-motion support. The Cloudflare Pages and Workers enquiry API can send an optional **WhatsApp message to the shop owner** after saving an enquiry to D1, using Meta's official WhatsApp Business API and a pre-approved message template. **WhatsApp alerts are not enabled automatically:** the owner must configure a separate sending number, Meta API credentials, approved template and receiving shop WhatsApp number. See [mobile scrolling and WhatsApp setup](docs/mobile-carousel-whatsapp.md). Railway's standalone Node server does not use this Cloudflare notification hook.
 
+## Exact Google Maps location
+
+The website uses the Google Maps URL saved in **Admin → Shop details** for its map button and footer address link. A street-address search may show a nearby business; to open the correct shop pin, copy the location directly from your shop's own Google Maps listing using **Share → Copy link** and paste it in the dashboard. See [exact Maps link setup](docs/precise-google-maps-link.md).
+
 ## Quick start on Windows (or Mac/Linux)
 
 1. Install [Node.js](https://nodejs.org/) version 20 or later.
