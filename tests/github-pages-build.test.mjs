@@ -76,3 +76,32 @@ test('only public storefront assets and static JSON are exported',()=>{
   const site=JSON.parse(read('static-data/site.json'));
   assert.equal(site.siteUrl,'https://nithin0553.github.io/Shop-Website/');
 });
+
+test('GitHub Pages image paths include the repository prefix exactly once',()=>{
+  const source=readFileSync(path.join(root,'scripts/github-pages-static-runtime.js'),'utf8');
+  const start=source.indexOf('function staticHtml(html) {');
+  const end=source.indexOf('\nasync function handleSubmit(',start);
+  assert.ok(start>=0&&end>start);
+  const transform=Function('GH_BASE',source.slice(start,end)+'\nreturn staticHtml;')('/Shop-Website');
+  const html=[
+    '<img src="/Shop-Website/assets/shop-logo-full.webp?v=123">',
+    '<img src="/Shop-Website/assets/brand-card-hero.png?v=123">',
+    '<img src="/assets/category-engine.webp">',
+    '<a href="/contact">Contact</a>',
+    '<a href="/Shop-Website/spare-parts">Spare parts</a>',
+    '<a href="https://maps.google.com/">Maps</a>'
+  ].join('');
+  const result=transform(html);
+  assert.match(result,/src="\/Shop-Website\/assets\/shop-logo-full.webp\?v=123"/);
+  assert.match(result,/src="\/Shop-Website\/assets\/brand-card-hero.png\?v=123"/);
+  assert.match(result,/src="\/Shop-Website\/assets\/category-engine.webp"/);
+  assert.match(result,/href="\/Shop-Website\/contact"/);
+  assert.match(result,/href="\/Shop-Website\/spare-parts"/);
+  assert.match(result,/href="https:\/\/maps.google.com\/"/);
+  assert.ok(!result.includes('/Shop-Website/Shop-Website/'));
+  for(const filename of ['shop-logo-full.webp','shop-logo-mark.webp','brand-card-hero.png','category-engine.webp','hero-shop.webp']){
+    assert.ok(existsSync(path.join(out,'assets',filename)),filename+' must be included in published artifacts');
+  }
+  const index=read('index.html');
+  assert.match(index,/\/Shop-Website\/app\.js\?v=[a-f0-9]{12}/);
+});

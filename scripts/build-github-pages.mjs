@@ -1,6 +1,7 @@
 // Create a standalone GitHub Pages site from public assets and committed public data.
 import { readFile, writeFile, mkdir, rm, cp } from 'node:fs/promises';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { FESTIVALS, FESTIVAL_INTENSITIES, FESTIVAL_PALETTES, normalizeFestivalSettings } from '../lib/festivals.mjs';
 
@@ -86,6 +87,13 @@ await write('festival-effects.js',festival);
 
 let html=await readFile(path.join(root,'public/index.html'),'utf8');
 html=html.replace(/\b(href|src)="\/(?!\/)/g,(_,key)=>key+'="'+base+'/');
+// Bust cached browser JS whenever the generated storefront changes.
+const appVersion=createHash('sha256').update(app).digest('hex').slice(0,12);
+html=replaceOnce(html,
+  'src="'+base+'/app.js"',
+  'src="'+base+'/app.js?v='+appVersion+'"',
+  'versioned storefront asset'
+);
 html=replaceOnce(html,
   '<script src="'+base+'/festival-effects.js" defer></script>',
   '<script>window.SHOP_STATIC_MODE=true;window.__SHOP_STATIC_BASE__='+JSON.stringify(base)+';</script>\n' +

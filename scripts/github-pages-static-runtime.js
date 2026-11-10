@@ -10,7 +10,13 @@ function withBase(url) {
   return url.startsWith('/') ? GH_BASE + url : url;
 }
 function staticHtml(html) {
-  return html.replace(/\b(href|src)="\/(?!\/)/g, (_, attr) => attr + '="' + GH_BASE + '/');
+  // Some image URLs already come from asset(), which includes GH_BASE.
+  // Prefix only truly root-relative links; never turn /Shop-Website/assets/
+  // into the invalid /Shop-Website/Shop-Website/assets/ path.
+  return html.replace(/\b(href|src)="(\/(?!\/)[^"]*)"/g, (_, attr, url) => {
+    const target = url === GH_BASE || url.startsWith(GH_BASE + '/') ? url : GH_BASE + url;
+    return attr + '="' + target + '"';
+  });
 }
 
 async function handleSubmit(e) {
