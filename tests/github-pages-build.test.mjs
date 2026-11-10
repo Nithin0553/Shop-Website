@@ -22,7 +22,7 @@ test('static export publishes direct repository-scoped routes and all committed 
   }
   for(const post of blogs) {
     const page=read('blogs/'+post.slug+'/index.html');
-    assert.ok(page.includes(post.title),post.slug);
+    assert.ok(page.includes(post.title.replace(/&/g,'&amp;')),post.slug);
     assert.ok(page.includes('rel="canonical"'),post.slug);
   }
   assert.match(read('sitemap.xml'),/nithin0553.github.io\/Shop-Website\/contact\//);
