@@ -54,6 +54,12 @@ if(renderStart<0||renderEnd<0)throw Error('Cannot locate render() HTML');
 const existingRender=app.slice(renderStart+'app.innerHTML='.length,renderEnd);
 app=app.slice(0,renderStart)+'app.innerHTML=staticHtml('+existingRender+')'+app.slice(renderEnd);
 app=replaceOnce(app,"history.pushState(null,'',url);","history.pushState(null,'',withBase(url));",'navigation');
+// All published blog bodies are bundled in static JSON; remove the API-only lazy loader.
+const lazyStart=app.indexOf('async function loadFullArticle(slug){');
+const lazyEnd=app.indexOf('\nfunction render(',lazyStart);
+if(lazyStart<0||lazyEnd<0)throw Error('Cannot locate lazy blog loader');
+app=app.slice(0,lazyStart)+app.slice(lazyEnd);
+app=replaceOnce(app,'if(slug&&BLOGS.some(p=>p.slug===slug&&!p.body))loadFullArticle(slug);','', 'static articles');
 const handlerStart=app.indexOf('async function handleSubmit(e){');
 const handlerEnd=app.lastIndexOf('\nstart();');
 if(handlerStart<0||handlerEnd<=handlerStart)throw Error('Cannot locate API client section');
@@ -68,10 +74,14 @@ app=replaceOnce(app,'Send Inquiry</button>','Continue on WhatsApp</button>','sub
 await write('app.js',app);
 
 let festival=await readFile(path.join(root,'public/festival-effects.js'),'utf8');
-festival=replaceOnce(festival,'if(inFlight||document.hidden||preview)return;',
-  'if(inFlight||document.hidden||preview||window.SHOP_STATIC_MODE)return;','festival refresh');
-festival=replaceOnce(festival,'if(preview||document.hidden)return;',
-  'if(preview||document.hidden||window.SHOP_STATIC_MODE)return;','festival connections');
+// Remove the live API polling and EventSource logic from the static festival copy.
+const refreshStart=festival.indexOf('async function refresh() {');
+const refreshEnd=festival.indexOf('function startPolling()',refreshStart);
+const connectStart=festival.indexOf('function resumeResources() {');
+const connectEnd=festival.indexOf('function start(data,name) {',connectStart);
+if(refreshStart<0||refreshEnd<0||connectStart<0||connectEnd<0)throw Error('Cannot locate festival API section');
+festival=festival.slice(0,connectStart)+'function resumeResources() { /* no backend on GitHub Pages */ }\n  '+festival.slice(connectEnd);
+festival=festival.slice(0,refreshStart)+'async function refresh() { /* static festival settings */ }\n  '+festival.slice(refreshEnd);
 await write('festival-effects.js',festival);
 
 let html=await readFile(path.join(root,'public/index.html'),'utf8');
