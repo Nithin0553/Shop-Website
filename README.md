@@ -4,6 +4,10 @@ A responsive, working website for a local two-wheeler spare-parts and accessorie
 
 **Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. The local Node.js server needs no third-party packages or build step; the optional Cloudflare Pages deployment uses an esbuild build step.
 
+## GitHub Pages (free static website)
+
+The shop can now be published at **https://nithin0553.github.io/Shop-Website/** using `npm run github:build` and the `Deploy static shop to GitHub Pages` GitHub Actions workflow. This edition preserves the storefront, animations, blogs, and festival visual design. It has **no server, no protected admin dashboard, and no enquiry database**: the customer form opens WhatsApp with a pre-filled message that the customer must send. Newsletter subscriptions are removed and content is edited in GitHub files. See [GitHub Pages setup and limitations](docs/github-pages-static.md). Existing Railway/Cloudflare data is not migrated automatically.
+
 ## Cloudflare Workers Free deployment
 
 A Cloudflare Workers + D1 version of the same website is available in this repository. It preserves public pages, the protected admin dashboard, enquiry collection, blog management, uploaded images and festival themes, while moving durable records to D1 and using polling for festival updates. See [the Cloudflare deployment and data migration guide](docs/cloudflare-workers.md). Existing Railway/local data is **not** automatically transferred; keep backups and the current host until the Cloudflare version is verified.
