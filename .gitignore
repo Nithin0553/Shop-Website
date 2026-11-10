@@ -19,3 +19,6 @@ cloudflare-out/
 
 # Cloudflare Pages production build; do not commit generated Worker bundle.
 dist-pages/
+
+# Generated public-only GitHub Pages artifact.
+dist-github-pages/
