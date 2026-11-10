@@ -1,0 +1,52 @@
+name: Deploy static shop to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run site tests
+        run: npm test
+      - name: Export static Pages site
+        run: npm run github:build
+      - name: Verify public-only output
+        run: |
+          test -s dist-github-pages/index.html
+          test -s dist-github-pages/static-data/blogs.json
+          test ! -e dist-github-pages/admin.js
+          test ! -e dist-github-pages/data/inquiries.json
+          test ! -e dist-github-pages/.env
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist-github-pages/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish website
+        id: deployment
+        uses: actions/deploy-pages@v4
