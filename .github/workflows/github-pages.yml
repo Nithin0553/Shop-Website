@@ -1,6 +1,16 @@
 name: Deploy static shop to GitHub Pages
 
 on:
+  pull_request:
+    paths:
+      - 'scripts/build-github-pages.mjs'
+      - 'scripts/github-pages-static-runtime.js'
+      - 'public/**'
+      - 'data/**'
+      - 'lib/festivals.mjs'
+      - 'tests/github-pages-build.test.mjs'
+      - '.github/workflows/github-pages.yml'
+      - 'package.json'
   push:
     branches: [main]
   workflow_dispatch:
@@ -38,6 +48,7 @@ jobs:
           path: dist-github-pages/
 
   deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:
