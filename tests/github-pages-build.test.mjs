@@ -62,10 +62,18 @@ test('festival artwork and data are included without a live dashboard',()=>{
   assert.equal(festivals.settings.enabled,false);
   assert.ok(read('festival-palettes.css').includes('data-festival="diwali"'));
   assert.ok(existsSync(path.join(out,'festival-artwork.js')));
-  assert.ok(!existsSync(path.join(out,'admin.js')));
+  assert.ok(existsSync(path.join(out,'admin.js')));
+  assert.ok(existsSync(path.join(out,'admin.css')));
   assert.ok(!existsSync(path.join(out,'admin.html')));
   assert.ok(!existsSync(path.join(out,'_worker.js')));
-  assert.match(read('admin/index.html'),/no customer database or online admin dashboard/);
+  assert.match(read('admin/index.html'),/\/Shop-Website\/admin\.js\?v=[a-f0-9]{12}/);
+  assert.match(read('admin/index.html'),/Content-Security-Policy/);
+  assert.match(read('admin.js'),/GitHub access token/);
+  assert.match(read('admin.js'),/const GH_API_PREFIX = 'https:\/\/api\.github\.com\/repos\/' \+ GH_REPOSITORY/);
+  assert.match(read('admin.js'),/GitHub saved this change/);
+  assert.ok(!read('admin.js').includes('localStorage.setItem'));
+  assert.ok(!read('admin.js').includes('sessionStorage.setItem'));
+  execFileSync(process.execPath, ['--check', path.join(out, 'admin.js')], {stdio:'pipe'});
 });
 
 test('only public storefront assets and static JSON are exported',()=>{
@@ -104,4 +112,24 @@ test('GitHub Pages image paths include the repository prefix exactly once',()=>{
   }
   const index=read('index.html');
   assert.match(index,/\/Shop-Website\/app\.js\?v=[a-f0-9]{12}/);
+});
+
+test('static admin uses original design, without publishing customer lists or the old server authentication',()=>{
+  const compiled=read('admin.js');
+  const page=read('admin/index.html');
+  assert.match(compiled,/class="login-shell"/);
+  assert.match(compiled,/class="admin-shell"/);
+  assert.match(compiled,/data-tab="blogs"/);
+  assert.match(compiled,/data-tab="festivals"/);
+  assert.match(compiled,/data-tab="settings"/);
+  assert.doesNotMatch(compiled,/data-tab="inquiries"/);
+  assert.doesNotMatch(compiled,/data-tab="subscribers"/);
+  assert.doesNotMatch(compiled,/await fetch\(path,/);
+  assert.doesNotMatch(compiled,/Set <code>ADMIN_PASSWORD<\/code> on your server/);
+  assert.match(compiled,/ghRead\('data\/site\.json'\)/);
+  assert.match(compiled,/ghWrite\('data\/blogs\.json'/);
+  assert.match(compiled,/ghWrite\('data\/festival\.json'/);
+  assert.match(page,/\/Shop-Website\/admin\.css/);
+  assert.match(page,/\/Shop-Website\/assets\/shop-favicon\.png/);
+  assert.doesNotMatch(page,/type="hidden"[^>]+token/i);
 });

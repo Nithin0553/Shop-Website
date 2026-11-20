@@ -6,7 +6,7 @@ A responsive, working website for a local two-wheeler spare-parts and accessorie
 
 ## GitHub Pages (free static website)
 
-The shop can now be published at **https://nithin0553.github.io/Shop-Website/** using `npm run github:build` and the `Deploy static shop to GitHub Pages` GitHub Actions workflow. This edition preserves the storefront, animations, blogs, and festival visual design. It has **no server, no protected admin dashboard, and no enquiry database**: the customer form opens WhatsApp with a pre-filled message that the customer must send. Newsletter subscriptions are removed and content is edited in GitHub files. See [GitHub Pages setup and limitations](docs/github-pages-static.md). Existing Railway/Cloudflare data is not migrated automatically.
+The shop can now be published at **https://nithin0553.github.io/Shop-Website/** using `npm run github:build` and the `Deploy static shop to GitHub Pages` GitHub Actions workflow. This edition preserves the storefront, animations, blogs, and festival visual design. It has **no server or enquiry database**: the customer form opens WhatsApp with a pre-filled message the customer must send. The original shop management dashboard is now available at [/Shop-Website/admin/](https://nithin0553.github.io/Shop-Website/admin/) and edits public repository files using an owner-authorized GitHub token (not the old server password). See [GitHub Pages admin setup](docs/github-pages-admin.md) and [static website limitations](docs/github-pages-static.md). Existing Railway/Cloudflare data is not migrated automatically.
 
 ## Cloudflare Workers Free deployment
 
