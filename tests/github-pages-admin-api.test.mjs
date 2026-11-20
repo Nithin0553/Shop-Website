@@ -27,7 +27,7 @@ function setupAdmin() {
   };
   let nextSha=1;
   async function fetchMock(url,options={}) {
-    const target=new URL(url);
+    const target=new URL(url,'https://nithin0553.github.io');
     observed.push({url,options});
     const reply=(body,status=200)=>({status,ok:status>=200&&status<300,json:async()=>body});
     if(target.href==='https://api.github.com/user'){
