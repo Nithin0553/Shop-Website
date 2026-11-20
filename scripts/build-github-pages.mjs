@@ -152,6 +152,8 @@ admin=admin.slice(0,oldLoadStart)+
   "}\n"+admin.slice(oldLoadEnd);
 admin=replaceOnce(admin,'Admin password</label>','GitHub access token</label>','admin login label');
 admin=replaceOnce(admin,'Enter your admin password','Paste your fine-grained GitHub token','admin login placeholder');
+admin=replaceOnce(admin,'Admin login is disabled. Set <code>ADMIN_PASSWORD</code> on your server and restart it.',
+  'GitHub access is currently unavailable. Check your connection and refresh.','obsolete server warning');
 admin=replaceOnce(admin,'autocomplete="current-password"','autocomplete="off"','admin password autocomplete');
 admin=replaceOnce(admin,'Sign in to manage customer enquiries, contact information and blog articles.',
   'Sign in with a repository-scoped GitHub token to manage blog articles, festival themes, shop information and images. This token stays only in this browser tab until you leave or sign out.',
