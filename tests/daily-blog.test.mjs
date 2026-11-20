@@ -106,3 +106,22 @@ test('dry-run generates valid preview without modifying the original blog file',
     feedFetcher:()=>{throw Error('Should not call news when already published');}});
   assert.equal(again.status,'already-published');
 });
+
+test('scheduled publishing is timezone-aware and deploys in the same run',()=>{
+  const workflow=readFileSync(path.join(root,'.github/workflows/daily-blog.yml'),'utf8');
+  assert.match(workflow,/cron: '37 8 \* \* \*'/);
+  assert.match(workflow,/timezone: 'Asia\/Kolkata'/);
+  assert.match(workflow,/contents: write/);
+  assert.match(workflow,/GEMINI_API_KEY: \$\{\{ secrets\.GEMINI_API_KEY \}\}/);
+  assert.match(workflow,/BEFORE committing/);
+  assert.match(workflow,/git push origin HEAD:main/);
+  assert.match(workflow,/actions\/upload-pages-artifact@v4/);
+  assert.match(workflow,/actions\/deploy-pages@v4/);
+  const order=['node scripts/daily-blog.mjs','npm test','npm run github:build','git commit -m','actions/upload-pages-artifact@v4'];
+  let previous=-1;
+  for(const term of order) {
+    const index=workflow.indexOf(term);
+    assert.ok(index>previous,term+' must be ordered after earlier steps');
+    previous=index;
+  }
+});
