@@ -7,7 +7,10 @@ import { indiaDate, NEWS_FEEDS, parseNewsFeed, chooseTopic, validateDraft } from
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const postsPath=path.join(root,'data','blogs.json');
-const DEFAULT_MODEL='gemini-2.5-flash-lite';
+const DEFAULT_MODEL='gemini-3.5-flash-lite';
+// Only retry on HTTP 404: a model may be listed yet unavailable for generation
+// to a new Google AI Studio project. Do not mask quota, billing or auth errors.
+const FALLBACK_MODELS=['gemini-3.1-flash-lite'];
 const SAFE_MODEL=/^gemini-[a-z0-9.-]+$/;
 
 export async function fetchNews(fetcher=fetch,now=new Date()){
@@ -64,28 +67,45 @@ export function makePrompt(topic, existing, date){
 export async function requestGeminiDraft(prompt,key,fetcher=fetch,model=DEFAULT_MODEL){
   if(!key || !key.trim())throw Error('GEMINI_API_KEY is missing; configure it in GitHub Actions secrets.');
   if(!SAFE_MODEL.test(model))throw Error('Invalid Gemini model name.');
-  const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-goog-api-key':key
-    },
-    body:JSON.stringify({
-      contents:[{role:'user',parts:[{text:prompt}]}],
-      generationConfig:{responseMimeType:'application/json',temperature:0.45,maxOutputTokens:2900}
-    }),
-    signal:AbortSignal.timeout(55000)
-  });
-  if(!response.ok){
-    // Do not log the response body: vendor errors sometimes include request details.
-    throw Error('Gemini API request failed (HTTP '+response.status+'). Verify key, model and quota.');
+  // A successful models.list response does NOT guarantee a project's
+  // permission to generate; check by making the actual generation request.
+  const options=[model,...FALLBACK_MODELS.filter(name=>name!==model)];
+  let response,selected;
+  for(const candidate of options){
+    selected=candidate;
+    response=await fetcher('https://generativelanguage.googleapis.com/v1beta/models/'+candidate+':generateContent',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-goog-api-key':key
+      },
+      body:JSON.stringify({
+        contents:[{role:'user',parts:[{text:prompt}]}],
+        generationConfig:{responseMimeType:'application/json',temperature:0.45,maxOutputTokens:2900}
+      }),
+      signal:AbortSignal.timeout(55000)
+    });
+    if(response.ok)break;
+    if(response.status===404){
+      console.warn('Gemini model '+candidate+' was unavailable for this API project (HTTP 404).');
+      continue;
+    }
+    // 401/403 = credentials/permissions, 429 = rate limits, 5xx = service.
+    // Neither retry on a different model nor reveal response bodies or tokens.
+    throw Error('Gemini model '+candidate+' returned HTTP '+response.status+
+      '. Check API key permissions, billing status or quota in Google AI Studio.');
   }
+  if(!response?.ok){
+    throw Error('No accessible Gemini Flash-Lite generation model was found (HTTP 404): '+
+      options.join(', ')+'. Check your Google AI Studio project model access.');
+  }
+  console.log('Gemini model accepted generation: '+selected);
   const data=await response.json();
-  const candidate=data.candidates?.[0];
-  if(!candidate || !candidate.content || !['STOP',undefined].includes(candidate.finishReason)){
+  const generated=data.candidates?.[0];
+  if(!generated || !generated.content || !['STOP',undefined].includes(generated.finishReason)){
     throw Error('Gemini did not finish generating an acceptable response.');
   }
-  const text=(candidate.content.parts||[]).map(part=>part.text||'').join('').trim();
+  const text=(generated.content.parts||[]).map(part=>part.text||'').join('').trim();
   if(!text)throw Error('Gemini returned no article.');
   try{return JSON.parse(text);}
   catch{throw Error('Gemini returned malformed JSON; skipped publication.');}

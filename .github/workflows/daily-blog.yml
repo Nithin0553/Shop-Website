@@ -41,7 +41,7 @@ jobs:
       - name: Draft original article from current topics and news headlines
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash-lite
+          GEMINI_MODEL: gemini-3.5-flash-lite
           DAILY_BLOG_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
         run: node scripts/daily-blog.mjs
       - name: Detect valid new article
