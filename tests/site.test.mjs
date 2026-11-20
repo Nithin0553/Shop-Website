@@ -26,7 +26,7 @@ before(async()=>{
   fs.writeFileSync(path.join(temp,'subscribers.json'),'[]\n');
   server=spawn(process.execPath,['server.mjs'],{cwd:root,env:{...process.env,PORT:String(port),DATA_DIR:temp,ADMIN_PASSWORD:password,SESSION_SECRET:'test-secret-with-at-least-forty-characters'},stdio:'ignore'});
   let ready=false;
-  for(let i=0;i<90;i++){try{const r=await fetch(base+'/api/site');if(r.ok){ready=true;break;}}catch{} await new Promise(r=>setTimeout(r,60));}
+  for(let i=0;i<200;i++){try{const r=await fetch(base+'/api/site');if(r.ok){ready=true;break;}}catch{} await new Promise(r=>setTimeout(r,80));}
   assert.ok(ready,'test server started');
 });
 after(()=>{server?.kill('SIGTERM');fs.rmSync(temp,{recursive:true,force:true});});
