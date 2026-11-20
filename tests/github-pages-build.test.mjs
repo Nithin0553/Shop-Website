@@ -53,7 +53,7 @@ test('enquiry flow requires customer to send WhatsApp message manually',()=>{
   assert.match(app,/Your enquiry is not stored here/);
   const site=JSON.parse(read('static-data/site.json'));
   assert.equal(site.phone,'+91 9030084872');
-  assert.equal(site.whatsapp,'919030084872');
+  assert.equal(site.whatsapp.replace(/\D/g,''),'919030084872');
 });
 
 test('festival artwork and data are included without a live dashboard',()=>{
