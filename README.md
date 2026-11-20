@@ -4,6 +4,10 @@ A responsive, working website for a local two-wheeler spare-parts and accessorie
 
 **Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. The local Node.js server needs no third-party packages or build step; the optional Cloudflare Pages deployment uses an esbuild build step.
 
+## Automatic daily two-wheeler blogs
+
+Our GitHub Pages blog can publish a newly written, source-aware two-wheeler industry update, maintenance tip, or spare-parts buying guide every morning at **8:37 AM India time**. The [daily blog workflow](.github/workflows/daily-blog.yml) researches recent headline metadata, drafts an original article using the Gemini API, checks for duplicates and quality, and publishes the static website in the same GitHub Actions run. **One-time setup is required:** add a private `GEMINI_API_KEY` repository secret. If the model is unavailable or the draft fails checks, the automation safely skips the article. See [daily blog automation setup](docs/daily-blog-automation.md).
+
 ## GitHub Pages (free static website)
 
 The shop can now be published at **https://nithin0553.github.io/Shop-Website/** using `npm run github:build` and the `Deploy static shop to GitHub Pages` GitHub Actions workflow. This edition preserves the storefront, animations, blogs, and festival visual design. It has **no server or enquiry database**: the customer form opens WhatsApp with a pre-filled message the customer must send. The original shop management dashboard is now available at [/Shop-Website/admin/](https://nithin0553.github.io/Shop-Website/admin/) and edits public repository files using an owner-authorized GitHub token (not the old server password). See [GitHub Pages admin setup](docs/github-pages-admin.md) and [static website limitations](docs/github-pages-static.md). Existing Railway/Cloudflare data is not migrated automatically.
