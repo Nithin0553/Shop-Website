@@ -99,10 +99,26 @@ export function chooseTopic(existing, news, date=indiaDate()) {
       source:selected
     };
   }
-  // Rotate guide topics; avoid reusing an already published topic until the library is exhausted.
-  for(let attempt=0;attempt<TOPICS.length;attempt++){
-    const topic=TOPICS[(dayNumber+attempt*7)%TOPICS.length];
-    if(!used.has(topic.key))return topic;
+  // Rotate original guide topics through distinct real-world reader scenarios.
+  // A guide is never republished with the same topic/scenario identifier.
+  const contexts=[
+    'first-time rider', 'daily commuter', 'rainy-season commuter',
+    'long-distance rider', 'used-bike buyer', 'scooter owner',
+    'higher-mileage vehicle owner', 'rider preparing for a service visit',
+    'rider comparing replacement parts', 'dusty-road commuter',
+    'rider planning a weekend journey', 'owner doing a monthly safety check'
+  ];
+  for(let round=0;round<contexts.length;round++){
+    for(let attempt=0;attempt<TOPICS.length;attempt++){
+      const topic=TOPICS[(dayNumber+attempt*7)%TOPICS.length];
+      const context=contexts[(round+Math.floor(dayNumber/TOPICS.length))%contexts.length];
+      const key=topic.key+'-'+slugify(context);
+      if(!used.has(key))return {
+        ...topic,key,
+        angle:topic.angle+'. Focus on the distinct practical situation of a '+context+
+          '; do not repeat the same general article.'
+      };
+    }
   }
   // When guide topics are exhausted, fresh news still provides genuinely new material.
   if(freshNews.length){
@@ -132,7 +148,7 @@ export function validateDraft(raw, existing, topic, date){
   if(existing.some(post=>post.slug===slug))throw Error('Article slug already exists.');
   const safety='For model-specific specifications, replacement intervals and safety-critical repairs, follow your vehicle owner’s manual and consult a qualified mechanic.';
   const attribution=topic.source?
-    '\n\n## News reference\n- '+topic.source.source+': '+topic.source.title+'\n- '+topic.source.url:
+    '\n\n## News reference\n- '+topic.source.source+' — '+topic.source.title+'\n- Source: '+topic.source.url:
     '';
   return {
     id:'auto-'+date, slug, title, summary,
