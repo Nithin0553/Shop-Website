@@ -39,7 +39,9 @@ jobs:
         run: |
           test -s dist-github-pages/index.html
           test -s dist-github-pages/static-data/blogs.json
-          test ! -e dist-github-pages/admin.js
+          test -s dist-github-pages/admin.js
+          test -s dist-github-pages/admin/index.html
+          test -s dist-github-pages/admin.css
           test ! -e dist-github-pages/data/inquiries.json
           test ! -e dist-github-pages/.env
       - name: Upload Pages artifact
