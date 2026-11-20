@@ -5,6 +5,10 @@ on:
     paths:
       - 'scripts/build-github-pages.mjs'
       - 'scripts/github-pages-static-runtime.js'
+      - 'scripts/daily-blog.mjs'
+      - 'scripts/auto-blog-content.mjs'
+      - 'tests/daily-blog.test.mjs'
+      - '.github/workflows/daily-blog.yml'
       - 'public/**'
       - 'data/**'
       - 'lib/festivals.mjs'
