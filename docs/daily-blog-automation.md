@@ -6,7 +6,7 @@ The Sri Sai Shanmukha Auto Centre GitHub Pages website has a scheduled workflow 
 
 1. Open [Google AI Studio](https://aistudio.google.com/api-keys), create a Gemini API key and keep it private.
 2. Open [Shop-Website GitHub Actions secrets](https://github.com/Nithin0553/Shop-Website/settings/secrets/actions) and create a **new repository secret** named **GEMINI_API_KEY** containing the key. Never paste a key into repository code, issues, screenshots, or chat.
-3. The workflow defaults to Gemini **gemini-2.5-flash-lite**. Free-tier availability and rate limits depend on the project and can change; verify its status in AI Studio. Paid billing, if enabled separately, may incur charges.
+3. The workflow defaults to Gemini **gemini-3.5-flash-lite** and retries **gemini-3.1-flash-lite** only if Google returns HTTP 404 (model unavailable). Google restricts some older 2.5 models for newer AI Studio projects; a model appearing in Google's model list does not guarantee generation access. Free-tier availability and rate limits depend on the project and can change; verify its status in AI Studio. Paid billing, if enabled separately, may incur charges.
 4. Visit [Actions → Daily two-wheeler blog publisher](https://github.com/Nithin0553/Shop-Website/actions/workflows/daily-blog.yml) and select **Run workflow** with **dry_run = true**. This previews a topic and article in the workflow log without modifying the website.
 5. Run again with **dry_run = false** to publish one article now. It validates, commits, rebuilds, and deploys the updated site. Subsequent scheduled runs work automatically.
 
