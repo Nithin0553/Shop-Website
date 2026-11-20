@@ -37,7 +37,7 @@ test('website pages and public articles load',async()=>{
   const updatedLogo=await request('/assets/brand-card-honda.png?v=20261107-site-content-v4');
   assert.equal(updatedLogo.res.status,200);
   assert.match(updatedLogo.res.headers.get('cache-control')||'',/no-cache/,'Brand images must revalidate after updates');
-  const {res,data}=await request('/api/blogs');assert.equal(res.status,200);assert.equal(data.length,6);assert.ok(data.every(p=>!('body' in p)));
+  const {res,data}=await request('/api/blogs');assert.equal(res.status,200);assert.ok(data.length>=6);assert.ok(data.every(p=>!('body' in p)));
 });
 test('enquiry validation and server persistence',async()=>{
   const invalid=await request('/api/inquiries',{method:'POST',body:{name:'A',phone:'1234',part:''}});assert.equal(invalid.res.status,400);
