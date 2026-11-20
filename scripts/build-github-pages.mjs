@@ -30,7 +30,7 @@ async function write(name, body) {
 await rm(output,{recursive:true,force:true});
 await cp(path.join(root,'public'),output,{recursive:true,filter(source){
   const name=path.basename(source);
-  return !['admin.html','admin.js','admin.css','.assetsignore','_worker.js','_redirects','_headers'].includes(name);
+  return !['admin.html','admin.js','.assetsignore','_worker.js','_redirects','_headers'].includes(name);
 }});
 const site=await readJson('site');
 const blogs=(await readJson('blogs')).filter(post=>post.status==='published');
@@ -127,17 +127,61 @@ for(const route of routes){
   await write(file,renderHead(route));
 }
 await write('404.html',renderHead({path:'/',title:'Page Not Found',description:'This page was not found.'},true));
-await write('admin/index.html',[
-  '<!doctype html><html lang="en"><meta charset="utf-8">',
-  '<meta name="viewport" content="width=device-width,initial-scale=1">',
-  '<meta name="robots" content="noindex"><title>Site management | Sri Sai Shanmukha Auto Centre</title>',
-  '<style>body{font-family:system-ui,sans-serif;background:#fff;color:#14263e;margin:0;padding:12vh 24px}',
-  'main{max-width:620px;margin:auto}a{color:#0755aa}h1{font-size:clamp(26px,5vw,42px)}</style>',
-  '<main><h1>Site management has moved to GitHub.</h1>',
-  '<p>This static website has no customer database or online admin dashboard.</p>',
-  '<p>To update contact details, blogs and festival settings, edit the repository data files and publish a new version.</p>',
-  '<p><a href="'+escapeHtml(publicUrl)+'">Back to shop</a></p></main></html>'
-].join(''));
+// Keep the original admin dashboard design and event handlers, replacing only
+// its protected Node/Workers API with a GitHub owner-authorized contents adapter.
+let admin = await readFile(path.join(root,'public/admin.js'),'utf8');
+const adapter = await readFile(path.join(root,'scripts/github-pages-admin-adapter.js'),'utf8');
+const apiStart = admin.indexOf('async function api(path,options={})');
+const apiEnd = admin.indexOf('\nfunction notice(',apiStart);
+if(apiStart<0||apiEnd<0)throw Error('Could not identify original admin API adapter.');
+admin=admin.slice(0,apiStart)+admin.slice(apiEnd);
+admin=replaceOnce(admin,"let tab='inquiries'","let tab='blogs'",'default admin tab');
+// In the static edition, enquiries and subscribers stay in WhatsApp and never
+// get saved in a public repo. Do not show misleading empty server-only panels.
+admin=admin.replace(/<button class="sidebar-link [^"]*" data-tab="inquiries"[\s\S]*?<\/button>/,'');
+admin=admin.replace(/<button class="sidebar-link [^"]*" data-tab="subscribers"[\s\S]*?<\/button>/,'');
+const oldLoadStart=admin.indexOf('async function loadData(){');
+const oldLoadEnd=admin.indexOf('\nasync function boot()',oldLoadStart);
+if(oldLoadStart<0||oldLoadEnd<0)throw Error('Could not identify admin data loader.');
+admin=admin.slice(0,oldLoadStart)+
+  "async function loadData(){\n"+
+  "  [settings,posts,images,festivalData]=await Promise.all([\n"+
+  "    api('/api/admin/site'),api('/api/admin/blogs'),api('/api/admin/images'),api('/api/admin/festivals')\n"+
+  "  ]);\n"+
+  "  festivalDraft={...festivalData.settings};\n"+
+  "}\n"+admin.slice(oldLoadEnd);
+admin=replaceOnce(admin,'Admin password</label>','GitHub access token</label>','admin login label');
+admin=replaceOnce(admin,'Enter your admin password','Paste your fine-grained GitHub token','admin login placeholder');
+admin=replaceOnce(admin,'autocomplete="current-password"','autocomplete="off"','admin password autocomplete');
+admin=replaceOnce(admin,'Sign in to manage customer enquiries, contact information and blog articles.',
+  'Sign in with a repository-scoped GitHub token to manage blog articles, festival themes, shop information and images. This token stays only in this browser tab until you leave or sign out.',
+  'admin login description');
+admin=replaceOnce(admin,'Enquiries. Blog posts. Business details.','Blog posts. Festivals. Business details.','admin login art');
+admin=admin.replaceAll('href="/"','href="'+base+'/"');
+admin=admin.replaceAll('src="/assets/','src="'+base+'/assets/');
+admin=replaceOnce(admin,"return '/?'+new URLSearchParams(","return GH_BASE+'/?'+new URLSearchParams(",'festival preview link');
+admin=admin.replace("['siteUrl','Public website URL (for SEO sitemap)','url']", '');
+admin=admin.replace("['instagramUrl','Instagram page URL','url'],,","['instagramUrl','Instagram page URL','url'],");
+// The Pages URL is generated during publishing rather than edited by the admin.
+admin=replaceOnce(admin,'Changes are now visible on the website.',
+  'GitHub saved this change. The public website updates after GitHub Pages deploys.',
+  'admin publish notice');
+admin=admin.replaceAll('updates open pages immediately.','appears after GitHub Pages republishes.');
+admin=admin.replaceAll('takes effect immediately.','publishes after the GitHub Pages build.');
+admin=adapter+'\n'+admin;
+await write('admin.js',admin);
+
+let adminHtml=await readFile(path.join(root,'public/admin.html'),'utf8');
+adminHtml=adminHtml.replace(/\b(href|src)="\/(?!\/)/g,(_,key)=>key+'="'+base+'/');
+const adminVersion=createHash('sha256').update(admin).digest('hex').slice(0,12);
+adminHtml=replaceOnce(adminHtml,'src="'+base+'/admin.js"',
+  'src="'+base+'/admin.js?v='+adminVersion+'"','versioned admin entry');
+adminHtml=replaceOnce(adminHtml,'</head>',
+  '<meta name="robots" content="noindex,nofollow" />\n'+
+  '<meta http-equiv="Content-Security-Policy" content="default-src &#39;self&#39;; script-src &#39;self&#39;; connect-src &#39;self&#39; https://api.github.com; style-src &#39;self&#39; &#39;unsafe-inline&#39; https://fonts.googleapis.com; font-src &#39;self&#39; https://fonts.gstatic.com; img-src &#39;self&#39; data:; frame-src &#39;self&#39;; base-uri &#39;self&#39;; form-action &#39;self&#39;" />\n'+
+  '</head>','admin CSP');
+await write('admin/index.html',adminHtml);
+
 await write('.nojekyll','');
 await write('robots.txt','User-agent: *\nAllow: /\nSitemap: '+publicUrl+'sitemap.xml\n');
 await write('sitemap.xml','<?xml version="1.0" encoding="UTF-8"?>\n'+
