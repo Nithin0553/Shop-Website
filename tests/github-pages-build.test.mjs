@@ -69,7 +69,7 @@ test('festival artwork and data are included without a live dashboard',()=>{
   assert.match(read('admin/index.html'),/\/Shop-Website\/admin\.js\?v=[a-f0-9]{12}/);
   assert.match(read('admin/index.html'),/Content-Security-Policy/);
   assert.match(read('admin.js'),/GitHub access token/);
-  assert.match(read('admin.js'),/api\.github\.com\/repos\/.*Shop-Website/);
+  assert.match(read('admin.js'),/const GH_API_PREFIX = 'https:\/\/api\.github\.com\/repos\/' \+ GH_REPOSITORY/);
   assert.match(read('admin.js'),/GitHub saved this change/);
   assert.ok(!read('admin.js').includes('localStorage.setItem'));
   assert.ok(!read('admin.js').includes('sessionStorage.setItem'));
