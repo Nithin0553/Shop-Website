@@ -54,7 +54,7 @@ test('Google News metadata is filtered without downloading or copying articles',
 
 test('editorial selection favors unused, original Indian bike and scooter topics',()=>{
   const guide=chooseTopic(existing,[],date);
-  assert.ok(TOPICS.some(topic=>topic.key===guide.key));
+  assert.ok(TOPICS.some(topic=>guide.key.startsWith(topic.key+'-')));
   assert.ok(['Maintenance Tips','Spare Parts Guide','Buying Guide','Bike Care','Scooter Care'].includes(guide.category));
   assert.ok(similarity('Battery Care Guide','Battery and Care Guide')>0.7);
 });
