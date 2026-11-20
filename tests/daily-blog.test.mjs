@@ -80,7 +80,7 @@ test('Gemini request sends the key only in a private header and validates JSON r
   let calls=0;
   const fake=async (url,options)=>{
     calls++;
-    assert.match(url,/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-2\.5-flash-lite:generateContent/);
+    assert.match(url,/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-3\.5-flash-lite:generateContent/);
     assert.equal(options.headers['x-goog-api-key'],'private-test-key');
     assert.equal(JSON.stringify(options.body).includes('private-test-key'),false);
     return {ok:true,status:200,json:async()=>({candidates:[{finishReason:'STOP',
@@ -90,6 +90,38 @@ test('Gemini request sends the key only in a private header and validates JSON r
   assert.equal(calls,1);
   assert.equal(result.title,mockDraft.title);
   await assert.rejects(requestGeminiDraft(prompt,'',fake),/GEMINI_API_KEY/);
+});
+
+test('Gemini 404 on a restricted model tries an accessible Flash-Lite alternative',async()=>{
+  const models=[];
+  const fetcher=async url=>{
+    const candidate=url.split('/models/')[1].split(':')[0];
+    models.push(candidate);
+    if(candidate==='gemini-2.5-flash-lite')return {ok:false,status:404};
+    return {ok:true,status:200,json:async()=>({candidates:[{finishReason:'STOP',
+      content:{parts:[{text:JSON.stringify(mockDraft)}]}}]})};
+  };
+  const output=await requestGeminiDraft('test prompt','private-test-key',fetcher,'gemini-2.5-flash-lite');
+  assert.equal(output.title,mockDraft.title);
+  assert.deepEqual(models,['gemini-2.5-flash-lite','gemini-3.1-flash-lite']);
+});
+
+test('Gemini 429 quota errors are not bypassed by switching models',async()=>{
+  let calls=0;
+  await assert.rejects(requestGeminiDraft('test','private-test-key',async()=>{
+    calls++;
+    return {ok:false,status:429};
+  }),/HTTP 429/);
+  assert.equal(calls,1);
+});
+
+test('multiple Gemini 404 errors give a clear model-access diagnosis',async()=>{
+  const tried=[];
+  await assert.rejects(requestGeminiDraft('test','private-test-key',async url=>{
+    tried.push(url);
+    return {ok:false,status:404};
+  }),/No accessible Gemini Flash-Lite generation model/);
+  assert.equal(tried.length,2);
 });
 
 test('dry-run generates valid preview without modifying the original blog file',async()=>{
