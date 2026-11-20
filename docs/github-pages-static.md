@@ -14,15 +14,15 @@ The GitHub Pages site is deliberately separate from the existing Cloudflare Work
 | --- | --- |
 | Homepage, About, Brands, Spare Parts, Contact | Fully static, with the original responsive styles and mobile carousels |
 | Six committed blog articles | Published as individual static paths, with article bodies loaded from JSON |
-| Blog management | Edit `data/blogs.json` in GitHub and republish; no online admin dashboard |
-| Festival theme manager | Edit `data/festival.json` in GitHub and republish; 20 themes/artwork are retained |
-| Contact details and shop Maps link | Edit `data/site.json` in GitHub and republish |
+| Blog management | Use the original GitHub-backed [admin dashboard](github-pages-admin.md), or edit `data/blogs.json` directly |
+| Festival theme manager | Use the [admin dashboard](github-pages-admin.md) to update `data/festival.json`; 20 themes/artwork are retained |
+| Contact details and shop Maps link | Use the [admin dashboard](github-pages-admin.md) or edit `data/site.json` directly |
 | Customer enquiries | Contact form opens WhatsApp with a pre-filled enquiry; **customer must press Send** |
 | Automatic WhatsApp notifications | Not available on GitHub Pages without an external service |
 | Email subscriptions | Removed; the blog section offers WhatsApp contact instead |
 | Uploaded blog images from D1/Railway | Must be copied into `public/assets/` and referred to from `data/blogs.json` before publishing |
 
-**No website-submitted form values are stored in GitHub or a database.** The browser does not send an enquiry itself: it opens WhatsApp, where the visitor decides whether to send the message. This is not the same as an automatic notification.
+**The admin page is restored at `/Shop-Website/admin/`, using an owner-issued GitHub token instead of the old server password.** See [admin access and security](github-pages-admin.md). No customer enquiry information is collected in the static dashboard. **No website-submitted form values are stored in GitHub or a database.** The browser does not send an enquiry itself: it opens WhatsApp, where the visitor decides whether to send the message. This is not the same as an automatic notification.
 
 ## First deployment (GitHub repository owner)
 
@@ -50,6 +50,8 @@ For a repository named `Shop-Website`, GitHub Pages uses the project URL `https:
 Direct paths such as `/Shop-Website/contact/` and `/Shop-Website/blogs/essential-two-wheeler-maintenance-tips/` are generated as physical `index.html` files, not just client-side routes.
 
 ## Update the shop after publication
+
+You can now edit shop details, published blogs, images, and festivals through the [GitHub Pages admin dashboard](github-pages-admin.md) without manually editing JSON. The dashboard signs in using a repository-scoped fine-grained GitHub token. Manual GitHub file edits remain available as a fallback.
 
 **Shop details:** Open `data/site.json` and edit the public phone, WhatsApp number, address, hours, and Google Maps URL. Commit the change to `main`. The WhatsApp destination should be a WhatsApp-active number in international digits (example `919030084872` only if that is your real shop WhatsApp number). If no WhatsApp field is set, the build provisionally uses the shop's phone number; please verify it works before sharing the site.
 
