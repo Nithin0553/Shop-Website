@@ -72,10 +72,29 @@ async function start() {
   if (blogs.status === 'fulfilled') {
     BLOGS = blogs.value.filter(post => post.status === 'published');
   }
-  window.ShopFestivalEffects?.start(
-    festivals.status === 'fulfilled' ? festivals.value : null,
-    SITE.shopName
-  );
+  let festivalData = festivals.status === 'fulfilled' ? festivals.value : null;
+  const query = new URLSearchParams(location.search);
+  // Unpublished preview: only the visitor opening the preview URL sees it.
+  // It never modifies a committed festival or public production settings.
+  if (festivalData && query.get('festivalPreview') === '1') {
+    const name = query.get('festival') || 'sankranti';
+    const variant = query.get('greetingVariant') || 'default';
+    const intensity = query.get('intensity') || 'low';
+    const selected = festivalData.festivals.find(item => item.id === name);
+    if (selected && Object.hasOwn(festivalData.intensities, intensity)) {
+      festivalData = {
+        ...festivalData,
+        preview: true,
+        settings: {
+          enabled: true,
+          festival: name,
+          intensity,
+          greetingVariant: variant === 'default' || Object.hasOwn(selected.greetingVariants || {}, variant) ? variant : 'default'
+        }
+      };
+    }
+  }
+  window.ShopFestivalEffects?.start(festivalData, SITE.shopName);
   bindGlobal();
   render();
 }
