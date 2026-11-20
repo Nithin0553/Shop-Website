@@ -1,0 +1,100 @@
+name: Daily two-wheeler blog publisher
+
+on:
+  schedule:
+    # 8:37 AM India time. Off the top of the hour to reduce scheduling delays.
+    - cron: '37 8 * * *'
+      timezone: 'Asia/Kolkata'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview the generated article without publishing'
+        type: boolean
+        default: true
+        required: false
+
+permissions:
+  contents: write
+
+# Coordinate with the normal website Pages deployment workflow.
+concurrency:
+  group: github-pages-production
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - name: Check out current shop website
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Draft original article from current topics and news headlines
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-2.5-flash-lite
+          DAILY_BLOG_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+        run: node scripts/daily-blog.mjs
+      - name: Detect valid new article
+        id: detect
+        run: |
+          if git diff --quiet -- data/blogs.json; then
+            echo "No changes to publish (preview or already published)."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Test content and export static website BEFORE committing
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          npm test
+          npm run github:build
+      - name: Check public-only Pages artifact
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          test -s dist-github-pages/index.html
+          test -s dist-github-pages/static-data/blogs.json
+          test -s dist-github-pages/admin/index.html
+          test ! -e dist-github-pages/data/inquiries.json
+          test ! -e dist-github-pages/.env
+      - name: Commit verified article to main
+        id: commit
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/blogs.json
+          git commit -m "blog: publish daily two-wheeler article"
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Upload new Pages site
+        if: steps.commit.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist-github-pages/
+
+  deploy:
+    if: needs.generate.outputs.changed == 'true'
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Important: a GITHUB_TOKEN-created commit does NOT trigger the normal Pages workflow.
+      # Publish this run's already validated artifact directly instead.
+      - name: Publish daily article to live GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
