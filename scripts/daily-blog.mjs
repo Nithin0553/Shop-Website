@@ -7,10 +7,10 @@ import { indiaDate, NEWS_FEEDS, parseNewsFeed, chooseTopic, validateDraft } from
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const postsPath=path.join(root,'data','blogs.json');
-const DEFAULT_MODEL='gemini-3.5-flash-lite';
-// Only retry on HTTP 404: a model may be listed yet unavailable for generation
-// to a new Google AI Studio project. Do not mask quota, billing or auth errors.
-const FALLBACK_MODELS=['gemini-3.1-flash-lite'];
+const DEFAULT_MODEL='gemini-3.8-flash';
+// Current non-Lite Gemini text models. Only try other models for 404/5xx,
+// not for auth or quota errors. Pro models must be selected explicitly.
+const FALLBACK_MODELS=['gemini-3.6-flash'];
 const SAFE_MODEL=/^gemini-[a-z0-9.-]+$/;
 
 export async function fetchNews(fetcher=fetch,now=new Date()){
@@ -133,8 +133,72 @@ export async function requestGeminiDraft(
   try{return JSON.parse(text);}
   catch{throw Error('Gemini returned malformed JSON; skipped publication.');}
 }
+
+const XAI_MODEL='grok-4.7';
+export async function requestGrokDraft(prompt,key,fetcher=fetch,model=XAI_MODEL){
+  if(!key || !key.trim()){
+    throw Error('Grok needs an XAI_API_KEY GitHub Actions secret and paid xAI API access.');
+  }
+  if(!/^grok-[a-z0-9.-]+$/.test(model))throw Error('Invalid Grok model name.');
+  const response=await fetcher('https://api.x.ai/v1/chat/completions',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      Authorization:'Bearer '+key
+    },
+    body:JSON.stringify({
+      model,
+      messages:[{role:'user',content:prompt}],
+      response_format:{type:'json_object'},
+      max_completion_tokens:4500
+    }),
+    signal:AbortSignal.timeout(95000)
+  });
+  if(!response.ok){
+    // Do not print response bodies, tokens, or the full user prompt in logs.
+    throw Error('Grok model '+model+' returned HTTP '+response.status+
+      '. Check xAI billing, model access and rate limits.');
+  }
+  const data=await response.json();
+  const answer=data.choices?.[0];
+  if(!answer || (answer.finish_reason && answer.finish_reason!=='stop')){
+    throw Error('Grok did not finish a complete article.');
+  }
+  const text=answer.message?.content;
+  if(typeof text!=='string' || !text.trim())throw Error('Grok returned no article.');
+  console.log('Grok model accepted generation: '+model);
+  try{return JSON.parse(text);}
+  catch{throw Error('Grok returned malformed JSON; skipped publication.');}
+}
+
+export async function requestDailyDraft(prompt,{
+  provider='gemini',
+  geminiKey=process.env.GEMINI_API_KEY,
+  grokKey=process.env.XAI_API_KEY,
+  model=DEFAULT_MODEL,
+  geminiFetcher=fetch,
+  grokFetcher=fetch,
+  enableGrokFallback=false,
+  pause
+}={}){
+  if(!['gemini','grok'].includes(provider))throw Error('Unknown AI provider. Choose gemini or grok.');
+  if(provider==='grok')return requestGrokDraft(prompt,grokKey,grokFetcher);
+  try {
+    return await requestGeminiDraft(prompt,geminiKey,geminiFetcher,model,pause);
+  } catch(error) {
+    // Spending money on a second provider requires explicit owner opt-in.
+    // Never bypass quota, billing, 401 or 403 permission failures.
+    const unavailable=/Gemini generation unavailable after trying/.test(error.message);
+    if(!enableGrokFallback || !unavailable || !grokKey?.trim())throw error;
+    console.warn('Gemini capacity unavailable. Trying owner-enabled paid Grok backup.');
+    return requestGrokDraft(prompt,grokKey,grokFetcher);
+  }
+}
+
 export async function prepareDailyArticle({now=new Date(),key=process.env.GEMINI_API_KEY,
-    existing,feedFetcher=fetch,modelFetcher=fetch,model=process.env.GEMINI_MODEL||DEFAULT_MODEL}={}){
+    existing,feedFetcher=fetch,modelFetcher=fetch,model=process.env.GEMINI_MODEL||DEFAULT_MODEL,
+    provider=process.env.BLOG_AI_PROVIDER||'gemini',grokKey=process.env.XAI_API_KEY,
+    grokFetcher=fetch,enableGrokFallback=process.env.BLOG_GROK_FALLBACK==='true',pause}={}){
   const date=indiaDate(now);
   const posts=existing??JSON.parse(await fs.readFile(postsPath,'utf8'));
   if(posts.some(post=>post.id==='auto-'+date)){
@@ -143,7 +207,10 @@ export async function prepareDailyArticle({now=new Date(),key=process.env.GEMINI
   const news=await fetchNews(feedFetcher,now);
   const topic=chooseTopic(posts,news,date);
   if(!topic)throw Error('No sufficiently new two-wheeler topic is available. Skipping rather than repeating.');
-  const raw=await requestGeminiDraft(makePrompt(topic,posts,date),key,modelFetcher,model);
+  const raw=await requestDailyDraft(makePrompt(topic,posts,date),{
+    provider,geminiKey:key,grokKey,model,geminiFetcher:modelFetcher,
+    grokFetcher,enableGrokFallback,pause
+  });
   const article=validateDraft(raw,posts,topic,date);
   return {status:'ready',date,article,posts};
 }

@@ -6,7 +6,7 @@ A responsive, working website for a local two-wheeler spare-parts and accessorie
 
 ## Automatic daily two-wheeler blogs
 
-Our GitHub Pages blog can publish a newly written, source-aware two-wheeler industry update, maintenance tip, or spare-parts buying guide every morning at **8:37 AM India time**. The [daily blog workflow](.github/workflows/daily-blog.yml) researches recent headline metadata, drafts an original article using the Gemini API, checks for duplicates and quality, and publishes the static website in the same GitHub Actions run. **One-time setup is required:** add a private `GEMINI_API_KEY` repository secret. If the model is unavailable or the draft fails checks, the automation safely skips the article. See [daily blog automation setup](docs/daily-blog-automation.md).
+Our GitHub Pages blog can publish a newly written, source-aware two-wheeler industry update, maintenance tip, or spare-parts buying guide every morning at **8:37 AM India time**. The [daily blog workflow](.github/workflows/daily-blog.yml) researches recent headline metadata, drafts an original article using the Gemini API, checks for duplicates and quality, and publishes the static website in the same GitHub Actions run. **One-time setup is required:** add a private `GEMINI_API_KEY` repository secret. The default is now Gemini 3.8 Flash, not Flash-Lite; the workflow can also select Gemini Pro or paid Grok 4.7 using a separate xAI API key. Paid Grok is not called without explicit opt-in. If the model is unavailable or the draft fails checks, the automation safely skips the article. See [daily blog automation setup](docs/daily-blog-automation.md).
 
 ## GitHub Pages (free static website)
 

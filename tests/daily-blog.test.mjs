@@ -7,7 +7,7 @@ import {
   indiaDate, NEWS_FEEDS, TOPICS, parseNewsFeed, chooseTopic,
   slugify, similarity, validateDraft
 } from '../scripts/auto-blog-content.mjs';
-import {prepareDailyArticle, requestGeminiDraft, runDaily,makePrompt} from '../scripts/daily-blog.mjs';
+import {prepareDailyArticle, requestGeminiDraft, requestGrokDraft, requestDailyDraft, runDaily,makePrompt} from '../scripts/daily-blog.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const existing=JSON.parse(readFileSync(path.join(root,'data/blogs.json'),'utf8'));
@@ -80,7 +80,7 @@ test('Gemini request sends the key only in a private header and validates JSON r
   let calls=0;
   const fake=async (url,options)=>{
     calls++;
-    assert.match(url,/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-3\.5-flash-lite:generateContent/);
+    assert.match(url,/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-3\.8-flash:generateContent/);
     assert.equal(options.headers['x-goog-api-key'],'private-test-key');
     assert.equal(JSON.stringify(options.body).includes('private-test-key'),false);
     return {ok:true,status:200,json:async()=>({candidates:[{finishReason:'STOP',
@@ -103,7 +103,7 @@ test('Gemini 404 on a restricted model tries an accessible Flash-Lite alternativ
   };
   const output=await requestGeminiDraft('test prompt','private-test-key',fetcher,'gemini-2.5-flash-lite');
   assert.equal(output.title,mockDraft.title);
-  assert.deepEqual(models,['gemini-2.5-flash-lite','gemini-3.1-flash-lite']);
+  assert.deepEqual(models,['gemini-2.5-flash-lite','gemini-3.6-flash']);
 });
 
 test('Gemini 429 quota errors are not bypassed by switching models',async()=>{
@@ -134,12 +134,12 @@ test('Gemini HTTP 503 retries the same model and succeeds without modifying cred
       content:{parts:[{text:JSON.stringify(mockDraft)}]}}]})};
   };
   const result=await requestGeminiDraft('test prompt','private-test-key',fake,
-    'gemini-3.5-flash-lite',async()=>{pauses++;});
+    'gemini-3.8-flash',async()=>{pauses++;});
   assert.equal(result.title,mockDraft.title);
   assert.equal(attempts.length,2);
   assert.equal(pauses,1);
   assert.ok(attempts.every(call=>call.authorization==='private-test-key'));
-  assert.ok(attempts.every(call=>call.url.includes('gemini-3.5-flash-lite')));
+  assert.ok(attempts.every(call=>call.url.includes('gemini-3.8-flash')));
 });
 
 test('persistent HTTP 503 retries and falls back without silently publishing',async()=>{
@@ -154,11 +154,11 @@ test('persistent HTTP 503 retries and falls back without silently publishing',as
     return {ok:false,status:503};
   };
   const result=await requestGeminiDraft('test prompt','private-test-key',fake,
-    'gemini-3.5-flash-lite',async()=>{pauses++;});
+    'gemini-3.8-flash',async()=>{pauses++;});
   assert.equal(result.title,mockDraft.title);
   assert.deepEqual(attempts,[
-    'gemini-3.5-flash-lite','gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite','gemini-3.1-flash-lite'
+    'gemini-3.8-flash','gemini-3.8-flash',
+    'gemini-3.6-flash','gemini-3.6-flash'
   ]);
   assert.equal(pauses,2);
 });
@@ -168,7 +168,7 @@ test('all models temporarily unavailable returns clear error after bounded retri
   await assert.rejects(requestGeminiDraft('test prompt','private-test-key',async()=>{
     attempts++;
     return {ok:false,status:503};
-  },'gemini-3.5-flash-lite',async()=>{pauses++;}),/Gemini generation unavailable.*HTTP 503/);
+  },'gemini-3.8-flash',async()=>{pauses++;}),/Gemini generation unavailable.*HTTP 503/);
   assert.equal(attempts,4);
   assert.equal(pauses,2);
 });
@@ -205,4 +205,91 @@ test('scheduled publishing is timezone-aware and deploys in the same run',()=>{
     assert.ok(index>previous,term+' must be ordered after earlier steps');
     previous=index;
   }
+});
+
+test('Grok generates JSON using a separate private xAI API key only when explicitly selected',async()=>{
+  let count=0;
+  const mock=async(url,options)=>{
+    count++;
+    assert.equal(url,'https://api.x.ai/v1/chat/completions');
+    assert.equal(options.headers.Authorization,'Bearer private-xai-token');
+    assert.equal(options.headers['Content-Type'],'application/json');
+    const request=JSON.parse(options.body);
+    assert.equal(request.model,'grok-4.7');
+    assert.equal(request.response_format.type,'json_object');
+    assert.ok(!options.body.includes('private-xai-token'));
+    return {ok:true,status:200,json:async()=>({choices:[{
+      finish_reason:'stop',message:{role:'assistant',content:JSON.stringify(mockDraft)}
+    }]})};
+  };
+  const result=await requestGrokDraft('test', 'private-xai-token',mock);
+  assert.equal(result.title,mockDraft.title);
+  assert.equal(count,1);
+  await assert.rejects(requestGrokDraft('test','',mock),/XAI_API_KEY/);
+});
+
+test('Grok is not contacted or billed by default on Gemini failure',async()=>{
+  let grokCalls=0;
+  await assert.rejects(requestDailyDraft('test',{
+    geminiKey:'private-google-key',grokKey:'private-xai-token',
+    geminiFetcher:async()=>({ok:false,status:503}),
+    grokFetcher:async()=>{grokCalls++;return {ok:false,status:503};},
+    pause:async()=>{}
+  }),/Gemini generation unavailable/);
+  assert.equal(grokCalls,0);
+});
+
+test('owner opt-in allows Grok fallback only when Gemini capacity is unavailable',async()=>{
+  let calls=0;
+  const result=await requestDailyDraft('test',{
+    provider:'gemini',model:'gemini-3.8-flash',enableGrokFallback:true,
+    geminiKey:'private-google-key',grokKey:'private-xai-token',
+    geminiFetcher:async()=>({ok:false,status:503}),
+    grokFetcher:async()=>{calls++;return {ok:true,status:200,json:async()=>({
+      choices:[{finish_reason:'stop',message:{content:JSON.stringify(mockDraft)}}]
+    })};},
+    pause:async()=>{}
+  });
+  assert.equal(result.title,mockDraft.title);
+  assert.equal(calls,1);
+});
+
+test('quota and authentication errors never launch paid Grok fallback',async()=>{
+  for(const status of [401,403,429]){
+    let grokCalls=0,geminiCalls=0;
+    await assert.rejects(requestDailyDraft('test',{
+      enableGrokFallback:true,geminiKey:'google-key',grokKey:'xai-key',
+      geminiFetcher:async()=>{geminiCalls++;return {ok:false,status};},
+      grokFetcher:async()=>{grokCalls++;return {ok:false,status:200};},
+      pause:async()=>{}
+    }),new RegExp('HTTP '+status));
+    assert.equal(geminiCalls,1);
+    assert.equal(grokCalls,0);
+  }
+});
+
+test('manual Grok selection never requires Gemini credentials',async()=>{
+  let googleCalls=0,xaiCalls=0;
+  const result=await requestDailyDraft('test',{
+    provider:'grok',geminiKey:'',grokKey:'private-xai-token',
+    geminiFetcher:async()=>{googleCalls++;throw Error('Unexpected Gemini call');},
+    grokFetcher:async()=>{xaiCalls++;return {ok:true,status:200,json:async()=>({
+      choices:[{finish_reason:'stop',message:{content:JSON.stringify(mockDraft)}}]
+    })};}
+  });
+  assert.equal(result.title,mockDraft.title);
+  assert.equal(googleCalls,0);
+  assert.equal(xaiCalls,1);
+});
+
+test('workflow exposes safe provider and Gemini model choices with paid backup disabled by default',()=>{
+  const workflow=readFileSync(path.join(root,'.github/workflows/daily-blog.yml'),'utf8');
+  assert.match(workflow,/gemini_model:/);
+  assert.match(workflow,/provider:/);
+  assert.match(workflow,/- gemini-3\.8-flash/);
+  assert.match(workflow,/- gemini-3\.1-pro-preview/);
+  assert.match(workflow,/- grok/);
+  assert.match(workflow,/XAI_API_KEY: \$\{\{ secrets\.XAI_API_KEY \}\}/);
+  assert.match(workflow,/BLOG_GROK_FALLBACK: \$\{\{ vars\.BLOG_GROK_FALLBACK \|\| 'false' \}\}/);
+  assert.match(workflow,/BLOG_AI_PROVIDER: \$\{\{ github\.event_name/);
 });
