@@ -6,9 +6,21 @@ The Sri Sai Shanmukha Auto Centre GitHub Pages website has a scheduled workflow 
 
 1. Open [Google AI Studio](https://aistudio.google.com/api-keys), create a Gemini API key and keep it private.
 2. Open [Shop-Website GitHub Actions secrets](https://github.com/Nithin0553/Shop-Website/settings/secrets/actions) and create a **new repository secret** named **GEMINI_API_KEY** containing the key. Never paste a key into repository code, issues, screenshots, or chat.
-3. The workflow defaults to Gemini **gemini-3.5-flash-lite** and retries **gemini-3.1-flash-lite** only if Google returns HTTP 404 (model unavailable). Google restricts some older 2.5 models for newer AI Studio projects; a model appearing in Google's model list does not guarantee generation access. Free-tier availability and rate limits depend on the project and can change; verify its status in AI Studio. Paid billing, if enabled separately, may incur charges.
-4. Visit [Actions → Daily two-wheeler blog publisher](https://github.com/Nithin0553/Shop-Website/actions/workflows/daily-blog.yml) and select **Run workflow** with **dry_run = true**. This previews a topic and article in the workflow log without modifying the website.
+3. The workflow now defaults to **Gemini 3.8 Flash** (`gemini-3.8-flash`), with **Gemini 3.6 Flash** (`gemini-3.6-flash`) as a fallback for missing/overloaded models. These are more capable models than Flash-Lite, but Google may still return HTTP 503 under load. Free-tier availability and rate limits depend on your project; paid billing, if enabled separately, may incur charges.
+4. Visit [Actions → Daily two-wheeler blog publisher](https://github.com/Nithin0553/Shop-Website/actions/workflows/daily-blog.yml) and select **Run workflow**. Choose **provider = gemini**, **gemini_model = gemini-3.8-flash**, and keep **dry_run checked (true)**. This previews an article in the workflow log without modifying the website. For an optional premium Gemini model, select **gemini-3.1-pro-preview** instead; your Google AI Studio project must have access and billing may be required.
 5. Run again with **dry_run = false** to publish one article now. It validates, commits, rebuilds, and deploys the updated site. Subsequent scheduled runs work automatically.
+
+### Optional Grok model (paid, not enabled by default)
+
+If Google's models are persistently overloaded, the workflow can use **Grok 4.7** through the xAI API. Grok is a separately billed commercial API. **Do not enable it unless you agree to xAI's charges.**
+
+1. Create an API key in [xAI Console](https://console.x.ai/) with the needed credits/billing and model access.
+2. In the [Shop-Website Actions secrets](https://github.com/Nithin0553/Shop-Website/settings/secrets/actions), add a secret named **XAI_API_KEY**. Never share the key or put it in the source code.
+3. To use Grok for **one manual run**, open the workflow, select **Run workflow → provider = grok**, keep **dry_run = true** for the first test, and run it. To publish later, uncheck dry_run. Gemini credentials are not required for Grok-only runs.
+4. To enable **automatic paid Grok fallback only when Gemini models are unavailable**, create an Actions **repository variable** named **BLOG_GROK_FALLBACK** with value `true` in [Actions variables](https://github.com/Nithin0553/Shop-Website/settings/variables/actions), **after** adding `XAI_API_KEY`. Default is `false`. When disabled, Gemini errors cannot trigger a Grok request, even if a Grok key exists.
+5. Daily scheduled jobs always start with Gemini 3.8 Flash and try Gemini 3.6 Flash. They only use paid Grok fallback if you explicitly set the opt-in variable and have an xAI key.
+
+**Pricing:** Check the [xAI pricing page](https://docs.x.ai/developers/pricing) before setting up paid access. Grok 4.7 is currently listed at $2 per million input tokens and $6 per million output tokens (plus possible provider-specific fees). Retry attempts may affect usage and costs. Gemini Pro access/pricing is also project-dependent.
 
 **Schedule:** Every morning at **8:37 AM India time (Asia/Kolkata)**. GitHub Actions scheduling may be delayed and occasional jobs may be dropped under load.
 
@@ -18,7 +30,7 @@ The generator checks Google News RSS headlines about Indian motorcycles, scooter
 
 Each article uses our existing blog format: original title, summary, category, appropriate shop illustration, publication date, structured 450–650-word guide, safety guidance and AI-assistance disclosure. News-inspired posts include an attributable source link. The writer is told not to invent model specifications, launch dates, prices, figures or vehicle-specific safety procedures. These safeguards do not guarantee perfect accuracy: review new posts periodically.
 
-**Temporary Gemini outages:** If Google returns HTTP 500, 502, 503 or 504, the generator retries once after a short delay, then attempts its configured backup model. Authorization (401/403) and quota (429) errors are not retried on alternative models. If both model attempts fail, no article is saved or published; review the workflow log and try again after the service recovers.
+**Temporary Gemini outages:** If Google returns HTTP 500, 502, 503 or 504, the generator retries once after a short delay, then attempts Gemini 3.6 Flash as its backup. If both Gemini models fail, it will call paid Grok **only if you explicitly enabled BLOG_GROK_FALLBACK and provided XAI_API_KEY**. Authorization (401/403) and quota (429) errors do not trigger fallback. If no accessible configured model responds, no article is published.
 
 The script checks existing titles, used news links, used topic variants and an Indian-date post ID. It will **not post duplicates or multiple generated entries in one day**. If a source, model, quota or quality check fails, the workflow reports failure instead of publishing uncertain material. That means a scheduled attempt is made daily, but a new post is not guaranteed every day.
 
