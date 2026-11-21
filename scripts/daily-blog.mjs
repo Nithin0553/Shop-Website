@@ -64,40 +64,63 @@ export function makePrompt(topic, existing, date){
     '- Provide genuinely useful information instead of generic filler; no single model brand dominance.'
   ].join('\n');
 }
-export async function requestGeminiDraft(prompt,key,fetcher=fetch,model=DEFAULT_MODEL){
+export async function requestGeminiDraft(
+  prompt,key,fetcher=fetch,model=DEFAULT_MODEL,
+  pause=ms=>new Promise(resolve=>setTimeout(resolve,ms))
+){
   if(!key || !key.trim())throw Error('GEMINI_API_KEY is missing; configure it in GitHub Actions secrets.');
   if(!SAFE_MODEL.test(model))throw Error('Invalid Gemini model name.');
-  // A successful models.list response does NOT guarantee a project's
-  // permission to generate; check by making the actual generation request.
+  // Retry only temporary service errors. A 401/403 (authorization) or
+  // 429 (quota) must not trigger additional potentially billable requests.
   const options=[model,...FALLBACK_MODELS.filter(name=>name!==model)];
-  let response,selected;
+  let response=null,selected='',lastFailure='';
   for(const candidate of options){
     selected=candidate;
-    response=await fetcher('https://generativelanguage.googleapis.com/v1beta/models/'+candidate+':generateContent',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-goog-api-key':key
-      },
-      body:JSON.stringify({
-        contents:[{role:'user',parts:[{text:prompt}]}],
-        generationConfig:{responseMimeType:'application/json',temperature:0.45,maxOutputTokens:2900}
-      }),
-      signal:AbortSignal.timeout(55000)
-    });
-    if(response.ok)break;
-    if(response.status===404){
-      console.warn('Gemini model '+candidate+' was unavailable for this API project (HTTP 404).');
-      continue;
+    for(let attempt=1;attempt<=2;attempt++){
+      try{
+        response=await fetcher('https://generativelanguage.googleapis.com/v1beta/models/'+candidate+':generateContent',{
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'x-goog-api-key':key
+          },
+          body:JSON.stringify({
+            contents:[{role:'user',parts:[{text:prompt}]}],
+            generationConfig:{responseMimeType:'application/json',temperature:0.45,maxOutputTokens:2900}
+          }),
+          signal:AbortSignal.timeout(55000)
+        });
+      }catch{
+        // Network/timeout errors can be transient. Never log API keys or
+        // response bodies that may expose content or credentials.
+        response=null;
+        lastFailure='network issue';
+        console.warn('Gemini model '+candidate+' encountered a temporary connection issue'+
+          (attempt===1?'; retrying.':'.'));
+        if(attempt===1)await pause(1200);
+        continue;
+      }
+      if(response.ok)break;
+      if(response.status===404){
+        lastFailure='HTTP 404';
+        console.warn('Gemini model '+candidate+' was unavailable (HTTP 404).');
+        break; // A missing model will not become available on an immediate retry.
+      }
+      if([500,502,503,504].includes(response.status)){
+        lastFailure='HTTP '+response.status;
+        console.warn('Gemini model '+candidate+' returned temporary HTTP '+response.status+
+          (attempt===1?'; retrying.':'; trying a fallback if available.'));
+        if(attempt===1)await pause(1200);
+        continue;
+      }
+      throw Error('Gemini model '+candidate+' returned HTTP '+response.status+
+        '. Check API key permissions, billing status or quota in Google AI Studio.');
     }
-    // 401/403 = credentials/permissions, 429 = rate limits, 5xx = service.
-    // Neither retry on a different model nor reveal response bodies or tokens.
-    throw Error('Gemini model '+candidate+' returned HTTP '+response.status+
-      '. Check API key permissions, billing status or quota in Google AI Studio.');
+    if(response?.ok)break;
   }
   if(!response?.ok){
-    throw Error('No accessible Gemini Flash-Lite generation model was found (HTTP 404): '+
-      options.join(', ')+'. Check your Google AI Studio project model access.');
+    throw Error('Gemini generation unavailable after trying '+options.join(', ')+
+      ' ('+lastFailure+'). No article was published; try again later.');
   }
   console.log('Gemini model accepted generation: '+selected);
   const data=await response.json();

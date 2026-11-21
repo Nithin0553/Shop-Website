@@ -120,8 +120,57 @@ test('multiple Gemini 404 errors give a clear model-access diagnosis',async()=>{
   await assert.rejects(requestGeminiDraft('test','private-test-key',async url=>{
     tried.push(url);
     return {ok:false,status:404};
-  }),/No accessible Gemini Flash-Lite generation model/);
+  }),/Gemini generation unavailable after trying/);
   assert.equal(tried.length,2);
+});
+
+test('Gemini HTTP 503 retries the same model and succeeds without modifying credentials',async()=>{
+  const attempts=[];
+  let pauses=0;
+  const fake=async (url,options)=>{
+    attempts.push({url,authorization:options.headers['x-goog-api-key']});
+    if(attempts.length===1)return {ok:false,status:503};
+    return {ok:true,status:200,json:async()=>({candidates:[{finishReason:'STOP',
+      content:{parts:[{text:JSON.stringify(mockDraft)}]}}]})};
+  };
+  const result=await requestGeminiDraft('test prompt','private-test-key',fake,
+    'gemini-3.5-flash-lite',async()=>{pauses++;});
+  assert.equal(result.title,mockDraft.title);
+  assert.equal(attempts.length,2);
+  assert.equal(pauses,1);
+  assert.ok(attempts.every(call=>call.authorization==='private-test-key'));
+  assert.ok(attempts.every(call=>call.url.includes('gemini-3.5-flash-lite')));
+});
+
+test('persistent HTTP 503 retries and falls back without silently publishing',async()=>{
+  const attempts=[];
+  let pauses=0;
+  const fake=async url=>{
+    attempts.push(url.split('/models/')[1].split(':')[0]);
+    if(attempts.length===4){
+      return {ok:true,status:200,json:async()=>({candidates:[{finishReason:'STOP',
+        content:{parts:[{text:JSON.stringify(mockDraft)}]}}]})};
+    }
+    return {ok:false,status:503};
+  };
+  const result=await requestGeminiDraft('test prompt','private-test-key',fake,
+    'gemini-3.5-flash-lite',async()=>{pauses++;});
+  assert.equal(result.title,mockDraft.title);
+  assert.deepEqual(attempts,[
+    'gemini-3.5-flash-lite','gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite','gemini-3.1-flash-lite'
+  ]);
+  assert.equal(pauses,2);
+});
+
+test('all models temporarily unavailable returns clear error after bounded retries',async()=>{
+  let attempts=0,pauses=0;
+  await assert.rejects(requestGeminiDraft('test prompt','private-test-key',async()=>{
+    attempts++;
+    return {ok:false,status:503};
+  },'gemini-3.5-flash-lite',async()=>{pauses++;}),/Gemini generation unavailable.*HTTP 503/);
+  assert.equal(attempts,4);
+  assert.equal(pauses,2);
 });
 
 test('dry-run generates valid preview without modifying the original blog file',async()=>{

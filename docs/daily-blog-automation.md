@@ -18,6 +18,8 @@ The generator checks Google News RSS headlines about Indian motorcycles, scooter
 
 Each article uses our existing blog format: original title, summary, category, appropriate shop illustration, publication date, structured 450–650-word guide, safety guidance and AI-assistance disclosure. News-inspired posts include an attributable source link. The writer is told not to invent model specifications, launch dates, prices, figures or vehicle-specific safety procedures. These safeguards do not guarantee perfect accuracy: review new posts periodically.
 
+**Temporary Gemini outages:** If Google returns HTTP 500, 502, 503 or 504, the generator retries once after a short delay, then attempts its configured backup model. Authorization (401/403) and quota (429) errors are not retried on alternative models. If both model attempts fail, no article is saved or published; review the workflow log and try again after the service recovers.
+
 The script checks existing titles, used news links, used topic variants and an Indian-date post ID. It will **not post duplicates or multiple generated entries in one day**. If a source, model, quota or quality check fails, the workflow reports failure instead of publishing uncertain material. That means a scheduled attempt is made daily, but a new post is not guaranteed every day.
 
 ## Why publication happens inside the same workflow
