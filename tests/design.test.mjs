@@ -53,12 +53,21 @@ test('about and contact mockup sections include real enquiry form',async()=>{
       assert.ok(html.includes(`<option value="${brand}"`),`${route}: missing enquiry brand ${brand}`);
   }
 });
-test('public article pages fetch and display the full article body',async()=>{
-  const html=await renderAt('/blogs/'+posts[0].slug);
-  assert.ok(html.includes('article-body'));
-  assert.ok(html.includes('##')===false || html.includes('<h2>'));
-  assert.ok(!html.includes('We could not load this article.'));
-  assert.ok(html.includes(posts[0].body.slice(0,20)) || html.includes(posts[0].body.split('\n').find(x=>x.length>20).slice(0,20)));
+test('public article pages fetch and display full original and newly generated article bodies',async()=>{
+  const candidates=[posts[0],posts.find(post=>post.slug==='essential-two-wheeler-maintenance-tips')].filter(Boolean);
+  for(const post of candidates){
+    const html=await renderAt('/blogs/'+post.slug);
+    assert.ok(html.includes('article-body'),post.slug);
+    assert.ok(html.includes('##')===false || html.includes('<h2>'),post.slug);
+    assert.ok(!html.includes('We could not load this article.'),post.slug);
+    // AI posts may begin with a Markdown heading, rendered as <h2> rather
+    // than the literal "## ". Assert against a real paragraph instead.
+    const paragraph=post.body.split(/\n\n+/).map(x=>x.trim())
+      .find(x=>x.length>45 && !x.startsWith('#') && !x.startsWith('- ') && !x.startsWith('http'));
+    assert.ok(paragraph,'expected a substantive blog paragraph for '+post.slug);
+    const snippet=paragraph.slice(0,24).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    assert.ok(html.includes(snippet),'Article body was not rendered: '+post.slug);
+  }
 });
 test('responsive design breakpoints and design reference classes exist',()=>{
   const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
