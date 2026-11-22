@@ -10,11 +10,12 @@
     {label:'Find a spare part',question:'How do I find a compatible spare part?'},
     {label:'Strange noise',question:'My scooter is making a strange noise. What should I check?'}
   ];
-  const urgent = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
+  const urgent = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smok(?:e|ing)|\bfire\b|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
   const criticalAdvice = '⚠️ Stop the vehicle as soon as it is safe. Switch off the engine if safe. Stay away from smoke, fire or leaking petrol. Call a mechanic or roadside help. Do not try to repair brakes, steering, fuel leaks or EV batteries yourself.';
   function basicAdvice(question, vehicle, conversation = []) {
     const q = String(question || '').trim().toLowerCase();
-    if (urgent.test(q)) return criticalAdvice;
+    const brakeLightQuestion = /\bbrake\s+lights?\b/.test(q) && !/\bbrakes?\s+(?:fail|don.t stop|not working|not stopping)\b|\bno brakes\b/.test(q);
+    if (!brakeLightQuestion && urgent.test(q)) return criticalAdvice;
     const vehicleName = [vehicle?.model, vehicle?.year].filter(Boolean).join(' ');
     const prefix = vehicleName ? 'For your ' + vehicleName + ': ' : '';
     const priorUsers = conversation.filter(item => item.role === 'user').map(item => item.text || '');
@@ -31,6 +32,9 @@
     if (/^(?:no|nope|nah|nothing|ledu|nahi|లేదు|नहीं)[.! ]*$/i.test(q) ||
         /^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)[.! ]*$/i.test(q)) {
       const yes = /^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)/i.test(q);
+      if (/\bor nothing\b|\bclick[^?]{0,40}\bor\b/.test(followUp)) {
+        return 'When you press start, which one happens: a click, the engine turning, or no sound at all?';
+      }
       if (/\b(click|clicking)\b/.test(followUp)) {
         return yes
           ? 'If you hear a click but the engine does not start, the battery or starter may need checking. Do not keep pressing start. Do the dashboard lights become dim when you press it?'
@@ -65,6 +69,10 @@
 
     if (/\b(tyre|tire)s?\b/.test(q) && /\b(check|inspect|look|maintenance)\b/.test(q)) {
       return prefix + 'Check the tyre for cuts, bulges, nails and worn tread while parked. Check pressure when cold using the tyre-pressure label or owner manual. Do not ride if the tyre is flat, badly damaged or losing air quickly.';
+    }
+
+    if (brakeLightQuestion) {
+      return prefix + 'The brake light tells vehicles behind you that you are slowing down. With the bike parked, check whether it lights up when each brake lever or pedal is pressed. Avoid opening live wiring. Have a mechanic check it before riding if it stays off. Does it fail with both brakes?';
     }
 
     // A warning light is not the same as a dead headlight or a battery problem.
