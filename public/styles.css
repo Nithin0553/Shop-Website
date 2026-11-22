@@ -237,6 +237,12 @@ body { font-size:15px; line-height:1.5; color:var(--ink) }
 .premium-section { position:relative; }
 .premium-section::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(239,246,255,.45)); pointer-events:none; }
 .marquee-shell { position:relative; overflow:hidden; padding:4px 0 6px; }
+/* Home page: headings stay aligned to the content grid, but the moving rows
+   sit directly inside their sections so cards enter and leave at the actual
+   left and right edges of the viewport instead of the centered container. */
+.design-brand-section > .marquee-shell,
+.design-categories-section > .marquee-shell { width:100%; max-width:none; margin-inline:0; }
+
 .marquee-shell::before,.marquee-shell::after { content:''; position:absolute; top:0; bottom:0; width:84px; z-index:3; pointer-events:none; }
 .marquee-shell::before { left:0; background:linear-gradient(90deg,#f5f8fc 8%,rgba(245,248,252,0)); }
 .marquee-shell::after { right:0; background:linear-gradient(270deg,#f5f8fc 8%,rgba(245,248,252,0)); }
