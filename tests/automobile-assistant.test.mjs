@@ -223,3 +223,34 @@ test('offline help uses simple familiar words and preserves safety warnings',()=
   assert.doesNotMatch(js,/Chain\/CVT adjustments depend/);
   assert.doesNotMatch(js,/fitment specifications/);
 });
+
+test('chat text is readable on phones and does not repeat misleading AI-busy prefixes',()=>{
+  const css=read('public/automobile-assistant.css');
+  const js=read('public/automobile-assistant.js');
+  assert.match(css,/max-width:94%;padding:13px 15px;/);
+  assert.match(css,/font-size:16px;line-height:1\.6/);
+  assert.match(css,/#vehicle-assistant \.va-bubble\{font-size:16px\}/);
+  assert.match(css,/#vehicle-assistant \.va-form textarea\{font-size:16px\}/);
+  assert.match(js,/let retryAIAt = 0/);
+  assert.match(js,/Date\.now\(\) \+ 60_000/);
+  assert.match(js,/basicAdvice\(message, vehicle, history\)/);
+  assert.match(js,/statusText\.textContent = 'Basic help'/);
+  assert.doesNotMatch(js,/AI is busy right now\./);
+  assert.doesNotMatch(js,/\+ basicAdvice\(message,vehicle\)/);
+});
+
+test('simple offline yes/no answers follow the previous starting problem',()=>{
+  const js=read('public/automobile-assistant.js');
+  // Evaluate only the pure built-in advice helpers, not the browser UI.
+  const start=js.indexOf('  const urgent = ');
+  const end=js.indexOf('\n  let html;',start);
+  assert.ok(start>0 && end>start);
+  const evaluate=new Function(js.slice(start,end)+'\nreturn basicAdvice;')();
+  const history=[{role:'user',text:'My bike is not starting'},{role:'assistant',text:'Do you hear a clicking sound?'}];
+  const negative=evaluate('No',{type:'motorcycle',model:'',year:''},history);
+  const positive=evaluate('Yes',{type:'motorcycle',model:'',year:''},history);
+  assert.match(negative,/dashboard lights turn on/);
+  assert.match(positive,/hear a click/);
+  assert.doesNotMatch(negative,/AI is busy/);
+  assert.match(evaluate('How do I check tyres?',{model:''},[]),/tyre-pressure label/);
+});
