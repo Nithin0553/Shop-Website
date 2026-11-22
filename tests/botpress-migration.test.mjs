@@ -19,6 +19,9 @@ test('Botpress switch is opt-in with no placeholder credentials or duplicate ass
   assert.ok(js.indexOf('if (await switchToBotpress()) return;') < js.indexOf('const prompts ='));
   assert.match(js,/botpressInjectUrl/);
   assert.match(js,/botpressConfigUrl/);
+  assert.match(js,/if \(!selected\) return false/);
+  assert.match(js,/showShopContact\(config\)/);
+  assert.match(read('public/automobile-assistant.css'),/botpress-contact-fallback/);
   assert.match(js,/cdn\.botpress\.cloud/);
   assert.match(js,/files\.bpcontent\.cloud/);
   assert.doesNotMatch(js,/GEMINI_API_KEY|x-goog-api-key/);
