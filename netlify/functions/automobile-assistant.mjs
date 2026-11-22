@@ -144,4 +144,14 @@ export default async function handler(request) {
       error?.status===429?429:503);
   }
 }
-export const config = {path:'/.netlify/functions/automobile-assistant'};
+// Netlify's edge-enforced rate limit is shared across instances and works
+// even when a function instance is cold. Local hourly throttle is only backup.
+export const config = {
+  path:'/.netlify/functions/automobile-assistant',
+  rateLimit:{
+    action:'rate_limit',
+    aggregateBy:['ip','domain'],
+    windowSize:60,
+    windowLimit:6
+  }
+};
