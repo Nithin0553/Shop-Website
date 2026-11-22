@@ -18,7 +18,7 @@
   border:1px solid rgba(255,255,255,.15);border-radius:999px;
   background:var(--va-navy);color:#fff;cursor:pointer;
   box-shadow:0 10px 28px rgba(13,40,69,.22);
-  font-size:13px;font-weight:650;letter-spacing:.01em;
+  font-size:15px;font-weight:650;letter-spacing:.01em;
   transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
 }
 #vehicle-assistant .va-launcher svg{color:var(--va-gold)}
@@ -26,7 +26,7 @@
 #vehicle-assistant .va-launcher.va-active{background:#27496c}
 #vehicle-assistant .va-panel{
   position:fixed;z-index:955;right:22px;bottom:82px;
-  width:min(400px,calc(100vw - 24px));height:min(625px,calc(100dvh - 104px));
+  width:min(430px,calc(100vw - 24px));height:min(660px,calc(100dvh - 104px));
   background:#fff;border:1px solid #dce4ed;border-radius:20px;
   box-shadow:0 22px 60px rgba(14,38,63,.21);
   display:flex;flex-direction:column;overflow:hidden;
@@ -43,8 +43,8 @@
   border:1px solid rgba(231,171,87,.27);color:var(--va-gold);font-size:21px;
 }
 #vehicle-assistant .va-heading{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
-#vehicle-assistant .va-heading strong{font-size:15px;font-weight:720;letter-spacing:-.02em;line-height:1}
-#vehicle-assistant .va-status{display:flex;align-items:center;gap:6px;color:#d7e3f1;font-size:11px;line-height:1}
+#vehicle-assistant .va-heading strong{font-size:18px;font-weight:720;letter-spacing:-.02em;line-height:1}
+#vehicle-assistant .va-status{display:flex;align-items:center;gap:6px;color:#d7e3f1;font-size:12.5px;line-height:1.25}
 #vehicle-assistant .va-status-dot{width:6px;height:6px;border-radius:50%;background:#7bd0aa;flex-shrink:0}
 #vehicle-assistant .va-status.va-unavailable .va-status-dot{background:#e9b766}
 #vehicle-assistant #va-close{
@@ -56,14 +56,14 @@
 #vehicle-assistant .va-vehicle{flex:0 0 auto;border-bottom:1px solid var(--va-line);background:#fff}
 #vehicle-assistant .va-vehicle summary{
   display:flex;align-items:center;gap:8px;padding:12px 16px;
-  cursor:pointer;list-style:none;font-size:12px;min-height:43px;
+  cursor:pointer;list-style:none;font-size:14px;min-height:48px;
   transition:background .15s ease;
 }
 #vehicle-assistant .va-vehicle summary::-webkit-details-marker{display:none}
 #vehicle-assistant .va-vehicle summary:hover{background:#f8fafc}
 #vehicle-assistant .va-vehicle-label{font-weight:700;color:#304560;flex:0 0 auto}
 #vehicle-assistant #va-vehicle-summary{
-  color:var(--va-muted);font-size:11px;flex:1;text-align:right;
+  color:var(--va-muted);font-size:13px;flex:1;text-align:right;
   overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
 }
 #vehicle-assistant .va-vehicle summary svg{color:#62778c;transition:transform .2s ease;flex:0 0 auto}
@@ -72,19 +72,19 @@
   padding:3px 16px 13px;display:grid;grid-template-columns:1fr 1fr;gap:10px;
   background:#fff;animation:va-fade-up .18s ease;
 }
-#vehicle-assistant .va-settings label{display:flex;min-width:0;flex-direction:column;gap:5px;font-size:10.5px;font-weight:650;color:#65768a}
+#vehicle-assistant .va-settings label{display:flex;min-width:0;flex-direction:column;gap:5px;font-size:13px;font-weight:650;color:#65768a}
 #vehicle-assistant .va-settings input,#vehicle-assistant .va-settings select{
   width:100%;min-width:0;height:35px;padding:6px 9px;border:1px solid #dbe3ec;
-  border-radius:9px;background:#fff;color:var(--va-text);font-size:12px;
+  border-radius:9px;background:#fff;color:var(--va-text);font-size:16px;
 }
 #vehicle-assistant .va-messages{
   flex:1;min-height:115px;overflow:auto;overscroll-behavior:contain;
-  display:flex;flex-direction:column;gap:10px;
+  display:flex;flex-direction:column;gap:12px;
   padding:18px 15px;background:#fafbfd;scroll-behavior:smooth;
 }
 #vehicle-assistant .va-bubble{
-  width:fit-content;max-width:90%;padding:10px 13px;
-  border-radius:14px;font-size:13px;line-height:1.55;
+  width:fit-content;max-width:94%;padding:13px 15px;
+  border-radius:15px;font-size:16px;line-height:1.6;
   white-space:pre-wrap;overflow-wrap:anywhere;
   animation:va-fade-up .22s ease both;
 }
@@ -113,7 +113,7 @@
 #vehicle-assistant .va-chips button{
   min-width:0;padding:10px;border:1px solid #dee6ee;border-radius:11px;
   background:#fff;color:#294565;cursor:pointer;
-  font-size:11.5px;font-weight:550;text-align:left;
+  font-size:13px;font-weight:550;text-align:left;
   transition:border-color .17s ease,background .17s ease,transform .17s ease;
 }
 #vehicle-assistant .va-chips button:hover{
@@ -127,7 +127,7 @@
   flex:1;min-width:0;height:43px;min-height:43px;max-height:115px;
   resize:none;overflow-y:auto;line-height:1.45;
   padding:11px 12px;border:1px solid #dce4ed;border-radius:13px;
-  color:#1b314c;background:#f9fafc;font-size:12.5px;
+  color:#1b314c;background:#f9fafc;font-size:16px;
   transition:border-color .17s ease,background .17s ease;
 }
 #vehicle-assistant .va-form textarea:focus{background:#fff;border-color:#d4a76a}
@@ -142,10 +142,10 @@
 #vehicle-assistant .va-footer{
   flex:0 0 auto;padding:5px 15px 11px;background:#fff;
   display:flex;justify-content:space-between;gap:9px;align-items:center;
-  color:#8995a2;font-size:10px;line-height:1.3;
+  color:#708096;font-size:12px;line-height:1.4;
 }
 #vehicle-assistant .va-footer a{
-  color:#08734e;font-size:10.5px;font-weight:650;text-decoration:none;white-space:nowrap;
+  color:#08734e;font-size:12px;font-weight:650;text-decoration:none;white-space:nowrap;
 }
 #vehicle-assistant .va-footer a:hover{text-decoration:underline}
 #vehicle-assistant .va-sr-only{
@@ -168,8 +168,10 @@
   }
   #vehicle-assistant .va-header{min-height:64px;padding:12px 14px}
   #vehicle-assistant .va-messages{padding:13px 11px}
-  #vehicle-assistant .va-bubble{font-size:12.5px}
-  #vehicle-assistant .va-chips{padding:8px 11px}
+  #vehicle-assistant .va-bubble{font-size:16px}
+  #vehicle-assistant .va-chips{padding:9px 11px}
+  #vehicle-assistant .va-form textarea{font-size:16px}
+  #vehicle-assistant .va-footer{font-size:11.5px}
 }
 @media(max-height:570px){
   #vehicle-assistant .va-panel{max-height:calc(100dvh - 80px)}
