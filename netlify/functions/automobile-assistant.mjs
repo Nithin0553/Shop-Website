@@ -4,7 +4,7 @@ const ORIGIN = 'https://nithin0553.github.io';
 const DEFAULT_MODEL = 'gemini-3.8-flash';
 const FALLBACK_MODEL = 'gemini-3.6-flash';
 const MODEL_NAME = /^gemini-[a-z0-9.-]+$/;
-const LIMIT = 12;
+const LIMIT = 40;
 const WINDOW_MS = 60 * 60 * 1000;
 // Best-effort per-instance throttling. This map is NOT shared across function
 // instances and is not a durable security/quota control.
@@ -212,6 +212,6 @@ export const config = {
     action:'rate_limit',
     aggregateBy:['ip','domain'],
     windowSize:60,
-    windowLimit:6
+    windowLimit:10
   }
 };
