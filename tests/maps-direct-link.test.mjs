@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const app = fs.readFileSync(path.join(root, 'public/app.js'), 'utf8');
 const admin = fs.readFileSync(path.join(root, 'public/admin.js'), 'utf8');
-const start = app.indexOf('function specificShopMapsSearch(){');
+const start = app.indexOf("const SHOP_GOOGLE_PLACE_ID=");
 const end = app.indexOf('function shopMark(){', start);
 assert.ok(start >= 0 && end > start, 'Expected standalone Google Maps URL functions');
 const mapsFns = app.slice(start, end);
@@ -33,7 +33,24 @@ test('legacy address-only search is upgraded to a shop-specific Google Maps sear
   assert.equal(u.searchParams.get('api'), '1');
   assert.ok(u.searchParams.get('query').includes(shopName));
   assert.ok(u.searchParams.get('query').includes('Karimnagar'));
+  assert.equal(u.searchParams.get('query_place_id'), 'ChIJkwgP3RXZzDsRjVeKqXDGltg');
   assert.notEqual(link, legacyLink);
+});
+
+test('the embedded map searches our named business at a street-level zoom', () => {
+  const embed = vm.runInNewContext(mapsFns + '\nshopMapEmbedUrl()', {
+    SITE:{shopName, address:shopAddress},
+    siteDefault:{shopName, address:shopAddress},
+    encodeURIComponent
+  });
+  const url=new URL(embed);
+  assert.equal(url.hostname,'maps.google.com');
+  assert.equal(url.searchParams.get('q'),shopName+', '+shopAddress);
+  assert.equal(url.searchParams.get('z'),'17');
+  assert.equal(url.searchParams.get('output'),'embed');
+  assert.doesNotMatch(embed, /key=/i);
+  assert.match(app, /src="\\$\\{esc\\(mapEmbedSrc\\)\\}"/);
+  assert.doesNotMatch(app, /maps\\?q=\\$\\{encodeURIComponent\\(SITE\\.address\\)\\}/);
 });
 
 test('owner-provided exact Google Maps pin URLs always take priority', () => {
