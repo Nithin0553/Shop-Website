@@ -228,7 +228,7 @@ test('safety-blocked Gemini replies do not trigger model fallback',async()=>{
 
 test('invalid or oversized questions are rejected before AI requests',async()=>{
   await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
-    const bad=await handler(request('a',{ip:'2001:db8::104'}));
+    const bad=await handler(request('   ',{ip:'2001:db8::104'}));
     assert.equal(bad.status,400);
     const empty=await handler(request('',{ip:'2001:db8::109'}));
     assert.equal(empty.status,400);
