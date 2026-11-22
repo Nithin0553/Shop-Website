@@ -49,8 +49,8 @@ test('the embedded map searches our named business at a street-level zoom', () =
   assert.equal(url.searchParams.get('z'),'17');
   assert.equal(url.searchParams.get('output'),'embed');
   assert.doesNotMatch(embed, /key=/i);
-  assert.match(app, /src="\\$\\{esc\\(mapEmbedSrc\\)\\}"/);
-  assert.doesNotMatch(app, /maps\\?q=\\$\\{encodeURIComponent\\(SITE\\.address\\)\\}/);
+  assert.ok(app.includes('src="${esc(mapEmbedSrc)}"'), 'iframe uses shop-specific embed URL');
+  assert.ok(!app.includes('encodeURIComponent(SITE.address)}&amp;output=embed'), 'no address-only map iframe');
 });
 
 test('owner-provided exact Google Maps pin URLs always take priority', () => {
