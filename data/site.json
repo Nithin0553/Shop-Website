@@ -11,5 +11,5 @@
   "instagramUrl": "",
   "facebookUrl": "",
   "siteUrl": "",
-  "chatbotApiUrl": ""
+  "chatbotApiUrl": "https://sssa-vehicle-assistant.netlify.app/.netlify/functions/automobile-assistant"
 }
