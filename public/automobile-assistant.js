@@ -99,7 +99,25 @@
         ' When you press start, do you hear a click, the engine turning, or nothing?';
     }
 
-    if (/\b(air filter)\b/.test(q)) {
+    if (/\b(oil leak|leaking oil|engine oil leaking)\b/.test(q)) {
+      return prefix + 'Park safely and turn the engine off. If oil is dripping heavily or an oil warning stays on, do not ride or drive. A mechanic needs to find the source before parts are replaced. Is the oil dripping while parked, or only after riding?';
+    }
+    if (/\b(misfire|misfiring|sputter|hesitat|jerk)\b/.test(q)) {
+      return prefix + (isElectric
+        ? 'Uneven power from an electric vehicle needs a proper check. Note whether it happens only when accelerating. Do not open the battery.'
+        : 'Jerking or misfiring may involve the spark plug, fuel supply or air intake, but the symptom alone cannot confirm a part. Note when it happens.') + ' Does it happen at idle or while accelerating?';
+    }
+    if (/\b(what is|what does|what do|meaning of|use of|explain)\b/.test(q)) {
+      if (/\bspark plug\b/.test(q)) return prefix + (isElectric
+        ? 'Electric scooters do not use a spark plug. The electric motor moves the vehicle without petrol combustion.'
+        : 'A spark plug makes a small spark that helps burn petrol inside the engine. If it wears out, starting or running can become difficult, but other faults cause similar symptoms.');
+      if (/\bbrake pads?\b/.test(q)) return prefix + 'Brake pads press against the brake disc to slow the wheel. They wear down with use. A mechanic should check their condition and select the correct pad for your model.';
+      if (/\bengine oil\b/.test(q)) return prefix + (isElectric
+        ? 'Most electric scooters do not use petrol-engine oil. Check your manual for any other fluids the model requires.'
+        : 'Engine oil helps reduce friction and heat between moving engine parts. The correct oil grade and change interval depend on the exact vehicle model.');
+      if (/\bbattery\b/.test(q)) return prefix + 'The battery supplies electrical power. On a petrol bike it helps with starting and lights; electric vehicles also have a separate drive battery. Testing is needed before recommending replacement.';
+    }
+    if (/\b(air filter)\b/.test(q) && !/\b(price|cost|stock|available|buy|replacement|fit|number)\b/.test(q)) {
       return prefix + 'An air filter keeps dust and dirt from entering the engine. A blocked filter can reduce airflow, but it is not proof of a particular fault. The correct filter depends on your exact model and variant. Are you asking what it does or looking for a replacement?';
     }
     if (/\b(part|spare|compatib|fitment|genuine|original|price|cost|available|stock|buy)\b/.test(q)) {
