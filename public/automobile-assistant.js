@@ -5,34 +5,34 @@
   'use strict';
   const BASE = window.__SHOP_STATIC_BASE__ || '/Shop-Website';
   const prompts = [
-    'My bike is not starting',
-    'How do I check tyre pressure?',
-    'How do I choose the right spare part?',
-    'My scooter is making a strange noise'
+    {label:'Won’t start',question:'My bike is not starting. What can I safely check?'},
+    {label:'Tyre pressure',question:'How do I check the correct tyre pressure?'},
+    {label:'Find a spare part',question:'How do I find a compatible spare part?'},
+    {label:'Strange noise',question:'My scooter is making a strange noise. What should I check?'}
   ];
   const urgent = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
-  const criticalAdvice = '⚠️ This may be unsafe. Stop driving or riding as soon as you can safely do so. Turn the vehicle off if safe, stay away from fire, smoke or leaking fuel, and contact roadside assistance or a qualified mechanic. Do not attempt roadside repairs to brakes, steering, fuel systems or high-voltage EV batteries.';
+  const criticalAdvice = '⚠️ Stop riding or driving as soon as it’s safe. Switch off the vehicle if safe, stay clear of smoke or leaking fuel, and contact roadside assistance or a qualified mechanic. Don’t attempt repairs to brakes, steering, fuel systems or EV batteries.';
   function basicAdvice(question, vehicle) {
     const q = question.toLowerCase();
     if (urgent.test(q)) return criticalAdvice;
     const prefix = vehicle?.model ? 'For a ' + [vehicle.model,vehicle.year].filter(Boolean).join(' ') + ', ' : '';
     if (/(?:start|starting|ignition|crank|no power)/i.test(q))
-      return prefix + 'first check the ignition/kill switch, adequate fuel or charge, and the side-stand/neutral interlock (if equipped). Do the dashboard lights turn on? Do you hear a click, a normal starter sound or nothing? Do not repeatedly crank, bypass safety switches or short battery terminals. Tell me what you observe.';
+      return prefix + 'check the kill switch, fuel/charge and side-stand or neutral setting. Don’t bypass safety switches or repeatedly crank. Do the dashboard lights work? Do you hear a click?';
     if (/(?:tyre|tire|puncture|pressure|wheel)/i.test(q))
-      return prefix + 'check cold tyre pressure against your owner manual or vehicle label, not the maximum on the tyre sidewall. Inspect tread and sidewalls for cuts, bulges, cords or other damage. Do not ride on a punctured, badly damaged or rapidly deflating tyre. Replacement tyre dimensions and ratings must match the manufacturer specifications.';
+      return prefix + 'check pressure when tyres are cold, using your vehicle label or owner’s manual. Look for cuts, bulges or low tread. Don’t ride with a damaged or flat tyre. Use manufacturer-approved tyre sizes.';
     if (/(?:part|spare|compatib|fitment|genuine|oil filter|air filter)/i.test(q))
-      return prefix + 'check the exact make, model, variant, model year and existing part number. Confirm size, connector/mounting style and the manufacturer-approved specification before purchasing. Avoid guessing from a photo. Our shop primarily sells two-wheeler spares; WhatsApp the shop to confirm fitment and availability.';
+      return prefix + 'note the make, exact model/variant, year and part number. Match the manufacturer’s fitment specifications, not just a photo. Ask our shop on WhatsApp to confirm two-wheeler part availability.';
     if (/(?:oil|lubricat|service)/i.test(q))
-      return prefix + 'check your model-specific oil grade, specification and service interval in the owner manual. For a safe level check, park on level ground and follow the dipstick/sight-glass instructions. Avoid hot components and overfilling. If an oil-pressure warning or major leak is present, stop using the vehicle and contact a mechanic.';
+      return prefix + 'use the oil specification and service interval from your owner’s manual. Check the level on level ground using the manual’s method. Avoid hot parts and overfilling. Stop driving if there’s an oil-pressure warning or major leak.';
     if (/(?:chain|sprocket|clutch|belt|cvt)/i.test(q))
-      return prefix + 'note unusual noise, vibration or visible wear, and check maintenance history. Chain slack and CVT service intervals vary by model. Never touch moving parts with the engine on. A qualified technician should inspect and adjust drivetrain parts.';
+      return prefix + 'note when the noise or vibration occurs and check the service history. Chain/CVT adjustments depend on the exact model. Never touch moving parts with the engine running; ask a mechanic to inspect them.';
     if (/(?:battery|light|indicator|electric|charging)/i.test(q))
-      return prefix + 'check the dashboard lights and look for obvious damaged connectors without touching bare wires. Do not short terminals, probe live wiring or open an EV battery pack. A mechanic can safely test the battery and charging circuit and verify replacement compatibility.';
+      return prefix + 'check if dashboard lights work and look for visibly damaged connectors. Don’t touch live wiring, short battery terminals or open EV batteries. A mechanic can test the charging system and confirm the right replacement.';
     if (/(?:sound|noise|rattle|vibrat)/i.test(q))
-      return prefix + 'tell me when the sound happens (idle, acceleration, braking, turning or bumps) and where it seems to come from. Do not keep driving with loss of braking, steering issues, smoke or severe vibration. An inspection is safer than guessing which part to replace.';
+      return prefix + 'tell me when the sound happens—at idle, during acceleration, braking or over bumps—and where it comes from. Stop driving if there’s smoke, severe vibration or a brake/steering problem.';
     if (/(?:car|suv|dashboard|check engine|coolant)/i.test(q))
-      return prefix + 'identify the model, year, warning light and whether the problem happens when starting, idling or driving. Refer to the manual for the exact light. Red oil-pressure, overheating or brake warnings need prompt safe stopping. Our shop mainly sells two-wheeler spares, but I can offer general car-care information.';
-    return 'I can help with motorcycle, scooter and car symptoms, spare parts and basic maintenance. Please tell me the vehicle type, make, model, year, symptoms, warning lights and when the problem happens. I can suggest safe checks, but I cannot confirm a diagnosis or stock availability.';
+      return prefix + 'tell me the model, year, warning light and when the problem occurs. Follow the owner’s manual for warning symbols. Stop safely for a red oil-pressure, overheating or brake warning. Our shop mainly stocks two-wheeler parts.';
+    return 'Tell me your vehicle model, the symptom and when it happens. I can suggest basic checks or help identify parts, but can’t confirm a diagnosis or stock availability.';
   }
   let html;
   try {
@@ -47,6 +47,7 @@
   const $ = selector => root.querySelector(selector);
   const openButton = $('#va-open'), panel = $('#va-panel'), messages = $('#va-messages');
   const question = $('#va-question'), send = $('#va-send'), status = $('#va-status');
+  const statusText = $('#va-status-text'), vehicleSummary = $('#va-vehicle-summary');
   const chips = $('#va-chips'), shopLink = $('#va-whatsapp');
   let endpoint = '', whatsapp = '', busy = false, history = [];
   async function configure() {
@@ -62,7 +63,8 @@
             url.pathname === '/.netlify/functions/automobile-assistant' &&
             !url.username && !url.password && !url.search && !url.hash) {
           endpoint = url.href;
-          status.textContent = 'AI help enabled';
+          statusText.textContent = 'AI ready';
+          status.classList.remove('va-unavailable');
         }
       }
       const digits = String(data.whatsapp || data.phone || '').replace(/\D/g, '');
@@ -160,11 +162,12 @@
       const indicator = addBubble('Checking your question…','assistant');
       try {
         answer = await askAI(message,vehicle);
-        status.textContent = 'AI help enabled';
+        statusText.textContent = 'AI ready';
+        status.classList.remove('va-unavailable');
       } catch {
-        answer = 'Online AI is temporarily unavailable. Here is some general guidance:\n\n' +
-          basicAdvice(message,vehicle);
-        status.textContent = 'Basic guidance available · AI temporarily unavailable';
+        answer = 'AI is busy right now. ' + basicAdvice(message,vehicle);
+        statusText.textContent = 'Quick help';
+        status.classList.add('va-unavailable');
       } finally { indicator.remove(); }
     }
     addBubble(answer,'assistant');
