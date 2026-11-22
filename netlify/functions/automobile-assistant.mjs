@@ -192,7 +192,7 @@ export default async function handler(request) {
     payload=normalize(JSON.parse(raw));
   } catch{return json({error:'Please check your question.'},400);}
   const brakeLightOnly=/\bbrake\s+lights?\b/i.test(payload.message) &&
-    !/\bbrakes?\s+(?:fail|don.t stop|not working|not stopping)\b|\bno brakes\b/i.test(payload.message);
+    !/\bbrakes?\s+(?:(?:have|has)\s+)?(?:fail(?:s|ed|ing|ure)?|don.t stop|not working|not stopping|not holding)\b|\bno brakes\b|\blost (?:my )?brakes\b/i.test(payload.message);
   if(!brakeLightOnly && safetyRisk.test(payload.message))return json({answer:criticalText,mode:'safety'});
   if(!throttle(request))return json({error:'Too many requests. Try later.'},429);
   try {
