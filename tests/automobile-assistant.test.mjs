@@ -202,7 +202,24 @@ test('chat has minimal copy, optional vehicle details and accessible microintera
   assert.match(js,/\.requestSubmit\(\)/);
   assert.match(js,/\.setAttribute\('aria-busy','true'\)/);
   assert.match(js,/window\.requestAnimationFrame/);
-  assert.match(backend,/aim for 45–100 words/);
-  assert.match(backend,/at most three short, safe checks/);
-  assert.match(backend,/more only for an urgent safety warning/);
+  assert.match(backend,/Aim for|aim for|40–85 words/);
+  assert.match(backend,/simple, everyday Indian English/);
+  assert.match(backend,/common, friendly spoken words/);
+  assert.match(backend,/little or no technical vehicle knowledge/);
+  assert.match(backend,/at most 2–3 short, numbered/);
+  assert.match(backend,/immediately explain it in simple words/);
+  assert.match(backend,/Do not assume the customer knows words like CVT/);
+  assert.match(backend,/at most 2–3 short, numbered, LOW-RISK steps/);
+  assert.match(backend,/End with no more than ONE simple follow-up question/);
+});
+
+test('offline help uses simple familiar words and preserves safety warnings',()=>{
+  const js=read('public/automobile-assistant.js');
+  assert.match(js,/Check if there is enough petrol or battery charge/);
+  assert.match(js,/When do you hear the sound/);
+  assert.match(js,/correct spare part/);
+  assert.match(js,/Call a mechanic or roadside help/);
+  assert.match(js,/Do not touch bare wires or open an electric vehicle battery/);
+  assert.doesNotMatch(js,/Chain\/CVT adjustments depend/);
+  assert.doesNotMatch(js,/fitment specifications/);
 });
