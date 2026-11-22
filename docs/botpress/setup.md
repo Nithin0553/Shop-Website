@@ -37,7 +37,7 @@ Save business details. The GitHub Pages workflow republishes the public site.
 
 After the updated `static-data/site.json` is published, the website loads the two authorized Botpress scripts in order. **The original Auto Assistant does not initialize when Botpress successfully loads**. The legacy function and Gemini key are not used by the new widget.
 
-If either Botpress URL is absent, invalid or temporarily fails loading, the legacy assistant remains the fallback to avoid a broken chat button. No duplicate chat buttons should appear in normal operation. To turn back temporarily, clear both Botpress URLs in Shop details.
+When **both Botpress fields are blank**, the old assistant stays available during setup. Once you fill either Botpress field, the old assistant is **not shown**. If the embed is incomplete, invalid or unavailable, a small **Ask our shop** WhatsApp button appears instead of unreliable generic advice. When both correct URLs are published, only Botpress Webchat appears. To roll back temporarily, clear both Botpress URLs in Shop details.
 
 The loader only accepts exact HTTPS domains `cdn.botpress.cloud` and `files.bpcontent.cloud` with standard Webchat script paths. It rejects other hosts and script URLs containing query fragments or user info.
 
