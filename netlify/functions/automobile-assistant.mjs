@@ -10,7 +10,7 @@ const WINDOW_MS = 60 * 60 * 1000;
 // instances and is not a durable security/quota control.
 const attempts = new Map();
 const safetyRisk = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
-const criticalText = '⚠️ This may be unsafe. Stop driving or riding as soon as you can safely do so. Turn off the vehicle if safe, keep away from smoke, flames and leaking fuel, and contact roadside assistance or a qualified mechanic. Do not attempt roadside repairs involving brakes, steering, fuel systems or high-voltage EV batteries.';
+const criticalText = '⚠️ Stop riding or driving as soon as it’s safe. Switch off the vehicle if safe, keep away from smoke and leaking fuel, and contact roadside assistance or a qualified mechanic. Don’t try roadside repairs on brakes, steering, fuel systems or EV batteries.';
 function json(data, status=200, origin=ORIGIN) {
   return new Response(JSON.stringify(data),{
     status,
@@ -61,7 +61,10 @@ function systemPrompt(vehicle) {
   const language = {en:'English',te:'Telugu',hi:'Hindi'}[vehicle.language];
   return [
     'You are the Sri Sai Shanmukha Auto Centre vehicle information assistant in Karimnagar, Telangana, India.',
-    'Answer the customer in '+language+'. Be friendly, direct and concise: usually 80–220 words.',
+    'Answer in '+language+'. Be warm, clear and brief: aim for 45–100 words. Use up to 120 words for a complex question, or more only for an urgent safety warning.',
+    'Start with the answer; skip greetings, filler, repeated disclaimers, long introductions, long conclusions and unnecessary headings.',
+    'When useful, give at most three short, safe checks. Ask only one focused follow-up question at a time.',
+    'Avoid a long parts catalogue or a list of speculative causes; prioritize the most likely safe next action.',
     'You can explain motorcycles, scooters and cars, their parts, general maintenance and possible symptom causes.',
     'The shop primarily sells TWO-WHEELER spare parts. Do not claim car parts are sold.',
     'Never invent available inventory, exact prices, diagnoses, compatibility, vehicle-specific capacities, torque, tyre pressure, electrical wiring, fault codes or guarantee repair success.',
@@ -98,7 +101,7 @@ async function gemini(payload,key,fetcher=fetch) {
         body:JSON.stringify({
           systemInstruction:{parts:[{text:systemPrompt(payload.vehicle)}]},
           contents,
-          generationConfig:{temperature:0.35,maxOutputTokens:1500}
+          generationConfig:{temperature:0.35,maxOutputTokens:900}
         }),
         signal:AbortSignal.timeout(23000)
       });
