@@ -1,0 +1,42 @@
+/* Floating customer assistant — visually aligned with the white, navy and gold shop design. */
+#vehicle-assistant { font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#102542; position:relative; z-index:950; }
+#vehicle-assistant *,#vehicle-assistant *::before,#vehicle-assistant *::after { box-sizing:border-box; }
+#vehicle-assistant .va-launcher { position:fixed; z-index:950; right:20px; bottom:20px; background:#102744; color:#fff; border:1px solid rgba(255,255,255,.16); box-shadow:0 10px 32px rgba(16,39,68,.25); display:flex; align-items:center; gap:10px; cursor:pointer; padding:13px 18px; border-radius:40px; font-size:14px; font-weight:700; }
+#vehicle-assistant .va-launcher:hover,#vehicle-assistant .va-active { background:#1a4674; }
+#vehicle-assistant button:focus-visible,#vehicle-assistant input:focus-visible,#vehicle-assistant select:focus-visible,#vehicle-assistant textarea:focus-visible,#vehicle-assistant a:focus-visible { outline:3px solid #d3912f; outline-offset:2px; }
+#vehicle-assistant .va-panel { position:fixed; z-index:955; right:20px; bottom:86px; width:min(420px,calc(100vw - 24px)); max-height:min(760px,calc(100dvh - 105px)); background:#fff; border:1px solid #e4dcd0; box-shadow:0 18px 70px rgba(17,39,67,.23); border-radius:20px; display:flex; flex-direction:column; overflow:hidden; }
+#vehicle-assistant .va-panel[hidden] { display:none !important; }
+#vehicle-assistant .va-header { background:#112d51; color:#fff; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #e9aa55; }
+#vehicle-assistant .va-header strong { display:block; font-size:17px; letter-spacing:-.025em; }
+#vehicle-assistant .va-header small { color:#cedaec; display:block; font-size:11px; margin-top:3px; }
+#vehicle-assistant #va-close { background:rgba(255,255,255,.1); color:#fff; border:none; width:32px; height:32px; cursor:pointer; font-size:24px; border-radius:8px; }
+#vehicle-assistant .va-disclaimer { margin:0; color:#5b5660; background:#fff7eb; border-bottom:1px solid #f2e2c6; padding:9px 16px; font-size:11px; line-height:1.55; }
+#vehicle-assistant .va-settings { padding:11px 14px; display:grid; grid-template-columns:1fr 1fr; gap:9px; border-bottom:1px solid #eaeef1; background:#fff; }
+#vehicle-assistant .va-settings label { min-width:0; display:flex; flex-direction:column; gap:4px; font-size:11px; color:#455770; font-weight:700; }
+#vehicle-assistant .va-settings input,#vehicle-assistant .va-settings select { font-family:inherit; font-size:12px; width:100%; min-width:0; height:34px; padding:6px 8px; border:1px solid #d6dee7; color:#172d47; border-radius:8px; background:#fff; }
+#vehicle-assistant .va-messages { padding:15px 14px; flex:1; min-height:112px; overflow-y:auto; background:#f7f9fc; display:flex; flex-direction:column; gap:10px; overscroll-behavior:contain; }
+#vehicle-assistant .va-bubble { max-width:94%; padding:11px 13px; border-radius:13px; line-height:1.5; font-size:12.5px; white-space:pre-wrap; overflow-wrap:anywhere; }
+#vehicle-assistant .va-assistant { background:#fff; border:1px solid #e0e7ee; color:#24374f; align-self:flex-start; border-bottom-left-radius:4px; }
+#vehicle-assistant .va-user { background:#123d68; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+#vehicle-assistant .va-chips { display:flex; overflow-x:auto; gap:7px; padding:9px 13px; background:#fafbfd; border-top:1px solid #ebeff3; }
+#vehicle-assistant .va-chips[hidden] { display:none; }
+#vehicle-assistant .va-chips button { flex:0 0 auto; max-width:190px; font-family:inherit; font-size:11px; background:#fff; border:1px solid #e1d7c9; color:#18446a; border-radius:20px; cursor:pointer; padding:8px 10px; white-space:normal; text-align:left; }
+#vehicle-assistant .va-chips button:hover { border-color:#d3912f; }
+#vehicle-assistant .va-form { padding:10px 13px; display:flex; gap:8px; background:#fff; border-top:1px solid #edf0f4; align-items:end; }
+#vehicle-assistant .va-form textarea { font-family:inherit; font-size:13px; resize:none; border:1px solid #d6dee7; border-radius:10px; padding:9px 10px; flex:1; min-width:0; height:58px; color:#152d47; background:#fff; }
+#vehicle-assistant .va-form button { font-family:inherit; background:#e9aa55; border:1px solid #c98e3f; border-radius:9px; color:#142b46; font-weight:800; cursor:pointer; padding:13px 12px; }
+#vehicle-assistant .va-form button:disabled { opacity:.5; cursor:wait; }
+#vehicle-assistant .va-footer { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:3px 13px 5px; font-size:10px; color:#637183; }
+#vehicle-assistant .va-footer a { color:#08734e; font-weight:700; text-decoration:none; }
+#vehicle-assistant .va-privacy { margin:0; padding:0 13px 10px; font-size:10px; line-height:1.5; color:#738196; }
+#vehicle-assistant .va-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:650px) {
+ #vehicle-assistant .va-launcher { right:12px; bottom:max(12px,env(safe-area-inset-bottom)); padding:13px; width:56px; height:56px; justify-content:center; border-radius:50%; }
+ #vehicle-assistant .va-launcher span { display:none; }
+ #vehicle-assistant .va-panel { right:8px; bottom:calc(max(12px,env(safe-area-inset-bottom)) + 65px); width:calc(100vw - 16px); max-height:calc(100dvh - 105px); border-radius:16px; }
+ #vehicle-assistant .va-settings { padding:9px 11px; gap:7px; }
+ #vehicle-assistant .va-disclaimer { font-size:10px; padding:6px 12px; }
+ #vehicle-assistant .va-messages { padding:9px; }
+ #vehicle-assistant .va-privacy { font-size:9px; }
+}
+@media(prefers-reduced-motion:reduce) { #vehicle-assistant * { scroll-behavior:auto !important; transition:none !important; } }

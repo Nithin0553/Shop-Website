@@ -22,3 +22,6 @@ dist-pages/
 
 # Generated public-only GitHub Pages artifact.
 dist-github-pages/
+
+# Local Netlify CLI project linkage and builds (never commit account metadata).
+.netlify/
