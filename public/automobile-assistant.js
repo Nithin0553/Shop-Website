@@ -14,7 +14,7 @@
   const criticalAdvice = '⚠️ Stop the vehicle as soon as it is safe. Switch off the engine if safe. Stay away from smoke, fire or leaking petrol. Call a mechanic or roadside help. Do not try to repair brakes, steering, fuel leaks or EV batteries yourself.';
   function basicAdvice(question, vehicle, conversation = []) {
     const q = String(question || '').trim().toLowerCase();
-    const brakeLightQuestion = /\bbrake\s+lights?\b/.test(q) && !/\bbrakes?\s+(?:fail|don.t stop|not working|not stopping)\b|\bno brakes\b/.test(q);
+    const brakeLightQuestion = /\bbrake\s+lights?\b/.test(q) && !/\bbrakes?\s+(?:(?:have|has)\s+)?(?:fail(?:s|ed|ing|ure)?|don.t stop|not working|not stopping|not holding)\b|\bno brakes\b|\blost (?:my )?brakes\b/.test(q);
     if (!brakeLightQuestion && urgent.test(q)) return criticalAdvice;
     const vehicleName = [vehicle?.model, vehicle?.year].filter(Boolean).join(' ');
     const prefix = vehicleName ? 'For your ' + vehicleName + ': ' : '';
