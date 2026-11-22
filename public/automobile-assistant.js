@@ -12,9 +12,22 @@
   ];
   const urgent = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
   const criticalAdvice = '⚠️ Stop the vehicle as soon as it is safe. Switch off the engine if safe. Stay away from smoke, fire or leaking petrol. Call a mechanic or roadside help. Do not try to repair brakes, steering, fuel leaks or EV batteries yourself.';
-  function basicAdvice(question, vehicle) {
+  function basicAdvice(question, vehicle, conversation = []) {
     const q = question.toLowerCase();
     if (urgent.test(q)) return criticalAdvice;
+    // The basic fallback must make sense when someone says "No" or "Yes"
+    // in response to the previous question, not restart the conversation.
+    const lastQuestion = [...conversation].reverse().find(item => item.role === 'user')?.text || '';
+    if (/^(?:no|nope|nah|nothing|ledu|nahi|లేదు|नहीं)[.! ]*$/i.test(q)) {
+      if (/\b(start|starting|crank|ignition)\b/i.test(lastQuestion))
+        return 'Okay. If there is no clicking sound, check whether the dashboard lights turn on. If the lights are also off, the battery may be weak. A mechanic can test it safely. Are the dashboard lights working?';
+      return 'Okay. Tell me what happens instead, so I can suggest the next simple check.';
+    }
+    if (/^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)[.! ]*$/i.test(q)) {
+      if (/\b(start|starting|crank|ignition)\b/i.test(lastQuestion))
+        return 'Thanks. If you hear a click but the engine does not start, the battery or starter may need checking. Avoid repeatedly pressing start. Do the dashboard lights become dim when you press it?';
+      return 'Got it. Tell me a little more about what you see or hear.';
+    }
     const prefix = vehicle?.model ? 'For your ' + [vehicle.model,vehicle.year].filter(Boolean).join(' ') + ': ' : '';
     if (/(?:start|starting|ignition|crank|no power)/i.test(q))
       return prefix + '1. Check if there is enough petrol or battery charge.\n2. Check that the engine stop switch is ON and the side stand is up (if fitted).\n3. See if the dashboard lights turn on.\nDo you hear a clicking sound when you press start? Do not bypass any safety switch.';
@@ -50,6 +63,7 @@
   const statusText = $('#va-status-text'), vehicleSummary = $('#va-vehicle-summary');
   const chips = $('#va-chips'), shopLink = $('#va-whatsapp');
   let endpoint = '', whatsapp = '', busy = false, history = [];
+  let retryAIAt = 0; // A short cooldown prevents repeated failed calls.
   async function configure() {
     try {
       const response = await fetch(BASE + '/static-data/site.json', {cache:'no-store'});
@@ -63,7 +77,7 @@
             url.pathname === '/.netlify/functions/automobile-assistant' &&
             !url.username && !url.password && !url.search && !url.hash) {
           endpoint = url.href;
-          statusText.textContent = 'AI ready';
+          statusText.textContent = 'Quick help';
           status.classList.remove('va-unavailable');
         }
       }
@@ -210,7 +224,7 @@
         body:JSON.stringify({message,vehicle,history:history.slice(-6)}),
         signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'
       });
-      if (!response.ok) throw Error('AI unavailable');
+      if (!response.ok) throw Error('AI service unavailable (HTTP ' + response.status + ')');
       const data = await response.json();
       if (!data || typeof data.answer !== 'string' || !data.answer.trim() || data.answer.length > 3500)
         throw Error('Unexpected response');
@@ -238,16 +252,26 @@
     $('#va-form').setAttribute('aria-busy','true');
     let answer;
     if (urgent.test(message)) answer = criticalAdvice;
-    else if (!endpoint) answer = basicAdvice(message, vehicle);
-    else {
+    else if (!endpoint || Date.now() < retryAIAt) {
+      answer = basicAdvice(message, vehicle, history);
+      if (endpoint) {
+        statusText.textContent = 'Basic help';
+        status.classList.add('va-unavailable');
+      }
+    } else {
       const indicator = makeThinking();
       try {
         answer = await askAI(message,vehicle);
-        statusText.textContent = 'AI ready';
+        retryAIAt = 0;
+        statusText.textContent = 'AI connected';
         status.classList.remove('va-unavailable');
-      } catch {
-        answer = 'AI is busy right now. ' + basicAdvice(message,vehicle);
-        statusText.textContent = 'Quick help';
+      } catch (error) {
+        // Live AI can fail due to configuration, timeout, provider quota or
+        // service overload. Show usable basic help without repeating an error
+        // message inside every answer.
+        retryAIAt = Date.now() + 60_000;
+        answer = basicAdvice(message, vehicle, history);
+        statusText.textContent = 'Basic help';
         status.classList.add('va-unavailable');
       } finally { indicator.remove(); }
     }
