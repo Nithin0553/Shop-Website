@@ -104,11 +104,23 @@ function whatsappUrl(message='Hello, I would like to enquire about two-wheeler s
   return digits ? `https://wa.me/${digits}?text=${encodeURIComponent(message)}`:'';
 }
 function phoneUrl(){return SITE.phone ? `tel:${SITE.phone.replace(/[^+\d]/g,'')}`:'';}
-// An actual Google Maps Share URL takes priority: it points to the shop's chosen pin.
-// Upgrade only the original address-only link; do not replace owner-set place links.
+// The verified Maps business listing has its own Place ID. Use it in outgoing
+// Google Maps links to open our shop, not a nearby business at the same address.
+const SHOP_GOOGLE_PLACE_ID='ChIJkwgP3RXZzDsRjVeKqXDGltg';
+// An owner-provided Google Maps share link still takes priority. The original
+// address-only default is upgraded to a place-specific search automatically.
 function specificShopMapsSearch(){
-  const query=[SITE.shopName||siteDefault.shopName,SITE.address||siteDefault.address,SITE.city].filter(Boolean).join(', ');
-  return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : '';
+  const shop=String(SITE.shopName||siteDefault.shopName).trim();
+  const address=String(SITE.address||siteDefault.address).trim();
+  const query=[shop,address].filter(Boolean).join(', ');
+  const placeId=shop.toLowerCase()==='sri sai shanmukha auto centre' ? SHOP_GOOGLE_PLACE_ID : '';
+  return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}${placeId?'&query_place_id='+encodeURIComponent(placeId):''}` : '';
+}
+// An address-only iframe can show neighboring businesses instead of the shop.
+// Search the business name AND address, at street-level zoom, in the inline map.
+function shopMapEmbedUrl(){
+  const query=[SITE.shopName||siteDefault.shopName,SITE.address||siteDefault.address].filter(Boolean).join(', ');
+  return query ? `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=17&output=embed` : '';
 }
 function mapsUrl(){
   const saved=String(SITE.mapsUrl||'').trim();
@@ -186,7 +198,8 @@ function inquiryForm(){
 }
 function shopContactSection(){
   const map=mapsUrl();
-  const mapEmbed=SITE.address ? `<iframe class="store-map-frame" title="Google Maps location — Sri Sai Shanmukha Auto Centre" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=${encodeURIComponent(SITE.address)}&amp;output=embed"></iframe>` : '<span class="map-placeholder">Map location coming soon</span>';
+  const mapEmbedSrc=SITE.address ? shopMapEmbedUrl() : '';
+  const mapEmbed=mapEmbedSrc ? `<iframe class="store-map-frame" title="Google Maps showing ${esc(SITE.shopName||siteDefault.shopName)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${esc(mapEmbedSrc)}"></iframe>` : '<span class="map-placeholder">Map location coming soon</span>';
   const mapDirections=map ? `<a class="map-link store-map-directions" href="${esc(map)}" target="_blank" rel="noopener noreferrer">Open in Google Maps ${ico('diagonal',14)}</a>` : '';
   return `<section class="shop-contact-section" id="visit-us"><div class="container shop-contact-layout">
     <div class="shop-contact-left"><div class="design-heading left-heading"><h2>Get in Touch / Visit Our Store</h2></div>
