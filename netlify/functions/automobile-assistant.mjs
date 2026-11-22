@@ -9,7 +9,7 @@ const WINDOW_MS = 60 * 60 * 1000;
 // Best-effort per-instance throttling. This map is NOT shared across function
 // instances and is not a durable security/quota control.
 const attempts = new Map();
-const safetyRisk = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
+const safetyRisk = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smok(?:e|ing)|\bfire\b|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
 const criticalText = '⚠️ Stop riding or driving as soon as it’s safe. Switch off the vehicle if safe, keep away from smoke and leaking fuel, and contact roadside assistance or a qualified mechanic. Don’t try roadside repairs on brakes, steering, fuel systems or EV batteries.';
 function json(data, status=200, origin=ORIGIN) {
   return new Response(JSON.stringify(data),{
@@ -191,7 +191,9 @@ export default async function handler(request) {
     if(raw.length>12_000)return json({error:'Question too long.'},413);
     payload=normalize(JSON.parse(raw));
   } catch{return json({error:'Please check your question.'},400);}
-  if(safetyRisk.test(payload.message))return json({answer:criticalText,mode:'safety'});
+  const brakeLightOnly=/\bbrake\s+lights?\b/i.test(payload.message) &&
+    !/\bbrakes?\s+(?:fail|don.t stop|not working|not stopping)\b|\bno brakes\b/i.test(payload.message);
+  if(!brakeLightOnly && safetyRisk.test(payload.message))return json({answer:criticalText,mode:'safety'});
   if(!throttle(request))return json({error:'Too many requests. Try later.'},429);
   try {
     const answer=await gemini(payload,process.env.GEMINI_API_KEY);
