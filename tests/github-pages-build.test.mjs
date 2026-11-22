@@ -133,3 +133,22 @@ test('static admin uses original design, without publishing customer lists or th
   assert.match(page,/\/Shop-Website\/assets\/shop-favicon\.png/);
   assert.doesNotMatch(page,/type="hidden"[^>]+token/i);
 });
+
+test('GitHub Pages includes complete floating auto assistant without exposing AI credentials',()=>{
+  const html=read('index.html');
+  assert.match(html,/\/Shop-Website\/automobile-assistant\.js\?v=[a-f0-9]{12}/);
+  assert.match(html,/\/Shop-Website\/automobile-assistant\.css\?v=[a-f0-9]{12}/);
+  for(const file of ['automobile-assistant.js','automobile-assistant.css','automobile-assistant.html']){
+    assert.ok(existsSync(path.join(out,file)),file);
+  }
+  const js=read('automobile-assistant.js');
+  assert.match(js,/\/static-data\/site\.json/);
+  assert.match(js,/\/automobile-assistant\.html/);
+  assert.match(read('automobile-assistant.html'),/Ask our shop/);
+  assert.ok(!js.includes('x-goog-api-key'));
+  const config=JSON.parse(read('static-data/site.json'));
+  assert.equal(config.chatbotApiUrl,'');
+  assert.ok(!existsSync(path.join(out,'netlify/functions/automobile-assistant.mjs')));
+  assert.ok(!existsSync(path.join(out,'netlify.toml')));
+  execFileSync(process.execPath,['--check',path.join(out,'automobile-assistant.js')],{stdio:'pipe'});
+});
