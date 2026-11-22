@@ -94,6 +94,21 @@ html=replaceOnce(html,
   'src="'+base+'/app.js?v='+appVersion+'"',
   'versioned storefront asset'
 );
+// Refresh the independent assistant code and styles after future updates.
+const assistantSource=await readFile(path.join(root,'public/automobile-assistant.js'),'utf8');
+const assistantCss=await readFile(path.join(root,'public/automobile-assistant.css'),'utf8');
+const assistantVersion=createHash('sha256').update(assistantSource).digest('hex').slice(0,12);
+const assistantCssVersion=createHash('sha256').update(assistantCss).digest('hex').slice(0,12);
+html=replaceOnce(html,
+  'src="'+base+'/automobile-assistant.js"',
+  'src="'+base+'/automobile-assistant.js?v='+assistantVersion+'"',
+  'versioned automobile assistant script'
+);
+html=replaceOnce(html,
+  'href="'+base+'/automobile-assistant.css"',
+  'href="'+base+'/automobile-assistant.css?v='+assistantCssVersion+'"',
+  'versioned automobile assistant stylesheet'
+);
 html=replaceOnce(html,
   '<script src="'+base+'/festival-effects.js" defer></script>',
   '<script>window.SHOP_STATIC_MODE=true;window.__SHOP_STATIC_BASE__='+JSON.stringify(base)+';</script>\n' +
