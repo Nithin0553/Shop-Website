@@ -111,7 +111,7 @@ The browser only accepts HTTPS `*.netlify.app` URLs with the exact function rout
 
 ### Security and operating limitations
 
-- The Netlify Function allows browser calls from only `https://nithin0553.github.io`, has a **Netlify platform-enforced rate-limit of 6 requests/minute per IP and domain**, and also uses a best-effort warm-instance limit of 12 requests/hour per IP. The second limit is not durable or shared between instances.
+- The Netlify Function allows browser calls from only `https://nithin0553.github.io`, has a **Netlify platform-enforced rate-limit of 10 requests/minute per IP and domain**, and also uses a best-effort warm-instance limit of 40 requests/hour per IP. The second limit is not durable or shared between instances; customers behind a shared public IP may share both limits.
 - **CORS is not authentication.** A public AI API can still receive non-browser/bot requests; network rate limiting and the provider's quota help, but cannot guarantee zero abuse or cost. Set Google AI Studio quotas/billing alerts, monitor Netlify Functions usage, and disable `AUTO_CHAT_ENABLED` if unexpected volume appears.
 - The site does not save conversation history. Recent chat messages are held in the browser tab's JavaScript memory during the current session and sent with the next user question. Netlify/Google may process the request according to their platform policies. Avoid collecting names, phone numbers, identity, payment details or other private data.
 - The chat **does not inspect a customer's vehicle directly**, cannot provide a verified fault diagnosis or exact parts compatibility, and has no access to live inventory. It should ask clarifying questions rather than assert unverified specifications.
@@ -128,6 +128,21 @@ The browser intentionally shows basic guidance when the live AI fails. It does *
 4. When the **function source code** changes, deploy the Netlify function separately with `netlify deploy --prod --dir=netlify-site --functions=netlify/functions`. Merging to GitHub only publishes the storefront, not this manually deployed service.
 
 The server accepts short follow-up messages (including `No`) and tries its secondary Gemini model when the primary returns an empty or token-limited answer. Both attempts use a bounded timeout shorter than the browser wait. Safety-blocked responses are never retried with another model.
+
+### Response accuracy and practical usefulness
+
+The assistant now distinguishes different types of customer questions instead of responding to loose keywords. **Online AI** is instructed to follow the last question, give one or two relevant checks with the meaning of the observed result, and avoid claiming a confirmed repair diagnosis, exact part compatibility or live inventory. The Gemini request uses medium thinking and a larger response-token allowance while still asking for short customer-facing answers.
+
+The **basic (offline) mode is limited**. It handles selected common questions about starting, punctures, tyre pressure, warning lights, brake lamps, air filters, spare parts, oil and batteries. It is not a mechanic or a full language model; unfamiliar problems should trigger a question for details, not a guessed repair. Basic answers are currently in English; Telugu and Hindi are provided by online AI when available.
+
+To regression-test the changed behaviour, try these customer flows:
+- "My Activa tyre has a puncture" should give puncture safety guidance, not only inflation instructions.
+- "My bike is not starting" → answer the clicking/dashboard question with "No" → the next reply should refer to the latest question and not restart the diagnosis.
+- "My brake light is not working" should discuss the lamp and safe inspection, while "My brakes have failed" must stop the ride and ask for urgent help.
+- "What does a spark plug do?" should explain the part, while stock/price/fitment questions should ask for model details and direct to the shop.
+- "My electric scooter won't start" should not recommend checking petrol or engine oil.
+
+These checks establish expected logic, **not** verified model accuracy on every vehicle. When showing **Basic help**, the assistant is not connected to Gemini and cannot provide full reasoning. The Netlify function must be redeployed manually after backend changes.
 
 ### Maintenance
 
