@@ -4,6 +4,10 @@ A responsive, working website for a local two-wheeler spare-parts and accessorie
 
 **Built with:** HTML, CSS, browser JavaScript, Node.js, and JSON file storage. The local Node.js server needs no third-party packages or build step; the optional Cloudflare Pages deployment uses an esbuild build step.
 
+## Vehicle Auto Assistant (motorcycles, scooters and cars)
+
+The public GitHub Pages storefront includes a responsive **Ask Auto Assistant** chat panel on every page. It provides basic, safety-oriented offline answers immediately, including starting issues, tyres, parts fitment, oil, electrical basics and unusual sounds. A fuller, multilingual Gemini-powered experience (English, Telugu, Hindi) can be added **without changing the GitHub Pages hosting** by deploying the separate Netlify Function and entering its URL in **Admin → Shop details → Auto Assistant AI endpoint**. The Gemini key stays server-side. Critical brake/steering/fuel/EV issues prompt safe stopping and professional help, and car questions do not imply our shop stocks car parts. See [Auto Assistant setup](docs/automobile-assistant.md). No paid AI endpoint is automatically enabled.
+
 ## Automatic daily two-wheeler blogs
 
 Our GitHub Pages blog can publish a newly written, source-aware two-wheeler industry update, maintenance tip, or spare-parts buying guide every morning at **8:37 AM India time**. The [daily blog workflow](.github/workflows/daily-blog.yml) researches recent headline metadata, drafts an original article using the Gemini API, checks for duplicates and quality, and publishes the static website in the same GitHub Actions run. **One-time setup is required:** add a private `GEMINI_API_KEY` repository secret. The default is now Gemini 3.8 Flash, not Flash-Lite; the workflow can also select Gemini Pro or paid Grok 4.7 using a separate xAI API key. Paid Grok is not called without explicit opt-in. If the model is unavailable or the draft fails checks, the automation safely skips the article. See [daily blog automation setup](docs/daily-blog-automation.md).
