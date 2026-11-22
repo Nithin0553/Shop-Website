@@ -13,39 +13,96 @@
   const urgent = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
   const criticalAdvice = '⚠️ Stop the vehicle as soon as it is safe. Switch off the engine if safe. Stay away from smoke, fire or leaking petrol. Call a mechanic or roadside help. Do not try to repair brakes, steering, fuel leaks or EV batteries yourself.';
   function basicAdvice(question, vehicle, conversation = []) {
-    const q = question.toLowerCase();
+    const q = String(question || '').trim().toLowerCase();
     if (urgent.test(q)) return criticalAdvice;
-    // The basic fallback must make sense when someone says "No" or "Yes"
-    // in response to the previous question, not restart the conversation.
-    const lastQuestion = [...conversation].reverse().find(item => item.role === 'user')?.text || '';
-    if (/^(?:no|nope|nah|nothing|ledu|nahi|లేదు|नहीं)[.! ]*$/i.test(q)) {
-      if (/\b(start|starting|crank|ignition)\b/i.test(lastQuestion))
-        return 'Okay. If there is no clicking sound, check whether the dashboard lights turn on. If the lights are also off, the battery may be weak. A mechanic can test it safely. Are the dashboard lights working?';
-      return 'Okay. Tell me what happens instead, so I can suggest the next simple check.';
+    const vehicleName = [vehicle?.model, vehicle?.year].filter(Boolean).join(' ');
+    const prefix = vehicleName ? 'For your ' + vehicleName + ': ' : '';
+    const priorUsers = conversation.filter(item => item.role === 'user').map(item => item.text || '');
+    const lastAssistant = [...conversation].reverse().find(item => item.role === 'assistant')?.text.toLowerCase() || '';
+    const symptom = priorUsers.slice(-4).join(' ').toLowerCase();
+    const context = (symptom + ' ' + q).trim();
+    const isElectric = /\b(ev|electric (?:bike|car|scooter|vehicle)|e-scooter)\b|ather|ola s1|chetak electric/i.test(
+      context + ' ' + (vehicle?.model || '')
+    );
+
+    // Short replies MUST follow the assistant's actual last question; earlier
+    // versions guessed from the first customer symptom and went down wrong paths.
+    if (/^(?:no|nope|nah|nothing|ledu|nahi|లేదు|नहीं)[.! ]*$/i.test(q) ||
+        /^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)[.! ]*$/i.test(q)) {
+      const yes = /^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)/i.test(q);
+      if (/\b(click|clicking)\b/.test(lastAssistant)) {
+        return yes
+          ? 'If you hear a click but the engine does not start, the battery or starter may need checking. Do not keep pressing start. Do the dashboard lights become dim when you press it?'
+          : 'Okay, no clicking sound. Check whether the dashboard lights turn on when the key is ON. If they are off too, the battery, switch or fuse may need checking. Do the dashboard lights turn on?';
+      }
+      if (/\b(dashboard lights|dash lights|lights turn on)\b/.test(lastAssistant)) {
+        return yes
+          ? 'The dashboard has power, so a completely dead battery is less likely, but it can still be weak. When you press start once, do you hear a click, the engine turning, or nothing?'
+          : 'No dashboard lights means the electrical supply may be interrupted. Check that the key and engine switch are ON. Do not touch wires. A mechanic can check the battery and fuse safely.';
+      }
+      if (/\b(flat tyre|flat tire|puncture)\b/.test(lastAssistant)) {
+        return yes
+          ? 'Do not ride on a flat or punctured tyre. Use roadside help or take the wheel to a tyre repair shop. Do not pull out a nail or screw yourself.'
+          : 'Okay. Is the tyre losing air slowly, or are you asking for the correct pressure?';
+      }
+      return 'Could you tell me what you mean by ' + (yes ? '"yes"' : '"no"') +
+        '? I want to follow the right question, not guess about your vehicle.';
     }
-    if (/^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)[.! ]*$/i.test(q)) {
-      if (/\b(start|starting|crank|ignition)\b/i.test(lastQuestion))
-        return 'Thanks. If you hear a click but the engine does not start, the battery or starter may need checking. Avoid repeatedly pressing start. Do the dashboard lights become dim when you press it?';
-      return 'Got it. Tell me a little more about what you see or hear.';
+
+    // Distinguish a real puncture from a routine pressure question.
+    if (/\b(punctur(?:e|ed)|flat tyre|flat tire|tyre is flat|tire is flat|nail in (?:my |the )?tyre|air leak(?:ing)? from (?:my |the )?tyre)\b/i.test(q)) {
+      return prefix + 'Do not ride on a flat tyre. If you can see a nail or screw, leave it in place. Ask a tyre repair shop to check whether it can be repaired safely. Is the tyre completely flat or losing air slowly?';
     }
-    const prefix = vehicle?.model ? 'For your ' + [vehicle.model,vehicle.year].filter(Boolean).join(' ') + ': ' : '';
-    if (/(?:start|starting|ignition|crank|no power)/i.test(q))
-      return prefix + '1. Check if there is enough petrol or battery charge.\n2. Check that the engine stop switch is ON and the side stand is up (if fitted).\n3. See if the dashboard lights turn on.\nDo you hear a clicking sound when you press start? Do not bypass any safety switch.';
-    if (/(?:tyre|tire|puncture|pressure|wheel)/i.test(q))
-      return prefix + '1. Check the air pressure when the tyres are cold. Use the number in your vehicle manual or tyre-pressure label.\n2. Look for cuts, bumps or worn-out tyres.\nDo not ride if a tyre is flat or damaged. Use only the tyre size recommended for your vehicle.';
-    if (/(?:part|spare|compatib|fitment|genuine|oil filter|air filter)/i.test(q))
-      return prefix + 'Tell us the vehicle company, exact model, year and the old part number (if available). This helps us find the correct spare part. Do not buy only by looking at a photo. Ask our shop on WhatsApp to check which two-wheeler parts are available.';
-    if (/(?:oil|lubricat|service)/i.test(q))
-      return prefix + 'Check your vehicle manual for the correct engine oil and when to change it. Park on flat ground and follow the manual to check the oil level. Do not touch a hot engine or add too much oil. If the oil warning light comes on or oil is leaking badly, stop driving and call a mechanic.';
-    if (/(?:chain|sprocket|clutch|belt|cvt)/i.test(q))
-      return prefix + 'Listen for unusual sounds and note when they happen. Do not touch the chain, belt or other moving parts while the engine is ON. The correct adjustment depends on your vehicle. Ask a mechanic to check it.';
-    if (/(?:battery|light|indicator|electric|charging)/i.test(q))
-      return prefix + 'First check whether the dashboard lights turn on. Look for loose or damaged wires without touching them. Do not touch bare wires or open an electric vehicle battery. A mechanic can test the battery and help you choose the right one.';
-    if (/(?:sound|noise|rattle|vibrat)/i.test(q))
-      return prefix + 'When do you hear the sound: when starting, speeding up, using the brakes or going over bumps? Where does it come from? If you notice smoke, strong shaking or a brake/steering problem, stop safely and call a mechanic.';
-    if (/(?:car|suv|dashboard|check engine|coolant)/i.test(q))
-      return prefix + 'Tell me the car model, year and which dashboard warning light is showing. Check your vehicle manual for what it means. If the engine is too hot or a red oil or brake warning is on, stop safely and call a mechanic. Our shop mainly sells bike and scooter parts.';
-    return 'What bike, scooter or car do you have? Tell me the model and what problem you see. I can suggest simple checks or help find the right spare part.';
+    if (/\b(tyre|tire)\b/.test(q) && /\b(pressure|psi|air|inflate|fill)\b/.test(q)) {
+      return prefix + '1. Check tyre pressure before riding, when the tyres are cold.\n2. Use a tyre-pressure gauge and the value on your vehicle label or in the owner manual. Front and rear values can differ.\nTell me the exact model and year if you need help finding the label.';
+    }
+
+    // A warning light is not the same as a dead headlight or a battery problem.
+    if (/\b(check engine|engine warning|oil warning|red oil|warning light|abs light)\b/.test(q)) {
+      return prefix + 'Which warning symbol is showing, and is it red or amber? If the red oil or brake warning stays on, or the engine is overheating, stop safely and arrange inspection. Do not assume a warning light means a specific part must be replaced.';
+    }
+
+    if (/\b(start|starting|crank|ignition|won.t start|no power)\b/.test(q)) {
+      if (/\b(click|clicking)\b/.test(q)) {
+        return prefix + 'A click when starting can happen with a weak battery or a starter problem, but it is not a confirmed diagnosis. Check whether the dashboard lights become dim as you press start once. Do they dim?';
+      }
+      if (/\b(no lights|dash(?:board)? (?:is )?(?:off|dead)|nothing happens|completely dead)\b/.test(q)) {
+        return prefix + 'If no dashboard lights appear, check that the key is ON and the stop switch is in the normal running position (if fitted). The battery or fuse may need testing. Do the horn and indicators work?';
+      }
+      if (/\b(cranks? but|engine turns over|turns over but)\b/.test(q)) {
+        return prefix + (isElectric
+          ? 'If the motor does not move although the display is on, check for a stand or brake-start warning. Do not open the battery.'
+          : 'If the starter turns the engine but it does not fire, check there is petrol and the engine-stop switch is ON. Do not keep trying for long.') +
+          ' Is any warning light showing?';
+      }
+      return prefix + (isElectric
+        ? 'Check whether the display turns on and the vehicle is charged. Do not open the EV battery or bypass a safety switch.'
+        : 'Check whether the dashboard lights turn on with the key ON. Check if there is enough petrol or battery charge, as appropriate for your vehicle.') +
+        ' When you press start, do you hear a click, the engine turning, or nothing?';
+    }
+
+    if (/\b(air filter)\b/.test(q)) {
+      return prefix + 'An air filter keeps dust and dirt from entering the engine. A blocked filter can reduce airflow, but it is not proof of a particular fault. The correct filter depends on your exact model and variant. Are you asking what it does or looking for a replacement?';
+    }
+    if (/\b(part|spare|compatib|fitment|genuine|original|price|cost|available|stock|buy)\b/.test(q)) {
+      return prefix + 'To find the correct spare part, tell us its name and your bike or scooter company, exact model, variant and year. An old part number helps too. Our shop can check availability and price on WhatsApp; I cannot confirm live stock or fitment here.';
+    }
+    if (/\b(oil|lubricat|service)\b/.test(q)) {
+      return prefix + 'Use the engine oil type and service interval given in your vehicle manual; they differ by model. Check the level only as your manual explains, on level ground. Do not open a hot engine. Which model and year are you asking about?';
+    }
+    if (/\b(chain|sprocket|clutch|belt|cvt)\b/.test(q)) {
+      return prefix + 'If there is unusual sound or slipping, note when it happens. Never touch the chain, belt or moving parts with the engine ON. A mechanic can inspect wear and adjustment. Does the problem happen while starting or while riding?';
+    }
+    if (/\b(battery|headlight|indicator|electric|charging|horn)\b/.test(q)) {
+      return prefix + 'Check whether the dashboard lights and horn work when the key is ON. If the lights dim strongly when starting, the battery may be weak, but it needs testing to confirm. Do not touch exposed wires. Which part is not working?';
+    }
+    if (/\b(sound|noise|rattle|vibrat|squeak|knock)\b/.test(q)) {
+      return prefix + 'When do you hear the sound: while starting, speeding up, braking or going over bumps? Tell me where it comes from too. Do not ride if there is strong shaking, brake trouble or a loose wheel. When do you hear the sound?';
+    }
+    if (/\b(car|suv|coolant|radiator)\b/.test(q)) {
+      return prefix + 'Tell me the car model, year and exactly what happens. If the engine is overheating or a red oil or brake warning is on, stop safely and call a mechanic. Our shop mainly sells bike and scooter spare parts.';
+    }
+    return prefix + 'Tell me the exact problem you notice and when it happens (starting, riding or braking). Also tell me the vehicle model if you know it. Then I can suggest a relevant safe check instead of guessing.';
   }
   let html;
   try {
