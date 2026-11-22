@@ -1,42 +1,181 @@
-/* Floating customer assistant — visually aligned with the white, navy and gold shop design. */
-#vehicle-assistant { font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#102542; position:relative; z-index:950; }
-#vehicle-assistant *,#vehicle-assistant *::before,#vehicle-assistant *::after { box-sizing:border-box; }
-#vehicle-assistant .va-launcher { position:fixed; z-index:950; right:20px; bottom:20px; background:#102744; color:#fff; border:1px solid rgba(255,255,255,.16); box-shadow:0 10px 32px rgba(16,39,68,.25); display:flex; align-items:center; gap:10px; cursor:pointer; padding:13px 18px; border-radius:40px; font-size:14px; font-weight:700; }
-#vehicle-assistant .va-launcher:hover,#vehicle-assistant .va-active { background:#1a4674; }
-#vehicle-assistant button:focus-visible,#vehicle-assistant input:focus-visible,#vehicle-assistant select:focus-visible,#vehicle-assistant textarea:focus-visible,#vehicle-assistant a:focus-visible { outline:3px solid #d3912f; outline-offset:2px; }
-#vehicle-assistant .va-panel { position:fixed; z-index:955; right:20px; bottom:86px; width:min(420px,calc(100vw - 24px)); max-height:min(760px,calc(100dvh - 105px)); background:#fff; border:1px solid #e4dcd0; box-shadow:0 18px 70px rgba(17,39,67,.23); border-radius:20px; display:flex; flex-direction:column; overflow:hidden; }
-#vehicle-assistant .va-panel[hidden] { display:none !important; }
-#vehicle-assistant .va-header { background:#112d51; color:#fff; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #e9aa55; }
-#vehicle-assistant .va-header strong { display:block; font-size:17px; letter-spacing:-.025em; }
-#vehicle-assistant .va-header small { color:#cedaec; display:block; font-size:11px; margin-top:3px; }
-#vehicle-assistant #va-close { background:rgba(255,255,255,.1); color:#fff; border:none; width:32px; height:32px; cursor:pointer; font-size:24px; border-radius:8px; }
-#vehicle-assistant .va-disclaimer { margin:0; color:#5b5660; background:#fff7eb; border-bottom:1px solid #f2e2c6; padding:9px 16px; font-size:11px; line-height:1.55; }
-#vehicle-assistant .va-settings { padding:11px 14px; display:grid; grid-template-columns:1fr 1fr; gap:9px; border-bottom:1px solid #eaeef1; background:#fff; }
-#vehicle-assistant .va-settings label { min-width:0; display:flex; flex-direction:column; gap:4px; font-size:11px; color:#455770; font-weight:700; }
-#vehicle-assistant .va-settings input,#vehicle-assistant .va-settings select { font-family:inherit; font-size:12px; width:100%; min-width:0; height:34px; padding:6px 8px; border:1px solid #d6dee7; color:#172d47; border-radius:8px; background:#fff; }
-#vehicle-assistant .va-messages { padding:15px 14px; flex:1; min-height:112px; overflow-y:auto; background:#f7f9fc; display:flex; flex-direction:column; gap:10px; overscroll-behavior:contain; }
-#vehicle-assistant .va-bubble { max-width:94%; padding:11px 13px; border-radius:13px; line-height:1.5; font-size:12.5px; white-space:pre-wrap; overflow-wrap:anywhere; }
-#vehicle-assistant .va-assistant { background:#fff; border:1px solid #e0e7ee; color:#24374f; align-self:flex-start; border-bottom-left-radius:4px; }
-#vehicle-assistant .va-user { background:#123d68; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
-#vehicle-assistant .va-chips { display:flex; overflow-x:auto; gap:7px; padding:9px 13px; background:#fafbfd; border-top:1px solid #ebeff3; }
-#vehicle-assistant .va-chips[hidden] { display:none; }
-#vehicle-assistant .va-chips button { flex:0 0 auto; max-width:190px; font-family:inherit; font-size:11px; background:#fff; border:1px solid #e1d7c9; color:#18446a; border-radius:20px; cursor:pointer; padding:8px 10px; white-space:normal; text-align:left; }
-#vehicle-assistant .va-chips button:hover { border-color:#d3912f; }
-#vehicle-assistant .va-form { padding:10px 13px; display:flex; gap:8px; background:#fff; border-top:1px solid #edf0f4; align-items:end; }
-#vehicle-assistant .va-form textarea { font-family:inherit; font-size:13px; resize:none; border:1px solid #d6dee7; border-radius:10px; padding:9px 10px; flex:1; min-width:0; height:58px; color:#152d47; background:#fff; }
-#vehicle-assistant .va-form button { font-family:inherit; background:#e9aa55; border:1px solid #c98e3f; border-radius:9px; color:#142b46; font-weight:800; cursor:pointer; padding:13px 12px; }
-#vehicle-assistant .va-form button:disabled { opacity:.5; cursor:wait; }
-#vehicle-assistant .va-footer { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:3px 13px 5px; font-size:10px; color:#637183; }
-#vehicle-assistant .va-footer a { color:#08734e; font-weight:700; text-decoration:none; }
-#vehicle-assistant .va-privacy { margin:0; padding:0 13px 10px; font-size:10px; line-height:1.5; color:#738196; }
-#vehicle-assistant .va-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-@media(max-width:650px) {
- #vehicle-assistant .va-launcher { right:12px; bottom:max(12px,env(safe-area-inset-bottom)); padding:13px; width:56px; height:56px; justify-content:center; border-radius:50%; }
- #vehicle-assistant .va-launcher span { display:none; }
- #vehicle-assistant .va-panel { right:8px; bottom:calc(max(12px,env(safe-area-inset-bottom)) + 65px); width:calc(100vw - 16px); max-height:calc(100dvh - 105px); border-radius:16px; }
- #vehicle-assistant .va-settings { padding:9px 11px; gap:7px; }
- #vehicle-assistant .va-disclaimer { font-size:10px; padding:6px 12px; }
- #vehicle-assistant .va-messages { padding:9px; }
- #vehicle-assistant .va-privacy { font-size:9px; }
+/* Clean, compact Auto Assistant — independent of the storefront layout. */
+#vehicle-assistant {
+  --va-navy:#132b4a; --va-text:#172e4a; --va-muted:#6b7b8d;
+  --va-gold:#e7ab57; --va-line:#e5eaf0;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  color:var(--va-text); position:relative; z-index:950;
 }
-@media(prefers-reduced-motion:reduce) { #vehicle-assistant * { scroll-behavior:auto !important; transition:none !important; } }
+#vehicle-assistant *,#vehicle-assistant *::before,#vehicle-assistant *::after{box-sizing:border-box}
+#vehicle-assistant button,#vehicle-assistant input,#vehicle-assistant select,#vehicle-assistant textarea{font:inherit}
+#vehicle-assistant button:focus-visible,#vehicle-assistant input:focus-visible,
+#vehicle-assistant select:focus-visible,#vehicle-assistant textarea:focus-visible,
+#vehicle-assistant summary:focus-visible,#vehicle-assistant a:focus-visible{
+  outline:3px solid #dfa24e;outline-offset:2px
+}
+#vehicle-assistant .va-launcher{
+  position:fixed;z-index:950;right:22px;bottom:22px;
+  display:flex;align-items:center;gap:10px;padding:12px 18px;
+  border:1px solid rgba(255,255,255,.15);border-radius:999px;
+  background:var(--va-navy);color:#fff;cursor:pointer;
+  box-shadow:0 10px 28px rgba(13,40,69,.22);
+  font-size:13px;font-weight:650;letter-spacing:.01em;
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+}
+#vehicle-assistant .va-launcher svg{color:var(--va-gold)}
+#vehicle-assistant .va-launcher:hover{transform:translateY(-3px);background:#214269;box-shadow:0 14px 34px rgba(13,40,69,.26)}
+#vehicle-assistant .va-launcher.va-active{background:#27496c}
+#vehicle-assistant .va-panel{
+  position:fixed;z-index:955;right:22px;bottom:82px;
+  width:min(400px,calc(100vw - 24px));height:min(625px,calc(100dvh - 104px));
+  background:#fff;border:1px solid #dce4ed;border-radius:20px;
+  box-shadow:0 22px 60px rgba(14,38,63,.21);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:va-panel-in .22s cubic-bezier(.2,.8,.2,1) both;
+}
+#vehicle-assistant .va-panel[hidden]{display:none!important}
+#vehicle-assistant .va-header{
+  background:var(--va-navy);color:#fff;display:flex;align-items:center;
+  padding:15px 16px;gap:11px;min-height:72px;flex-shrink:0;
+}
+#vehicle-assistant .va-mark{
+  width:36px;height:36px;display:grid;place-items:center;
+  border-radius:12px;background:rgba(231,171,87,.14);
+  border:1px solid rgba(231,171,87,.27);color:var(--va-gold);font-size:21px;
+}
+#vehicle-assistant .va-heading{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+#vehicle-assistant .va-heading strong{font-size:15px;font-weight:720;letter-spacing:-.02em;line-height:1}
+#vehicle-assistant .va-status{display:flex;align-items:center;gap:6px;color:#d7e3f1;font-size:11px;line-height:1}
+#vehicle-assistant .va-status-dot{width:6px;height:6px;border-radius:50%;background:#7bd0aa;flex-shrink:0}
+#vehicle-assistant .va-status.va-unavailable .va-status-dot{background:#e9b766}
+#vehicle-assistant #va-close{
+  width:32px;height:32px;border:0;border-radius:9px;
+  background:rgba(255,255,255,.09);color:#dbe6f3;font-size:24px;line-height:1;
+  cursor:pointer;transition:background .18s ease,color .18s ease;
+}
+#vehicle-assistant #va-close:hover{background:rgba(255,255,255,.18);color:#fff}
+#vehicle-assistant .va-vehicle{flex:0 0 auto;border-bottom:1px solid var(--va-line);background:#fff}
+#vehicle-assistant .va-vehicle summary{
+  display:flex;align-items:center;gap:8px;padding:12px 16px;
+  cursor:pointer;list-style:none;font-size:12px;min-height:43px;
+  transition:background .15s ease;
+}
+#vehicle-assistant .va-vehicle summary::-webkit-details-marker{display:none}
+#vehicle-assistant .va-vehicle summary:hover{background:#f8fafc}
+#vehicle-assistant .va-vehicle-label{font-weight:700;color:#304560;flex:0 0 auto}
+#vehicle-assistant #va-vehicle-summary{
+  color:var(--va-muted);font-size:11px;flex:1;text-align:right;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+#vehicle-assistant .va-vehicle summary svg{color:#62778c;transition:transform .2s ease;flex:0 0 auto}
+#vehicle-assistant .va-vehicle[open] summary svg{transform:rotate(180deg)}
+#vehicle-assistant .va-settings{
+  padding:3px 16px 13px;display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  background:#fff;animation:va-fade-up .18s ease;
+}
+#vehicle-assistant .va-settings label{display:flex;min-width:0;flex-direction:column;gap:5px;font-size:10.5px;font-weight:650;color:#65768a}
+#vehicle-assistant .va-settings input,#vehicle-assistant .va-settings select{
+  width:100%;min-width:0;height:35px;padding:6px 9px;border:1px solid #dbe3ec;
+  border-radius:9px;background:#fff;color:var(--va-text);font-size:12px;
+}
+#vehicle-assistant .va-messages{
+  flex:1;min-height:115px;overflow:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:10px;
+  padding:18px 15px;background:#fafbfd;scroll-behavior:smooth;
+}
+#vehicle-assistant .va-bubble{
+  width:fit-content;max-width:90%;padding:10px 13px;
+  border-radius:14px;font-size:13px;line-height:1.55;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+  animation:va-fade-up .22s ease both;
+}
+#vehicle-assistant .va-assistant{
+  align-self:flex-start;background:#fff;border:1px solid #e3e8ef;
+  color:#263a53;border-bottom-left-radius:5px;
+  box-shadow:0 2px 5px rgba(17,44,73,.025);
+}
+#vehicle-assistant .va-user{
+  align-self:flex-end;background:#173b60;color:#fff;border-bottom-right-radius:5px;
+}
+#vehicle-assistant .va-bubble.va-revealing{border-color:#d6e0ea}
+#vehicle-assistant .va-caret{display:inline-block;width:5px;height:13px;margin-left:3px;background:#d49b4c;border-radius:2px;vertical-align:-2px;animation:va-caret .65s step-end infinite}
+#vehicle-assistant .va-thinking{display:flex;align-items:center;gap:5px;min-width:63px;min-height:41px;justify-content:center}
+#vehicle-assistant .va-thinking span{
+  display:block;width:6px;height:6px;border-radius:50%;background:#8b9bb0;
+  animation:va-bounce 1s ease-in-out infinite;
+}
+#vehicle-assistant .va-thinking span:nth-child(2){animation-delay:.15s}
+#vehicle-assistant .va-thinking span:nth-child(3){animation-delay:.3s}
+#vehicle-assistant .va-chips{
+  display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:10px 14px;
+  background:#fafbfd;border-top:1px solid var(--va-line);
+}
+#vehicle-assistant .va-chips[hidden]{display:none}
+#vehicle-assistant .va-chips button{
+  min-width:0;padding:10px;border:1px solid #dee6ee;border-radius:11px;
+  background:#fff;color:#294565;cursor:pointer;
+  font-size:11.5px;font-weight:550;text-align:left;
+  transition:border-color .17s ease,background .17s ease,transform .17s ease;
+}
+#vehicle-assistant .va-chips button:hover{
+  background:#fffaf3;border-color:#e6bd7f;transform:translateY(-1px);
+}
+#vehicle-assistant .va-form{
+  flex-shrink:0;display:flex;align-items:end;gap:9px;
+  padding:11px 13px 7px;background:#fff;border-top:1px solid var(--va-line);
+}
+#vehicle-assistant .va-form textarea{
+  flex:1;min-width:0;height:43px;min-height:43px;max-height:115px;
+  resize:none;overflow-y:auto;line-height:1.45;
+  padding:11px 12px;border:1px solid #dce4ed;border-radius:13px;
+  color:#1b314c;background:#f9fafc;font-size:12.5px;
+  transition:border-color .17s ease,background .17s ease;
+}
+#vehicle-assistant .va-form textarea:focus{background:#fff;border-color:#d4a76a}
+#vehicle-assistant .va-form textarea::placeholder{color:#8491a0}
+#vehicle-assistant .va-form button{
+  flex:0 0 42px;width:42px;height:42px;display:grid;place-items:center;
+  border:0;border-radius:12px;cursor:pointer;background:var(--va-gold);color:#122a47;
+  transition:transform .16s ease,background .16s ease,opacity .16s ease;
+}
+#vehicle-assistant .va-form button:not(:disabled):hover{transform:translateY(-2px);background:#f0b86d}
+#vehicle-assistant .va-form button:disabled{opacity:.46;cursor:not-allowed}
+#vehicle-assistant .va-footer{
+  flex:0 0 auto;padding:5px 15px 11px;background:#fff;
+  display:flex;justify-content:space-between;gap:9px;align-items:center;
+  color:#8995a2;font-size:10px;line-height:1.3;
+}
+#vehicle-assistant .va-footer a{
+  color:#08734e;font-size:10.5px;font-weight:650;text-decoration:none;white-space:nowrap;
+}
+#vehicle-assistant .va-footer a:hover{text-decoration:underline}
+#vehicle-assistant .va-sr-only{
+  position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;padding:0;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+@keyframes va-panel-in{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes va-fade-up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes va-bounce{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-5px);opacity:1}}
+@keyframes va-caret{50%{opacity:0}}
+@media(max-width:650px){
+  #vehicle-assistant .va-launcher{
+    right:13px;bottom:max(13px,env(safe-area-inset-bottom));
+    width:54px;height:54px;justify-content:center;padding:0;border-radius:50%;
+  }
+  #vehicle-assistant .va-launcher span{display:none}
+  #vehicle-assistant .va-panel{
+    right:8px;bottom:calc(max(13px,env(safe-area-inset-bottom)) + 64px);
+    width:calc(100vw - 16px);height:min(620px,calc(100dvh - 102px));border-radius:17px;
+  }
+  #vehicle-assistant .va-header{min-height:64px;padding:12px 14px}
+  #vehicle-assistant .va-messages{padding:13px 11px}
+  #vehicle-assistant .va-bubble{font-size:12.5px}
+  #vehicle-assistant .va-chips{padding:8px 11px}
+}
+@media(max-height:570px){
+  #vehicle-assistant .va-panel{max-height:calc(100dvh - 80px)}
+  #vehicle-assistant .va-header{min-height:56px;padding:10px 14px}
+  #vehicle-assistant .va-messages{padding:10px 12px}
+}
+@media(prefers-reduced-motion:reduce){
+  #vehicle-assistant *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
