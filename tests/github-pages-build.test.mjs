@@ -147,7 +147,12 @@ test('GitHub Pages includes complete floating auto assistant without exposing AI
   assert.match(read('automobile-assistant.html'),/Ask our shop/);
   assert.ok(!js.includes('x-goog-api-key'));
   const config=JSON.parse(read('static-data/site.json'));
-  assert.equal(config.chatbotApiUrl,'');
+  assert.equal(typeof config.chatbotApiUrl,'string');
+  if (config.chatbotApiUrl) {
+    const endpoint = new URL(config.chatbotApiUrl);
+    assert.equal(endpoint.protocol,'https:');
+    assert.equal(endpoint.pathname,'/.netlify/functions/automobile-assistant');
+  }
   assert.ok(!existsSync(path.join(out,'netlify/functions/automobile-assistant.mjs')));
   assert.ok(!existsSync(path.join(out,'netlify.toml')));
   execFileSync(process.execPath,['--check',path.join(out,'automobile-assistant.js')],{stdio:'pipe'});

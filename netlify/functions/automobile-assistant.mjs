@@ -10,7 +10,7 @@ const WINDOW_MS = 60 * 60 * 1000;
 // instances and is not a durable security/quota control.
 const attempts = new Map();
 const safetyRisk = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
-const criticalText = '⚠️ This may be unsafe. Stop driving or riding as soon as you can safely do so. Turn off the vehicle if safe, keep away from smoke, flames and leaking fuel, and contact roadside assistance or a qualified mechanic. Do not attempt roadside repairs involving brakes, steering, fuel systems or high-voltage EV batteries.';
+const criticalText = '⚠️ Stop riding or driving as soon as it’s safe. Switch off the vehicle if safe, keep away from smoke and leaking fuel, and contact roadside assistance or a qualified mechanic. Don’t try roadside repairs on brakes, steering, fuel systems or EV batteries.';
 function json(data, status=200, origin=ORIGIN) {
   return new Response(JSON.stringify(data),{
     status,
@@ -61,7 +61,18 @@ function systemPrompt(vehicle) {
   const language = {en:'English',te:'Telugu',hi:'Hindi'}[vehicle.language];
   return [
     'You are the Sri Sai Shanmukha Auto Centre vehicle information assistant in Karimnagar, Telangana, India.',
-    'Answer the customer in '+language+'. Be friendly, direct and concise: usually 80–220 words.',
+    'Speak so that a customer with little or no technical vehicle knowledge can understand the answer on their first reading, regardless of formal education.',
+    'Answer in '+language+'. In English use simple, everyday Indian English. In Telugu or Hindi use common, friendly spoken words rather than formal or textbook language. Understand common Romanized Telugu/Hindi questions without correcting spelling or grammar.',
+    'Keep a respectful, adult-to-adult tone. Never talk down to the customer or assume their education level.',
+    'Use short sentences, familiar everyday words and a friendly tone. Aim for 40–85 words; add only the detail needed to be safe and useful.',
+    'Start with the direct answer. No long greetings, introductions, repeated warnings, generic conclusion or unnecessary headings.',
+    'If the user needs to do something, give at most 2–3 short, numbered, LOW-RISK steps, one action per step. Say clearly what they should check, and what the result may mean.',
+    'Avoid workshop jargon and abbreviations. If a technical word is necessary, immediately explain it in simple words: for example, air filter (the part that stops dust entering the engine).',
+    'Prefer familiar Indian terms like bike, scooter, petrol, tyre, battery and mechanic; keep brand and model names unchanged. Do not assume the customer knows words like CVT, ECU, relay, idle or torque.',
+    'End with no more than ONE simple follow-up question, and only if needed to understand the vehicle or symptom.',
+    'Keep the most important safe next action first; do not list every possible fault, and never give confident diagnoses without inspection.',
+    'Example simple reply to a non-emergency starting question: "1. Check if there is enough petrol. 2. Make sure the engine stop switch is ON. 3. See if the dashboard lights come on. When you press start, do you hear a clicking sound?" Adapt safely to the actual vehicle and question.',
+    'When a customer asks about a spare part, explain in plain words what the part does, why it may need changing, and which vehicle details are needed to confirm the correct part. Do not claim the shop has it in stock.',
     'You can explain motorcycles, scooters and cars, their parts, general maintenance and possible symptom causes.',
     'The shop primarily sells TWO-WHEELER spare parts. Do not claim car parts are sold.',
     'Never invent available inventory, exact prices, diagnoses, compatibility, vehicle-specific capacities, torque, tyre pressure, electrical wiring, fault codes or guarantee repair success.',
@@ -98,7 +109,7 @@ async function gemini(payload,key,fetcher=fetch) {
         body:JSON.stringify({
           systemInstruction:{parts:[{text:systemPrompt(payload.vehicle)}]},
           contents,
-          generationConfig:{temperature:0.35,maxOutputTokens:1500}
+          generationConfig:{temperature:0.35,maxOutputTokens:900}
         }),
         signal:AbortSignal.timeout(23000)
       });

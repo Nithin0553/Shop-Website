@@ -1,31 +1,47 @@
-<button class="va-launcher" id="va-open" type="button" aria-label="Open vehicle assistant" aria-controls="va-panel" aria-expanded="false" title="Ask about your vehicle">
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/><path d="M8 11h8M12 7v8"/></svg>
-  <span>Ask Auto Assistant</span>
+<button class="va-launcher" id="va-open" type="button" aria-label="Open Auto Assistant" aria-controls="va-panel" aria-expanded="false">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8.5 8A8 8 0 0 1 8 18.8L3 21l1.5-5A8 8 0 1 1 20 11.5Z"/><path d="M8 12h8m-4-4v8"/></svg>
+  <span>Ask Auto</span>
 </button>
-<section id="va-panel" class="va-panel" role="dialog" aria-label="Vehicle help assistant" hidden>
-  <div class="va-header">
-    <div><strong>Auto Assistant</strong><small>Motorcycles · Scooters · Cars</small></div>
+
+<section id="va-panel" class="va-panel" role="dialog" aria-label="Auto Assistant" hidden>
+  <header class="va-header">
+    <span class="va-mark" aria-hidden="true">✦</span>
+    <div class="va-heading">
+      <strong>Auto Assistant</strong>
+      <span class="va-status" id="va-status"><span class="va-status-dot" aria-hidden="true"></span><span id="va-status-text">Quick help</span></span>
+    </div>
     <button id="va-close" type="button" aria-label="Close assistant" title="Close">×</button>
-  </div>
-  <p class="va-disclaimer">General guidance only. Never drive with unsafe brakes, steering, smoke or fuel leaks. AI answers can be incorrect.</p>
-  <div class="va-settings">
-    <label>Vehicle <select id="va-type"><option value="motorcycle">Motorcycle</option><option value="scooter">Scooter</option><option value="car">Car</option><option value="other">Other</option></select></label>
-    <label>Make & model <input id="va-model" maxlength="70" placeholder="e.g. Honda Activa 6G" autocomplete="off" /></label>
-    <label>Year <input id="va-year" maxlength="4" inputmode="numeric" placeholder="Optional" /></label>
-    <label>Language <select id="va-language"><option value="en">English</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option></select></label>
-  </div>
+  </header>
+
+  <details class="va-vehicle" id="va-vehicle-details">
+    <summary>
+      <span class="va-vehicle-label">Vehicle & language</span>
+      <span id="va-vehicle-summary">Motorcycle · English</span>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <div class="va-settings">
+      <label>Type <select id="va-type"><option value="motorcycle">Motorcycle</option><option value="scooter">Scooter</option><option value="car">Car</option><option value="other">Other</option></select></label>
+      <label>Make & model <input id="va-model" maxlength="70" placeholder="Honda Activa 6G" autocomplete="off" /></label>
+      <label>Year <input id="va-year" maxlength="4" inputmode="numeric" placeholder="Optional" /></label>
+      <label>Language <select id="va-language"><option value="en">English</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option></select></label>
+    </div>
+  </details>
+
   <div class="va-messages" id="va-messages" role="log" aria-live="polite" aria-relevant="additions">
-    <div class="va-bubble va-assistant">Hello! Tell me about your vehicle and what's happening. I can explain spare parts, suggest simple checks and help you decide when to visit a mechanic.</div>
+    <div class="va-bubble va-assistant">Hi! What can I help you with?</div>
   </div>
-  <div class="va-chips" id="va-chips" aria-label="Suggested questions"></div>
+
+  <div class="va-chips" id="va-chips" aria-label="Quick questions"></div>
+
   <form id="va-form" class="va-form">
-    <label class="va-sr-only" for="va-question">Ask an automobile question</label>
-    <textarea id="va-question" rows="2" maxlength="800" placeholder="Ask about your vehicle…" required></textarea>
-    <button id="va-send" type="submit" aria-label="Send question">Send</button>
+    <label class="va-sr-only" for="va-question">Ask a vehicle question</label>
+    <textarea id="va-question" rows="1" maxlength="800" placeholder="Ask anything about your vehicle…" required></textarea>
+    <button id="va-send" type="submit" aria-label="Send message" title="Send">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg>
+    </button>
   </form>
-  <div class="va-footer">
-    <span id="va-status">Basic guidance available</span>
-    <a id="va-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>Ask our shop on WhatsApp ↗</a>
-  </div>
-  <p class="va-privacy">Please don't share personal or payment details. Online questions, when enabled, are sent to an AI provider; no chat history is saved by this website.</p>
+  <footer class="va-footer">
+    <span>General guidance · No personal details</span>
+    <a id="va-whatsapp" href="#" target="_blank" rel="noopener noreferrer" hidden>Ask our shop ↗</a>
+  </footer>
 </section>
