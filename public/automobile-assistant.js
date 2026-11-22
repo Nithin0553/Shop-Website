@@ -4,6 +4,78 @@
 (async () => {
   'use strict';
   const BASE = window.__SHOP_STATIC_BASE__ || '/Shop-Website';
+
+  // When Botpress is published and configured, it completely replaces the
+  // legacy Netlify/Gemini assistant. Without a valid Botpress embed, the old
+  // chat remains available until the owner finishes setup.
+  function verifiedBotpressUrl(value, host, pathPattern) {
+    try {
+      const url = new URL(String(value || '').trim());
+      if (url.protocol !== 'https:' || url.hostname !== host ||
+          url.username || url.password || url.search || url.hash ||
+          !pathPattern.test(url.pathname)) return '';
+      return url.href;
+    } catch {
+      return '';
+    }
+  }
+  function loadBotpressScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = () => {
+        script.remove();
+        reject(new Error('Botpress script unavailable'));
+      };
+      document.head.append(script);
+    });
+  }
+  function showShopContact(config) {
+    const digits = String(config.whatsapp || config.phone || '').replace(/\D/g,'');
+    if (!/^\d{10,15}$/.test(digits)) return;
+    const link = document.createElement('a');
+    link.className = 'botpress-contact-fallback';
+    link.href = 'https://wa.me/' + digits;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Ask our shop';
+    link.setAttribute('aria-label','Auto Assistant unavailable. Contact our shop on WhatsApp');
+    document.body.append(link);
+  }
+  async function switchToBotpress() {
+    let config;
+    try {
+      const response = await fetch(BASE + '/static-data/site.json', {cache:'no-store'});
+      if (!response.ok) return false;
+      config = await response.json();
+    } catch { return false; }
+    const injector = verifiedBotpressUrl(
+      config.botpressInjectUrl, 'cdn.botpress.cloud', /^\/webchat\/v\d+\.\d+\/inject\.js$/
+    );
+    const settings = verifiedBotpressUrl(
+      config.botpressConfigUrl, 'files.bpcontent.cloud', /^\/[A-Za-z0-9/_-]+\.js$/
+    );
+    // No Botpress setup yet: leave the legacy bot in place during migration.
+    const selected = Boolean(config.botpressInjectUrl || config.botpressConfigUrl);
+    if (!selected) return false;
+    // Once the owner selects Botpress, do not revert to the legacy bot's
+    // possibly inaccurate troubleshooting answers when Botpress is unavailable.
+    if (!injector || !settings) {
+      showShopContact(config);
+      return true;
+    }
+    try {
+      await loadBotpressScript(injector);
+      await loadBotpressScript(settings);
+    } catch {
+      showShopContact(config);
+    }
+    return true;
+  }
+  if (await switchToBotpress()) return;
+
   const prompts = [
     {label:'Won’t start',question:'My bike is not starting. What can I safely check?'},
     {label:'Tyre pressure',question:'How do I check the correct tyre pressure?'},
