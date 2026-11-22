@@ -32,6 +32,46 @@
       document.head.append(script);
     });
   }
+  // This shop's Botpress deployment uses the VDK Edge embed, not the
+  // cdn.botpress.cloud / files.bpcontent.cloud embed from the standard editor.
+  const EDGE_BASE = 'https://vdk-viber-runtime-prod.bot.botpress.host';
+  const EDGE_BOT_ID = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
+  function loadEdgeStylesheet() {
+    return new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = EDGE_BASE + '/edge/webchat.css';
+      link.onload = resolve;
+      link.onerror = () => { link.remove(); reject(Error('Botpress stylesheet unavailable')); };
+      document.head.append(link);
+    });
+  }
+  async function loadEdgeBotpress(botId) {
+    if (!EDGE_BOT_ID.test(botId)) throw Error('Invalid Botpress bot ID');
+    const configUrl = EDGE_BASE + '/edge/bots/' + botId + '/config';
+    // Load only the public scripts and configuration supplied by this Botpress
+    // runtime. Never accept arbitrary JavaScript, markup, or a new host from
+    // admin settings or the remote configuration response.
+    const [_, response] = await Promise.all([
+      loadEdgeStylesheet(),
+      fetch(configUrl, {credentials:'omit', cache:'no-store'})
+    ]);
+    if (!response.ok) throw Error('Botpress bot configuration unavailable');
+    const data = await response.json();
+    if (!data || !data.webchat || typeof data.webchat !== 'object' || Array.isArray(data.webchat)) {
+      throw Error('Invalid Botpress Webchat configuration');
+    }
+    await loadBotpressScript(EDGE_BASE + '/edge/webchat.js');
+    if (typeof window.VdkEdgeWebchat?.mount !== 'function') {
+      throw Error('Botpress Webchat loader did not initialize');
+    }
+    await Promise.resolve(window.VdkEdgeWebchat.mount({
+      ...data.webchat,
+      mode: 'bubble',
+      baseUrl: EDGE_BASE,
+      botId
+    }));
+  }
   function showShopContact(config) {
     const digits = String(config.whatsapp || config.phone || '').replace(/\D/g,'');
     if (!/^\d{10,15}$/.test(digits)) return;
@@ -51,6 +91,17 @@
       if (!response.ok) return false;
       config = await response.json();
     } catch { return false; }
+    // Edge takes priority once configured: it is the exact embed type the
+    // owner generated in Botpress. Legacy fields are kept for easy rollback.
+    const edgeId = String(config.botpressEdgeBotId || '').trim();
+    if (edgeId) {
+      try {
+        await loadEdgeBotpress(edgeId);
+      } catch {
+        showShopContact(config);
+      }
+      return true; // Never start the old, inaccurate assistant in Edge mode.
+    }
     const injector = verifiedBotpressUrl(
       config.botpressInjectUrl, 'cdn.botpress.cloud', /^\/webchat\/v\d+\.\d+\/inject\.js$/
     );

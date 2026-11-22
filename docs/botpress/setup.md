@@ -1,6 +1,25 @@
 # Switch the shop website from Auto Assistant to Botpress
 
-This integration is **prepared, not activated**. The existing assistant remains visible until the shop owner provides the **real Botpress embed URLs**. Do not use sample IDs or invented script URLs.
+## Active Botpress Edge bubble (owner-provided embed, November 22, 2026)
+
+The owner supplied this published **VDK Edge** Webchat configuration, which is **different from the standard `cdn.botpress.cloud` embed** explained below:
+
+- Bot ID: `cab6ea0c-9837-402f-8370-759a63ce2e5f`
+- Runtime: `https://vdk-viber-runtime-prod.bot.botpress.host`
+- Webchat style: `/edge/webchat.css`
+- Webchat script: `/edge/webchat.js`
+- Bot config: `/edge/bots/cab6ea0c-9837-402f-8370-759a63ce2e5f/config`
+- Mode: **bubble** (floating chat launcher), not **embed**.
+
+The shop's `data/site.json` field `botpressEdgeBotId` is set to the supplied ID. The public site uses **only this** Edge runtime when the field is present; the previous Netlify/Gemini bot will not initialize or appear. It fetches the bot's published `webchat` configuration and calls `VdkEdgeWebchat.mount({...webchat, mode:'bubble', baseUrl, botId})` just like the provided embed. The host and script paths are hard-coded, and the bot ID is validated as a UUID before use. An Edge load/configuration error shows the shop's WhatsApp link rather than incorrect generic answers.
+
+To change or disable this integration, go to the website's **Admin → Shop details → Botpress Edge bot ID (bubble widget)**. Clearing it will return to the legacy chatbot only if both standard Botpress fields are also blank. **Do not paste the full HTML/script snippet into a single URL field.**
+
+This integration is committed to GitHub Pages but the production Edge runtime couldn't be directly reached from the development environment, so real-world chatbot rendering and replies still require checking in a browser. This is an integration and deployment setup, not confirmation of actual answer quality.
+
+## Standard Botpress Webchat (alternative / rollback guide)
+
+If you later switch to the ordinary Botpress Webchat CDN embed, clear the Edge bot ID and configure the two standard `cdn.botpress.cloud` and `files.bpcontent.cloud` URLs as described below. Do not mix the two embed formats.
 
 ## 1. Create and publish the Botpress agent
 
@@ -29,7 +48,7 @@ These are *public embedding scripts*, not credentials. **Never** paste your Botp
 
 Open https://nithin0553.github.io/Shop-Website/admin/ and sign in using the established shop-admin method.
 
-In **Shop details**, set:
+For **standard Botpress Webchat only** (not the configured Edge bot), in **Shop details** set:
 - **Botpress Webchat loader URL (cdn.botpress.cloud)** = the *first* script URL.
 - **Botpress configuration URL (files.bpcontent.cloud)** = the *second* script URL.
 
@@ -37,7 +56,7 @@ Save business details. The GitHub Pages workflow republishes the public site.
 
 After the updated `static-data/site.json` is published, the website loads the two authorized Botpress scripts in order. **The original Auto Assistant does not initialize when Botpress successfully loads**. The legacy function and Gemini key are not used by the new widget.
 
-When **both Botpress fields are blank**, the old assistant stays available during setup. Once you fill either Botpress field, the old assistant is **not shown**. If the embed is incomplete, invalid or unavailable, a small **Ask our shop** WhatsApp button appears instead of unreliable generic advice. When both correct URLs are published, only Botpress Webchat appears. To roll back temporarily, clear both Botpress URLs in Shop details.
+When **the Edge bot ID and both standard Botpress fields are blank**, the old assistant stays available during setup. Once any Botpress field is filled, the old assistant is **not shown**. If the embed is incomplete, invalid or unavailable, a small **Ask our shop** WhatsApp button appears instead of unreliable generic advice. When both correct URLs are published, only Botpress Webchat appears. To roll back temporarily, clear both Botpress URLs in Shop details.
 
 The loader only accepts exact HTTPS domains `cdn.botpress.cloud` and `files.bpcontent.cloud` with standard Webchat script paths. It rejects other hosts and script URLs containing query fragments or user info.
 

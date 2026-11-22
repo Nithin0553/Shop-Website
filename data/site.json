@@ -13,5 +13,6 @@
   "siteUrl": "",
   "chatbotApiUrl": "https://sssa-vehicle-assistant.netlify.app/.netlify/functions/automobile-assistant",
   "botpressInjectUrl": "",
-  "botpressConfigUrl": ""
+  "botpressConfigUrl": "",
+  "botpressEdgeBotId": "cab6ea0c-9837-402f-8370-759a63ce2e5f"
 }
