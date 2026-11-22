@@ -32,6 +32,18 @@
       document.head.append(script);
     });
   }
+  function showShopContact(config) {
+    const digits = String(config.whatsapp || config.phone || '').replace(/\D/g,'');
+    if (!/^\d{10,15}$/.test(digits)) return;
+    const link = document.createElement('a');
+    link.className = 'botpress-contact-fallback';
+    link.href = 'https://wa.me/' + digits;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Ask our shop';
+    link.setAttribute('aria-label','Auto Assistant unavailable. Contact our shop on WhatsApp');
+    document.body.append(link);
+  }
   async function switchToBotpress() {
     let config;
     try {
@@ -45,16 +57,22 @@
     const settings = verifiedBotpressUrl(
       config.botpressConfigUrl, 'files.bpcontent.cloud', /^\/[A-Za-z0-9/_-]+\.js$/
     );
-    // Do not load untrusted script URLs or activate a half-configured bot.
-    if (!injector || !settings) return false;
+    // No Botpress setup yet: leave the legacy bot in place during migration.
+    const selected = Boolean(config.botpressInjectUrl || config.botpressConfigUrl);
+    if (!selected) return false;
+    // Once the owner selects Botpress, do not revert to the legacy bot's
+    // possibly inaccurate troubleshooting answers when Botpress is unavailable.
+    if (!injector || !settings) {
+      showShopContact(config);
+      return true;
+    }
     try {
       await loadBotpressScript(injector);
       await loadBotpressScript(settings);
-      return true;
     } catch {
-      // A temporarily inaccessible Botpress CDN must not break the storefront.
-      return false;
+      showShopContact(config);
     }
+    return true;
   }
   if (await switchToBotpress()) return;
 
