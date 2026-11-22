@@ -100,3 +100,14 @@ test('highlighted brand wordmarks have larger artwork and three-up layout',()=>{
     assert.equal(png.readUInt32BE(20),220);
   }
 });
+
+test('WhatsApp contact strip CTA uses accessible green with a matching hover state',()=>{
+  const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
+  assert.match(css,/\.contact-band \.strip-whatsapp\s*\{[^}]*background:#0b8246 !important;[^}]*color:#ffffff !important;[^}]*border:2px solid #0b8246 !important;/);
+  assert.match(css,/\.contact-band \.strip-whatsapp:hover,\s*\.contact-band \.strip-whatsapp:focus-visible\s*\{[^}]*background:#086b3a !important;[^}]*border-color:#086b3a !important;/);
+  assert.doesNotMatch(css,/\.contact-band \.strip-whatsapp\s*\{[^}]*background:#0a1a33 !important;/);
+  // Keep the old, functional WhatsApp contact link and its icon.
+  const app=fs.readFileSync(path.join(root,'public/app.js'),'utf8');
+  assert.match(app,/class="strip-whatsapp" href="\$\{esc\(whatsappUrl\(\)\)\}"/);
+  assert.match(app,/ico\('whatsapp',21\)\} Chat on WhatsApp/);
+});
