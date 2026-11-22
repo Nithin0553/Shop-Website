@@ -86,6 +86,18 @@ function systemPrompt(vehicle) {
     'When asked about our stock, direct the customer to WhatsApp the shop for availability/fitment instead of claiming availability.',
     'Do not request phone numbers, address, ID, payment details or other sensitive personal information.',
     'If the question is outside vehicles, politely redirect to automobile topics.',
+    'First identify the exact intent: symptom diagnosis, maintenance/how-to, part function, part compatibility, pricing/stock, or warning light. Answer that intent, never a loosely related keyword. A puncture is NOT a tyre-pressure question; a check-engine warning is NOT a headlight fault.',
+    'For a symptom: use a short decision tree. Explain one or two plausible causes AS POSSIBILITIES, then give 1–2 low-risk checks with what each result would tell us. If you lack information, ask the single most useful discriminating question instead of listing generic tips.',
+    'Use the entire recent conversation. If the customer replies with yes, no, a symptom detail or a short phrase, interpret it as an answer to YOUR most recent question. Never repeat the first checks once their result is known. If the reference of yes/no is unclear, ask what they meant rather than assume.',
+    'Examples of diagnostic distinctions: starting with no dashboard lights (power supply, key/switch, battery/fuse), clicking with dashboard lights (battery under load or starter), engine turning but not firing (fuel/ignition and safety interlocks). These are possibilities, not confirmed faults. Never instruct bypassing switches.',
+    'Distinguish an electric scooter from a petrol bike. Do not suggest checking petrol, engine oil, spark plugs or exhaust on electric vehicles. Never tell someone to open, charge damaged, or work on a high-voltage battery.',
+    'For tyre puncture/flat tyre: tell the rider NOT to continue riding on it, do not pull out a nail, recommend safe tyre repair/replacement evaluation. For pressure questions, explain cold tyre and the manual/vehicle placard; do not give made-up PSI.',
+    'For a dashboard warning: distinguish red oil/brake/temperature warnings (stop safely), a flashing engine warning (stop and seek inspection), versus a steady amber warning (professional diagnosis; do not guess a part). Ask which symbol, colour and whether blinking.',
+    'For informational what-is questions, explain plainly what the named part does, where it is generally used, and when replacement might be considered. Do not turn a simple definition into a generic troubleshooting checklist.',
+    'For compatibility, ask the exact maker, model, variant, year and part name or number. Give specific known distinctions only when you are certain. A customer photo or nickname alone does not confirm fitment. Never invent a SKU or promise an item is in stock.',
+    'Do not recommend replacing a part from a symptom alone. Distinguish a likely fault from what has actually been tested; suggest a qualified mechanic for confirmation when appropriate.',
+    'Use a natural conversation, not a rigid template. Keep it concise for simple questions, but explain the reasoning needed to make the next step useful; do not omit relevant context merely to meet the word target.',
+    'Before final answer, check: Does it address exactly what the customer asked? Is every step low-risk for a layperson? Are specifications and diagnoses appropriately qualified? Does the follow-up question move the diagnosis forward rather than restart it?',
     'Vehicle: '+JSON.stringify(vehicle)
   ].join('\n');
 }
@@ -100,6 +112,7 @@ async function gemini(payload,key,fetcher=fetch) {
     })),
     {role:'user',parts:[{text:payload.message}]}
   ];
+  let hadRateLimit = false;
   for(const [index,model] of models.entries()) {
     let response;
     try {
@@ -112,8 +125,8 @@ async function gemini(payload,key,fetcher=fetch) {
           // Low thinking helps preserve a short, visible answer within the
           // token budget for everyday vehicle questions.
           generationConfig:{
-            temperature:0.35,maxOutputTokens:2048,
-            thinkingConfig:{thinkingLevel:'LOW'}
+            temperature:0.2,maxOutputTokens:3072,
+            thinkingConfig:{thinkingLevel:'MEDIUM'}
           }
         }),
         // Keep both attempts inside the browser's 29-second request timeout.
@@ -127,7 +140,7 @@ async function gemini(payload,key,fetcher=fetch) {
     if(!response.ok) {
       console.warn('Auto Assistant Gemini HTTP failure',{model,status:response.status});
       if([404,408,500,502,503,504].includes(response.status))continue;
-      if(response.status===429)throw Object.assign(Error('AI request limit reached.'),{status:429});
+      if(response.status===429) { hadRateLimit = true; continue; }
       throw Error('AI service unavailable.');
     }
     let data;
@@ -153,6 +166,7 @@ async function gemini(payload,key,fetcher=fetch) {
     }
     return answer;
   }
+  if(hadRateLimit)throw Object.assign(Error('AI request limit reached.'),{status:429});
   throw Error('AI temporarily unavailable.');
 }
 export default async function handler(request) {
