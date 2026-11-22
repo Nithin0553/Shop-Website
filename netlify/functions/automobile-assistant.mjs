@@ -46,7 +46,7 @@ function normalize(payload) {
   if(!payload || typeof payload!=='object' || Array.isArray(payload))
     throw Error('Invalid question payload.');
   const message = typeof payload.message==='string' ? payload.message.trim() : '';
-  if(message.length<3 || message.length>800)throw Error('Question must have 3–800 characters.');
+  if(!message || message.length>800)throw Error('Question must have 1–800 characters.');
   const vehicle = payload.vehicle && typeof payload.vehicle==='object' && !Array.isArray(payload.vehicle) ? payload.vehicle : {};
   const type = ['motorcycle','scooter','car','other'].includes(vehicle.type) ? vehicle.type : 'motorcycle';
   const language = ['en','te','hi'].includes(vehicle.language) ? vehicle.language : 'en';
@@ -100,7 +100,7 @@ async function gemini(payload,key,fetcher=fetch) {
     })),
     {role:'user',parts:[{text:payload.message}]}
   ];
-  for(const model of models) {
+  for(const [index,model] of models.entries()) {
     let response;
     try {
       response = await fetcher('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{
@@ -109,20 +109,48 @@ async function gemini(payload,key,fetcher=fetch) {
         body:JSON.stringify({
           systemInstruction:{parts:[{text:systemPrompt(payload.vehicle)}]},
           contents,
-          generationConfig:{temperature:0.35,maxOutputTokens:900}
+          // Low thinking helps preserve a short, visible answer within the
+          // token budget for everyday vehicle questions.
+          generationConfig:{
+            temperature:0.35,maxOutputTokens:2048,
+            thinkingConfig:{thinkingLevel:'LOW'}
+          }
         }),
-        signal:AbortSignal.timeout(23000)
+        // Keep both attempts inside the browser's 29-second request timeout.
+        signal:AbortSignal.timeout(index===0?17000:9000)
       });
-    } catch { continue; }
+    } catch {
+      // Never log API keys, visitor questions, model responses or error bodies.
+      console.warn('Auto Assistant Gemini request failed',{model,reason:'network_or_timeout'});
+      continue;
+    }
     if(!response.ok) {
-      if([404,500,502,503,504].includes(response.status))continue;
+      console.warn('Auto Assistant Gemini HTTP failure',{model,status:response.status});
+      if([404,408,500,502,503,504].includes(response.status))continue;
       if(response.status===429)throw Object.assign(Error('AI request limit reached.'),{status:429});
       throw Error('AI service unavailable.');
     }
-    const data=await response.json();
-    const candidate=data.candidates?.[0];
-    const answer=(candidate?.content?.parts||[]).map(part=>part.text||'').join('').trim();
-    if(!answer || answer.length>3500)throw Error('AI response could not be used.');
+    let data;
+    try {
+      data=await response.json();
+    } catch {
+      console.warn('Auto Assistant Gemini response failed',{model,reason:'invalid_json'});
+      continue;
+    }
+    const candidate=data?.candidates?.[0];
+    const finishReason=candidate?.finishReason;
+    // Do not try another model to bypass a provider safety block.
+    if(['SAFETY','PROHIBITED_CONTENT','BLOCKLIST','SPII'].includes(finishReason))
+      throw Error('AI content blocked.');
+    const answer=(candidate?.content?.parts||[])
+      .filter(part=>!part.thought && typeof part.text==='string')
+      .map(part=>part.text).join('').trim();
+    if(!answer || answer.length>3500 || finishReason==='MAX_TOKENS') {
+      console.warn('Auto Assistant Gemini response unusable',{
+        model,reason:finishReason==='MAX_TOKENS'?'max_tokens':'empty_or_oversize'
+      });
+      continue;
+    }
     return answer;
   }
   throw Error('AI temporarily unavailable.');
@@ -133,7 +161,12 @@ export default async function handler(request) {
   if(request.method==='OPTIONS')return json({ok:true});
   if(request.method!=='POST')return json({error:'Method not allowed.'},405);
   const configured=process.env.GEMINI_API_KEY && process.env.AUTO_CHAT_ENABLED==='true';
-  if(!configured)return json({error:'AI assistance is not configured. Use basic guidance.'},503);
+  if(!configured) {
+    console.warn('Auto Assistant AI not configured',{
+      hasKey:Boolean(process.env.GEMINI_API_KEY),enabled:process.env.AUTO_CHAT_ENABLED==='true'
+    });
+    return json({error:'AI assistance is not configured. Use basic guidance.'},503);
+  }
   if(!String(request.headers.get('content-type')||'').toLowerCase().includes('application/json'))
     return json({error:'Expected JSON request.'},415);
   const length=Number(request.headers.get('content-length')||0);
