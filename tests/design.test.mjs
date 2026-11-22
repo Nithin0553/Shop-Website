@@ -38,6 +38,20 @@ test('homepage follows approved design hierarchy',async()=>{
   assert.ok(html.indexOf('Spare Parts Categories')<html.indexOf('Why Choose Us?'));
   assert.ok(!html.includes('98765 43210'),'No fake phone numbers should be displayed');
 });
+test('homepage brand and category marquees scroll from both page edges, not within the centered container',async()=>{
+  const html=await renderAt('/');
+  const brand=html.match(/<section class="section design-brand-section premium-section" id="our-brands">([\\s\\S]*?)<\\/section>/)?.[1];
+  const parts=html.match(/<section class="section design-categories-section premium-section" id="categories">([\\s\\S]*?)<\\/section>/)?.[1];
+  assert.ok(brand && parts, 'both home sections rendered');
+  // The centered container must close BEFORE each full-width moving track.
+  assert.match(brand, /<\\/div><div class="marquee-shell brand-marquee"/);
+  assert.match(parts, /<\\/div><div class="marquee-shell parts-marquee"/);
+  const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
+  assert.match(css, /\\.design-brand-section > \\.marquee-shell,[\\s\\S]*?\\.design-categories-section > \\.marquee-shell\\s*\\{[^}]*width:100%/);
+  assert.match(css, /\\.marquee-shell\\s*\\{[^}]*overflow:hidden/);
+  assert.match(css, /@keyframes scroll-x/);
+});
+
 test('blog page features article, sidebar, filters and working subscribe form',async()=>{
   const html=await renderAt('/blogs');
   for(const text of ['Maintenance Tips, Buying','Featured Blog','Browse by Category','Latest Blogs','subscribe-form','subscribe-email'])assert.ok(html.includes(text),`Missing ${text}`);
