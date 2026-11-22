@@ -58,14 +58,19 @@ test('the existing shop pages load the floating assistant CSS and JS',()=>{
   assert.match(js,/\.textContent = text;/);
   assert.match(js,/\/static-data\/site\.json/);
   assert.match(js,/\.netlify\/functions\/automobile-assistant/);
-  assert.match(template,/Please don't share personal/);
+  assert.match(template,/General guidance · No personal details/);
   assert.doesNotMatch(js,/GEMINI_API_KEY|x-goog-api-key|ghp_|github_pat_/);
   assert.doesNotMatch(js,/localStorage|sessionStorage|document\.cookie/);
 });
 
-test('the initial API endpoint is disabled and owner-editable in the existing admin',()=>{
+test('the AI endpoint is configurable by the owner without exposing a secret',()=>{
   const site=JSON.parse(read('data/site.json'));
-  assert.equal(site.chatbotApiUrl,'');
+  assert.equal(typeof site.chatbotApiUrl,'string');
+  if (site.chatbotApiUrl) {
+    const target=new URL(site.chatbotApiUrl);
+    assert.equal(target.protocol,'https:');
+    assert.equal(target.pathname,'/.netlify/functions/automobile-assistant');
+  }
   assert.match(read('public/admin.js'),/Auto Assistant AI endpoint \(Netlify Function URL\)/);
   assert.match(read('netlify.toml'),/directory = "netlify\/functions"/);
   assert.ok(existsSync(path.join(root,'netlify-site/index.html')));
@@ -101,7 +106,7 @@ test('urgent safety issues do not call AI model',async()=>{
       const result=await handler(request('My brakes have failed and I smell smoke',{ip:'2001:db8::101'}));
       assert.equal(result.status,200);
       const answer=(await result.json()).answer;
-      assert.match(answer,/Stop driving or riding/);
+      assert.match(answer,/Stop riding or driving/);
       assert.match(answer,/qualified mechanic/);
     } finally {globalThis.fetch=old;}
   });
@@ -168,4 +173,36 @@ test('Netlify function code has no embedded AI tokens or stored customer message
   assert.match(code,/AUTO_CHAT_ENABLED/);
   assert.match(code,/best-effort/i);
   assert.doesNotMatch(code,/localStorage|sessionStorage|writeFile|JSON\.stringify\(attempts\)/);
+});
+
+test('chat has minimal copy, optional vehicle details and accessible microinteractions',()=>{
+  const template=read('public/automobile-assistant.html');
+  const css=read('public/automobile-assistant.css');
+  const js=read('public/automobile-assistant.js');
+  const backend=read('netlify/functions/automobile-assistant.mjs');
+  assert.match(template,/id="va-vehicle-details"/);
+  assert.match(template,/<details\b/);
+  assert.doesNotMatch(template,/<details[^>]*\bopen\b/);
+  assert.match(template,/Hi! What can I help you with\?/);
+  assert.match(template,/id="va-status-text"/);
+  assert.match(template,/Ask Auto/);
+  assert.match(template,/Ask our shop/);
+  assert.doesNotMatch(template,/Motorcycles · Scooters · Cars/);
+  assert.doesNotMatch(template,/AI answers can be incorrect/);
+  assert.doesNotMatch(template,/Please don't share personal or payment/);
+  assert.match(css,/@keyframes va-panel-in/);
+  assert.match(css,/@keyframes va-bounce/);
+  assert.match(css,/@keyframes va-caret/);
+  assert.match(css, /prefers-reduced-motion:reduce/);
+  assert.match(css,/va-vehicle\[open\]/);
+  assert.match(js,/function makeThinking\(/);
+  assert.match(js,/function revealAnswer\(/);
+  assert.match(js,/Intl\.Segmenter/);
+  assert.match(js,/window\.matchMedia/);
+  assert.match(js,/\.requestSubmit\(\)/);
+  assert.match(js,/\.setAttribute\('aria-busy','true'\)/);
+  assert.match(js,/window\.requestAnimationFrame/);
+  assert.match(backend,/aim for 45–100 words/);
+  assert.match(backend,/at most three short, safe checks/);
+  assert.match(backend,/more only for an urgent safety warning/);
 });
