@@ -40,15 +40,15 @@ test('homepage follows approved design hierarchy',async()=>{
 });
 test('homepage brand and category marquees scroll from both page edges, not within the centered container',async()=>{
   const html=await renderAt('/');
-  const brand=html.match(/<section class="section design-brand-section premium-section" id="our-brands">([\\s\\S]*?)<\\/section>/)?.[1];
-  const parts=html.match(/<section class="section design-categories-section premium-section" id="categories">([\\s\\S]*?)<\\/section>/)?.[1];
+  const brand=html.match(/<section class="section design-brand-section premium-section" id="our-brands">([\s\S]*?)<\/section>/)?.[1];
+  const parts=html.match(/<section class="section design-categories-section premium-section" id="categories">([\s\S]*?)<\/section>/)?.[1];
   assert.ok(brand && parts, 'both home sections rendered');
   // The centered container must close BEFORE each full-width moving track.
-  assert.match(brand, /<\\/div><div class="marquee-shell brand-marquee"/);
-  assert.match(parts, /<\\/div><div class="marquee-shell parts-marquee"/);
+  assert.match(brand, /<\/div><div class="marquee-shell brand-marquee"/);
+  assert.match(parts, /<\/div><div class="marquee-shell parts-marquee"/);
   const css=fs.readFileSync(path.join(root,'public/styles.css'),'utf8');
-  assert.match(css, /\\.design-brand-section > \\.marquee-shell,[\\s\\S]*?\\.design-categories-section > \\.marquee-shell\\s*\\{[^}]*width:100%/);
-  assert.match(css, /\\.marquee-shell\\s*\\{[^}]*overflow:hidden/);
+  assert.match(css, /\.design-brand-section > \.marquee-shell,[\s\S]*?\.design-categories-section > \.marquee-shell\s*\{[^}]*width:100%/);
+  assert.match(css, /\.marquee-shell\s*\{[^}]*overflow:hidden/);
   assert.match(css, /@keyframes scroll-x/);
 });
 
