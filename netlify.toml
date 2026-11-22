@@ -1,0 +1,8 @@
+# Optional function-only companion to the GitHub Pages storefront.
+# Manual Netlify CLI deployment is recommended to avoid daily blog Git commits
+# triggering unnecessary Netlify builds and consuming free-plan credits.
+[build]
+  publish = "netlify-site"
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
