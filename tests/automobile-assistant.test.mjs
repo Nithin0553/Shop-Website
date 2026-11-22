@@ -353,6 +353,41 @@ test('basic help follows the last asked question, not earlier mentions of clicki
   assert.match(noContext,/what you mean by "no"/i);
 });
 
+test('misfiring and a failed brake lamp are not mistaken for fire or brake failure',()=>{
+  const js=read('public/automobile-assistant.js');
+  const start=js.indexOf('  const urgent = '),end=js.indexOf('\n  let html;',start);
+  const basic=new Function(js.slice(start,end)+'\nreturn basicAdvice;')();
+  const misfire=basic('My bike is misfiring',{type:'motorcycle'},[]);
+  assert.doesNotMatch(misfire,/Stop the vehicle as soon as it is safe/);
+  const light=basic('My brake light is not working',{type:'motorcycle'},[]);
+  assert.match(light,/brake light tells vehicles/i);
+  assert.doesNotMatch(light,/Stop the vehicle as soon as it is safe/);
+  const serious=basic('My brakes failed and brake light is off',{type:'motorcycle'},[]);
+  assert.match(serious,/Stop the vehicle/i);
+});
+
+test('Netlify classifies actual brake failure as urgent but not a lamp fault',async()=>{
+  await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
+    const old=globalThis.fetch;
+    let count=0;
+    globalThis.fetch=async()=>{
+      count++;
+      return {ok:true,status:200,json:async()=>({candidates:[{content:{parts:[{text:'Check the brake lamp safely.'}]}}]})};
+    };
+    try {
+      const lamp=await handler(request('My brake light is not working',{ip:'2001:db8::115'}));
+      assert.equal((await lamp.json()).mode,'ai');
+      assert.equal(count,1);
+      const dangerous=await handler(request('My brakes have failed',{ip:'2001:db8::116'}));
+      assert.equal((await dangerous.json()).mode,'safety');
+      assert.equal(count,1);
+      const misfire=await handler(request('My bike is misfiring',{ip:'2001:db8::117'}));
+      assert.equal((await misfire.json()).mode,'ai');
+      assert.equal(count,2);
+    }finally{globalThis.fetch=old;}
+  });
+});
+
 test('Gemini instruction prioritizes troubleshooting and guards unsupported claims',()=>{
   const server=read('netlify/functions/automobile-assistant.mjs');
   assert.match(server,/A puncture is NOT a tyre-pressure question/);
