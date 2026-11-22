@@ -180,8 +180,8 @@ test('two-character replies reach Gemini with their preceding context',async()=>
       assert.equal((await res.json()).mode,'ai');
       assert.equal(requestPayload.contents.at(-1).parts[0].text,'No');
       assert.equal(requestPayload.contents[0].parts[0].text,'My bike is not starting.');
-      assert.equal(requestPayload.generationConfig.thinkingConfig.thinkingLevel,'LOW');
-      assert.equal(requestPayload.generationConfig.maxOutputTokens,2048);
+      assert.equal(requestPayload.generationConfig.thinkingConfig.thinkingLevel,'MEDIUM');
+      assert.equal(requestPayload.generationConfig.maxOutputTokens,3072);
     }finally{globalThis.fetch=old;}
   });
 });
@@ -307,6 +307,121 @@ test('chat text is readable on phones and does not repeat misleading AI-busy pre
   assert.match(js,/statusText\.textContent = 'Basic help'/);
   assert.doesNotMatch(js,/AI is busy right now\./);
   assert.doesNotMatch(js,/\+ basicAdvice\(message,vehicle\)/);
+});
+
+test('basic help prioritizes the actual problem, not just a matching keyword',()=>{
+  const js=read('public/automobile-assistant.js');
+  const start=js.indexOf('  const urgent = '),end=js.indexOf('\n  let html;',start);
+  const basic=new Function(js.slice(start,end)+'\nreturn basicAdvice;')();
+  const vehicle={type:'scooter',model:'Honda Activa 6G',year:'2023'};
+  const puncture=basic('My scooter tyre got punctured',vehicle,[]);
+  assert.match(puncture,/Do not ride on a flat tyre/i);
+  assert.doesNotMatch(puncture,/check tyre pressure before riding/i);
+  const pressure=basic('How to check tyre pressure?',vehicle,[]);
+  assert.match(pressure,/tyre-pressure gauge/);
+  assert.match(pressure,/owner manual/);
+  assert.doesNotMatch(pressure,/32 PSI|35 PSI/);
+  const warning=basic('My car check engine light is on',{type:'car'},[]);
+  assert.match(warning,/warning symbol/i);
+  assert.doesNotMatch(warning,/horn work|battery may be weak/i);
+  const airFilter=basic('What does an air filter do?',vehicle,[]);
+  assert.match(airFilter,/keeps dust and dirt/i);
+  const stock=basic('Do you have Activa brake pads in stock?',vehicle,[]);
+  assert.match(stock,/cannot confirm live stock/);
+  const electric=basic('My electric scooter is not starting',{type:'scooter',model:'Ather 450X'},[]);
+  assert.match(electric,/display turns on/);
+  assert.doesNotMatch(electric,/petrol|engine oil|spark plug/i);
+  const dangerous=basic('My brakes have failed',vehicle,[]);
+  assert.match(dangerous,/Stop the vehicle/i);
+});
+
+test('basic help follows the last asked question, not earlier mentions of clicking',()=>{
+  const js=read('public/automobile-assistant.js');
+  const start=js.indexOf('  const urgent = '),end=js.indexOf('\n  let html;',start);
+  const basic=new Function(js.slice(start,end)+'\nreturn basicAdvice;')();
+  const vehicle={type:'motorcycle'};
+  const prior=[
+    {role:'user',text:'My bike is not starting'},
+    {role:'assistant',text:'If you hear a click, the battery may be weak. Do the dashboard lights become dim?'}
+  ];
+  assert.match(basic('Yes',vehicle,prior),/lights dim strongly/i);
+  assert.doesNotMatch(basic('Yes',vehicle,prior),/If you hear a click but the engine/i);
+  const noClick=basic('No clicking when I press start',vehicle,[]);
+  assert.match(noClick,/dashboard lights work/i);
+  assert.doesNotMatch(noClick,/A click when starting can happen/i);
+  const noContext=basic('No',vehicle,[]);
+  assert.match(noContext,/what you mean by "no"/i);
+});
+
+test('misfiring and a failed brake lamp are not mistaken for fire or brake failure',()=>{
+  const js=read('public/automobile-assistant.js');
+  const start=js.indexOf('  const urgent = '),end=js.indexOf('\n  let html;',start);
+  const basic=new Function(js.slice(start,end)+'\nreturn basicAdvice;')();
+  const misfire=basic('My bike is misfiring',{type:'motorcycle'},[]);
+  assert.doesNotMatch(misfire,/Stop the vehicle as soon as it is safe/);
+  const light=basic('My brake light is not working',{type:'motorcycle'},[]);
+  assert.match(light,/brake light tells vehicles/i);
+  assert.doesNotMatch(light,/Stop the vehicle as soon as it is safe/);
+  const serious=basic('My brakes failed and brake light is off',{type:'motorcycle'},[]);
+  assert.match(serious,/Stop the vehicle/i);
+});
+
+test('Netlify classifies actual brake failure as urgent but not a lamp fault',async()=>{
+  await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
+    const old=globalThis.fetch;
+    let count=0;
+    globalThis.fetch=async()=>{
+      count++;
+      return {ok:true,status:200,json:async()=>({candidates:[{content:{parts:[{text:'Check the brake lamp safely.'}]}}]})};
+    };
+    try {
+      const lamp=await handler(request('My brake light is not working',{ip:'2001:db8::115'}));
+      assert.equal((await lamp.json()).mode,'ai');
+      assert.equal(count,1);
+      const dangerous=await handler(request('My brakes have failed',{ip:'2001:db8::116'}));
+      assert.equal((await dangerous.json()).mode,'safety');
+      assert.equal(count,1);
+      const misfire=await handler(request('My bike is misfiring',{ip:'2001:db8::117'}));
+      assert.equal((await misfire.json()).mode,'ai');
+      assert.equal(count,2);
+    }finally{globalThis.fetch=old;}
+  });
+});
+
+test('Gemini instruction prioritizes troubleshooting and guards unsupported claims',()=>{
+  const server=read('netlify/functions/automobile-assistant.mjs');
+  assert.match(server,/A puncture is NOT a tyre-pressure question/);
+  assert.match(server,/message and context|entire recent conversation/i);
+  assert.match(server,/Do not recommend replacing a part from a symptom alone/);
+  assert.match(server,/Distinguish an electric scooter from a petrol bike/);
+  assert.match(server,/Before final answer, check/);
+});
+
+test('Gemini quota-limit on primary may use a working backup; total limits remain 429',async()=>{
+  await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
+    const old=globalThis.fetch;
+    let count=0;
+    globalThis.fetch=async()=>{
+      count++;
+      if(count===1)return {ok:false,status:429};
+      return {ok:true,status:200,json:async()=>({
+        candidates:[{finishReason:'STOP',content:{parts:[{text:'Ask a mechanic to test the battery.'}]}}]
+      })};
+    };
+    try {
+      const response=await handler(request('My bike has starting trouble',{ip:'2001:db8::113'}));
+      assert.equal(response.status,200);
+      assert.equal(count,2);
+    }finally{globalThis.fetch=old;}
+  });
+  await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
+    const old=globalThis.fetch;
+    globalThis.fetch=async()=>({ok:false,status:429});
+    try{
+      const response=await handler(request('My bike has starting trouble',{ip:'2001:db8::114'}));
+      assert.equal(response.status,429);
+    }finally{globalThis.fetch=old;}
+  });
 });
 
 test('simple offline yes/no answers follow the previous starting problem',()=>{

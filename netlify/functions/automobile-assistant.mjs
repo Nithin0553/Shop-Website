@@ -4,12 +4,12 @@ const ORIGIN = 'https://nithin0553.github.io';
 const DEFAULT_MODEL = 'gemini-3.8-flash';
 const FALLBACK_MODEL = 'gemini-3.6-flash';
 const MODEL_NAME = /^gemini-[a-z0-9.-]+$/;
-const LIMIT = 12;
+const LIMIT = 40;
 const WINDOW_MS = 60 * 60 * 1000;
 // Best-effort per-instance throttling. This map is NOT shared across function
 // instances and is not a durable security/quota control.
 const attempts = new Map();
-const safetyRisk = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smoke|fire|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
+const safetyRisk = /(?:brak(?:e|es|ing).{0,55}(?:fail|not work|no response|lost|gone|stopp?ed)|(?:no|lost|without).{0,20}brak|fuel.{0,35}leak|petrol.{0,35}leak|smok(?:e|ing)|\bfire\b|burning smell|(?:battery|charger).{0,45}(?:swoll|smok|hot|fire)|stuck throttle|steering.{0,35}(?:lock|fail|jam)|wheel.{0,20}(?:wobble|loose|detach)|accident|crash|overheat(?:ing)?|severe coolant leak)/i;
 const criticalText = '⚠️ Stop riding or driving as soon as it’s safe. Switch off the vehicle if safe, keep away from smoke and leaking fuel, and contact roadside assistance or a qualified mechanic. Don’t try roadside repairs on brakes, steering, fuel systems or EV batteries.';
 function json(data, status=200, origin=ORIGIN) {
   return new Response(JSON.stringify(data),{
@@ -86,6 +86,18 @@ function systemPrompt(vehicle) {
     'When asked about our stock, direct the customer to WhatsApp the shop for availability/fitment instead of claiming availability.',
     'Do not request phone numbers, address, ID, payment details or other sensitive personal information.',
     'If the question is outside vehicles, politely redirect to automobile topics.',
+    'First identify the exact intent: symptom diagnosis, maintenance/how-to, part function, part compatibility, pricing/stock, or warning light. Answer that intent, never a loosely related keyword. A puncture is NOT a tyre-pressure question; a check-engine warning is NOT a headlight fault.',
+    'For a symptom: use a short decision tree. Explain one or two plausible causes AS POSSIBILITIES, then give 1–2 low-risk checks with what each result would tell us. If you lack information, ask the single most useful discriminating question instead of listing generic tips.',
+    'Use the entire recent conversation. If the customer replies with yes, no, a symptom detail or a short phrase, interpret it as an answer to YOUR most recent question. Never repeat the first checks once their result is known. If the reference of yes/no is unclear, ask what they meant rather than assume.',
+    'Examples of diagnostic distinctions: starting with no dashboard lights (power supply, key/switch, battery/fuse), clicking with dashboard lights (battery under load or starter), engine turning but not firing (fuel/ignition and safety interlocks). These are possibilities, not confirmed faults. Never instruct bypassing switches.',
+    'Distinguish an electric scooter from a petrol bike. Do not suggest checking petrol, engine oil, spark plugs or exhaust on electric vehicles. Never tell someone to open, charge damaged, or work on a high-voltage battery.',
+    'For tyre puncture/flat tyre: tell the rider NOT to continue riding on it, do not pull out a nail, recommend safe tyre repair/replacement evaluation. For pressure questions, explain cold tyre and the manual/vehicle placard; do not give made-up PSI.',
+    'For a dashboard warning: distinguish red oil/brake/temperature warnings (stop safely), a flashing engine warning (stop and seek inspection), versus a steady amber warning (professional diagnosis; do not guess a part). Ask which symbol, colour and whether blinking.',
+    'For informational what-is questions, explain plainly what the named part does, where it is generally used, and when replacement might be considered. Do not turn a simple definition into a generic troubleshooting checklist.',
+    'For compatibility, ask the exact maker, model, variant, year and part name or number. Give specific known distinctions only when you are certain. A customer photo or nickname alone does not confirm fitment. Never invent a SKU or promise an item is in stock.',
+    'Do not recommend replacing a part from a symptom alone. Distinguish a likely fault from what has actually been tested; suggest a qualified mechanic for confirmation when appropriate.',
+    'Use a natural conversation, not a rigid template. Keep it concise for simple questions, but explain the reasoning needed to make the next step useful; do not omit relevant context merely to meet the word target.',
+    'Before final answer, check: Does it address exactly what the customer asked? Is every step low-risk for a layperson? Are specifications and diagnoses appropriately qualified? Does the follow-up question move the diagnosis forward rather than restart it?',
     'Vehicle: '+JSON.stringify(vehicle)
   ].join('\n');
 }
@@ -100,6 +112,7 @@ async function gemini(payload,key,fetcher=fetch) {
     })),
     {role:'user',parts:[{text:payload.message}]}
   ];
+  let hadRateLimit = false;
   for(const [index,model] of models.entries()) {
     let response;
     try {
@@ -112,8 +125,8 @@ async function gemini(payload,key,fetcher=fetch) {
           // Low thinking helps preserve a short, visible answer within the
           // token budget for everyday vehicle questions.
           generationConfig:{
-            temperature:0.35,maxOutputTokens:2048,
-            thinkingConfig:{thinkingLevel:'LOW'}
+            temperature:0.2,maxOutputTokens:3072,
+            thinkingConfig:{thinkingLevel:'MEDIUM'}
           }
         }),
         // Keep both attempts inside the browser's 29-second request timeout.
@@ -127,7 +140,7 @@ async function gemini(payload,key,fetcher=fetch) {
     if(!response.ok) {
       console.warn('Auto Assistant Gemini HTTP failure',{model,status:response.status});
       if([404,408,500,502,503,504].includes(response.status))continue;
-      if(response.status===429)throw Object.assign(Error('AI request limit reached.'),{status:429});
+      if(response.status===429) { hadRateLimit = true; continue; }
       throw Error('AI service unavailable.');
     }
     let data;
@@ -153,6 +166,7 @@ async function gemini(payload,key,fetcher=fetch) {
     }
     return answer;
   }
+  if(hadRateLimit)throw Object.assign(Error('AI request limit reached.'),{status:429});
   throw Error('AI temporarily unavailable.');
 }
 export default async function handler(request) {
@@ -177,7 +191,9 @@ export default async function handler(request) {
     if(raw.length>12_000)return json({error:'Question too long.'},413);
     payload=normalize(JSON.parse(raw));
   } catch{return json({error:'Please check your question.'},400);}
-  if(safetyRisk.test(payload.message))return json({answer:criticalText,mode:'safety'});
+  const brakeLightOnly=/\bbrake\s+lights?\b/i.test(payload.message) &&
+    !/\bbrakes?\s+(?:(?:have|has)\s+)?(?:fail(?:s|ed|ing|ure)?|don.t stop|not working|not stopping|not holding)\b|\bno brakes\b|\blost (?:my )?brakes\b/i.test(payload.message);
+  if(!brakeLightOnly && safetyRisk.test(payload.message))return json({answer:criticalText,mode:'safety'});
   if(!throttle(request))return json({error:'Too many requests. Try later.'},429);
   try {
     const answer=await gemini(payload,process.env.GEMINI_API_KEY);
@@ -196,6 +212,6 @@ export const config = {
     action:'rate_limit',
     aggregateBy:['ip','domain'],
     windowSize:60,
-    windowLimit:6
+    windowLimit:10
   }
 };
