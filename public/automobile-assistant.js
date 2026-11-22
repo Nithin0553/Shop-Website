@@ -82,7 +82,8 @@
   function updateVehicleSummary() {
     const type = $('#va-type').selectedOptions[0]?.textContent || 'Motorcycle';
     const model = $('#va-model').value.trim();
-    vehicleSummary.textContent = model ? type + ' · ' + model : type + ' · Add model';
+    const language = $('#va-language').selectedOptions[0]?.textContent || 'English';
+    vehicleSummary.textContent = model ? model + ' · ' + language : type + ' · ' + language;
   }
   vehicleInputs.forEach(selector => $(selector).addEventListener('input', updateVehicleSummary));
   vehicleInputs.forEach(selector => $(selector).addEventListener('change', updateVehicleSummary));
