@@ -38,7 +38,9 @@ test('contact form and footer use approved help wording and accessible contrast'
   assert.ok(!js.includes('Enquiries are saved privately for the shop to follow up.'));
   assert.ok(!js.includes('శ్రీ సాయి షణ్ముఖ ఆటో సెంటర్'));
   assert.ok(css.includes('.contact-band .strip-whatsapp'));
-  assert.ok(css.includes('background:#0a1a33 !important;'));
+  assert.ok(css.includes('background:#0b8246 !important;'));
+  assert.ok(css.includes('color:#ffffff !important;'));
+  assert.ok(css.includes('background:#086b3a !important;'));
 });
 
 test('blog photography, map and navigation support graceful fallbacks',()=>{
