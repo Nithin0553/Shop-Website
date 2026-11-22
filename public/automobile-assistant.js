@@ -19,6 +19,7 @@
     const prefix = vehicleName ? 'For your ' + vehicleName + ': ' : '';
     const priorUsers = conversation.filter(item => item.role === 'user').map(item => item.text || '');
     const lastAssistant = [...conversation].reverse().find(item => item.role === 'assistant')?.text.toLowerCase() || '';
+    const followUp = (lastAssistant.match(/[^?]+\?/g) || []).at(-1) || '';
     const symptom = priorUsers.slice(-4).join(' ').toLowerCase();
     const context = (symptom + ' ' + q).trim();
     const isElectric = /\b(ev|electric (?:bike|car|scooter|vehicle)|e-scooter)\b|ather|ola s1|chetak electric/i.test(
@@ -30,17 +31,22 @@
     if (/^(?:no|nope|nah|nothing|ledu|nahi|లేదు|नहीं)[.! ]*$/i.test(q) ||
         /^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)[.! ]*$/i.test(q)) {
       const yes = /^(?:yes|yeah|yep|avunu|haan|అవును|हाँ)/i.test(q);
-      if (/\b(click|clicking)\b/.test(lastAssistant)) {
+      if (/\b(click|clicking)\b/.test(followUp)) {
         return yes
           ? 'If you hear a click but the engine does not start, the battery or starter may need checking. Do not keep pressing start. Do the dashboard lights become dim when you press it?'
           : 'Okay, no clicking sound. Check whether the dashboard lights turn on when the key is ON. If they are off too, the battery, switch or fuse may need checking. Do the dashboard lights turn on?';
       }
-      if (/\b(dashboard lights|dash lights|lights turn on)\b/.test(lastAssistant)) {
+      if (/\b(dim|dimmer|fainter)\b/.test(followUp)) {
+        return yes
+          ? 'If the lights dim strongly when pressing start, the battery may be weak, but this needs testing. Avoid repeated starting attempts. Does the engine turn at all?'
+          : 'If the lights stay bright but the starter does not turn, a mechanic may need to check the starter circuit. Does the engine turn at all when you press start?';
+      }
+      if (/\b(dashboard lights|dash lights|lights turn on)\b/.test(followUp)) {
         return yes
           ? 'The dashboard has power, so a completely dead battery is less likely, but it can still be weak. When you press start once, do you hear a click, the engine turning, or nothing?'
           : 'No dashboard lights means the electrical supply may be interrupted. Check that the key and engine switch are ON. Do not touch wires. A mechanic can check the battery and fuse safely.';
       }
-      if (/\b(flat tyre|flat tire|puncture)\b/.test(lastAssistant)) {
+      if (/\b(flat tyre|flat tire|puncture)\b/.test(followUp)) {
         return yes
           ? 'Do not ride on a flat or punctured tyre. Use roadside help or take the wheel to a tyre repair shop. Do not pull out a nail or screw yourself.'
           : 'Okay. Is the tyre losing air slowly, or are you asking for the correct pressure?';
@@ -50,7 +56,7 @@
     }
 
     // Distinguish a real puncture from a routine pressure question.
-    if (/\b(punctur(?:e|ed)|flat tyre|flat tire|tyre is flat|tire is flat|nail in (?:my |the )?tyre|air leak(?:ing)? from (?:my |the )?tyre)\b/i.test(q)) {
+    if (/\b(punctur(?:e|ed)|flat tyre|flat tire|tyre is flat|tire is flat|tyre got flat|tire got flat|nail in (?:my |the )?(?:tyre|tire)|air leak(?:ing)? from (?:my |the )?(?:tyre|tire))\b/i.test(q)) {
       return prefix + 'Do not ride on a flat tyre. If you can see a nail or screw, leave it in place. Ask a tyre repair shop to check whether it can be repaired safely. Is the tyre completely flat or losing air slowly?';
     }
     if (/\b(tyre|tire)\b/.test(q) && /\b(pressure|psi|air|inflate|fill)\b/.test(q)) {
@@ -63,11 +69,11 @@
     }
 
     if (/\b(start|starting|crank|ignition|won.t start|no power)\b/.test(q)) {
-      if (/\b(click|clicking)\b/.test(q)) {
+      if (/\b(click|clicking)\b/.test(q) && !/\b(no|without|doesn.t|not|never)\s+(?:any\s+)?(?:click|clicking)\b/.test(q)) {
         return prefix + 'A click when starting can happen with a weak battery or a starter problem, but it is not a confirmed diagnosis. Check whether the dashboard lights become dim as you press start once. Do they dim?';
       }
-      if (/\b(no lights|dash(?:board)? (?:is )?(?:off|dead)|nothing happens|completely dead)\b/.test(q)) {
-        return prefix + 'If no dashboard lights appear, check that the key is ON and the stop switch is in the normal running position (if fitted). The battery or fuse may need testing. Do the horn and indicators work?';
+      if (/\b(no lights|dash(?:board)? (?:is )?(?:off|dead)|nothing happens|completely dead|no (?:click|clicking))\b/.test(q)) {
+        return prefix + 'If no lights or clicking appear, first see whether the dashboard lights work with the key ON. If they do not, the battery, key switch or fuse may need checking. Do the dashboard lights turn on?';
       }
       if (/\b(cranks? but|engine turns over|turns over but)\b/.test(q)) {
         return prefix + (isElectric
@@ -252,7 +258,9 @@
     button.textContent = prompt.label;
     button.addEventListener('click', () => {
       if (busy) return;
-      question.value = prompt.question;
+      const type = $('#va-type').value;
+      const vehicle = type === 'car' ? 'car' : type === 'scooter' ? 'scooter' : 'bike';
+      question.value = prompt.question.replace(/\b(bike|scooter)\b/i, vehicle);
       resizeQuestion();
       $('#va-form').requestSubmit();
     });
