@@ -4,6 +4,60 @@
 (async () => {
   'use strict';
   const BASE = window.__SHOP_STATIC_BASE__ || '/Shop-Website';
+
+  // When Botpress is published and configured, it completely replaces the
+  // legacy Netlify/Gemini assistant. Without a valid Botpress embed, the old
+  // chat remains available until the owner finishes setup.
+  function verifiedBotpressUrl(value, host, pathPattern) {
+    try {
+      const url = new URL(String(value || '').trim());
+      if (url.protocol !== 'https:' || url.hostname !== host ||
+          url.username || url.password || url.search || url.hash ||
+          !pathPattern.test(url.pathname)) return '';
+      return url.href;
+    } catch {
+      return '';
+    }
+  }
+  function loadBotpressScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = () => {
+        script.remove();
+        reject(new Error('Botpress script unavailable'));
+      };
+      document.head.append(script);
+    });
+  }
+  async function switchToBotpress() {
+    let config;
+    try {
+      const response = await fetch(BASE + '/static-data/site.json', {cache:'no-store'});
+      if (!response.ok) return false;
+      config = await response.json();
+    } catch { return false; }
+    const injector = verifiedBotpressUrl(
+      config.botpressInjectUrl, 'cdn.botpress.cloud', /^\/webchat\/v\d+\.\d+\/inject\.js$/
+    );
+    const settings = verifiedBotpressUrl(
+      config.botpressConfigUrl, 'files.bpcontent.cloud', /^\/[A-Za-z0-9/_-]+\.js$/
+    );
+    // Do not load untrusted script URLs or activate a half-configured bot.
+    if (!injector || !settings) return false;
+    try {
+      await loadBotpressScript(injector);
+      await loadBotpressScript(settings);
+      return true;
+    } catch {
+      // A temporarily inaccessible Botpress CDN must not break the storefront.
+      return false;
+    }
+  }
+  if (await switchToBotpress()) return;
+
   const prompts = [
     {label:'Won’t start',question:'My bike is not starting. What can I safely check?'},
     {label:'Tyre pressure',question:'How do I check the correct tyre pressure?'},
