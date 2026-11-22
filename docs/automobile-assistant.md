@@ -10,6 +10,22 @@ It supports:
 - A WhatsApp handoff to the shop; the customer must tap **Send** in WhatsApp.
 - Mobile-friendly floating placement and screen-reader/keyboard navigation.
 
+## Updated chat experience
+
+The assistant now uses a compact floating launcher, a shorter greeting, one-tap quick questions, collapsible vehicle details, and small typing/loading animations. Answers appear with a fast text-reveal effect; reduced-motion devices see the full reply immediately. Critical warnings always appear immediately.
+
+To apply the **frontend improvements**, GitHub Pages updates automatically after the change is merged into `main`.
+
+To apply the **shorter Gemini responses**, the separate Netlify Function must be deployed again. From PowerShell, in the same linked project directory:
+
+```powershell
+cd "B:\\Sri Sai Shanmukha Auto Centre\\Shop-Website"
+git pull origin main
+netlify deploy --prod --dir=netlify-site --functions=netlify/functions
+```
+
+No additional Gemini key or Netlify environment configuration is required if the existing function already works. The backend now aims for roughly 45–100 words, up to three short checks and one follow-up question, while retaining essential safety warnings.
+
 The chat has **two distinct modes**. **Basic guidance** is always available on GitHub Pages using curated rules for common questions, but it is not a general AI model and replies in English. **Online AI** answers more varied questions and can reply in Telugu/Hindi; it requires the optional separate Netlify Function described below.
 
 **No one can safely run a shared Gemini API key directly on GitHub Pages.** The key stays on the Netlify server, never in HTML, GitHub JSON, or client-side JavaScript. The assistant does not claim the shop sells car parts; Sri Sai Shanmukha Auto Centre primarily sells two-wheeler spares.
