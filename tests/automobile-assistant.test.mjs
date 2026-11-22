@@ -158,10 +158,80 @@ test('temporary Gemini HTTP 503 safely uses second model and hides internal diag
   });
 });
 
+test('two-character replies reach Gemini with their preceding context',async()=>{
+  await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
+    const old=globalThis.fetch;
+    let requestPayload;
+    globalThis.fetch=async (_url,options)=>{
+      requestPayload=JSON.parse(options.body);
+      return {ok:true,status:200,json:async()=>({
+        candidates:[{content:{parts:[{text:'Check the dashboard lights next.'}]}}]
+      })};
+    };
+    try {
+      const history=[
+        {role:'user',text:'My bike is not starting.'},
+        {role:'assistant',text:'Do you hear a clicking sound?'}
+      ];
+      const res=await handler(request('No',{
+        ip:'2001:db8::106',body:{history}
+      }));
+      assert.equal(res.status,200);
+      assert.equal((await res.json()).mode,'ai');
+      assert.equal(requestPayload.contents.at(-1).parts[0].text,'No');
+      assert.equal(requestPayload.contents[0].parts[0].text,'My bike is not starting.');
+      assert.equal(requestPayload.generationConfig.thinkingConfig.thinkingLevel,'LOW');
+      assert.equal(requestPayload.generationConfig.maxOutputTokens,2048);
+    }finally{globalThis.fetch=old;}
+  });
+});
+
+test('an empty or token-limited primary reply tries the secondary model',async()=>{
+  await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
+    const old=globalThis.fetch;
+    let count=0;
+    globalThis.fetch=async()=>{
+      count++;
+      if(count===1)return {ok:true,status:200,json:async()=>({
+        candidates:[{finishReason:'MAX_TOKENS',content:{parts:[]}}]
+      })};
+      return {ok:true,status:200,json:async()=>({
+        candidates:[{finishReason:'STOP',content:{parts:[{text:'Check the battery lights.'}]}}]
+      })};
+    };
+    try {
+      const res=await handler(request('Why does my scooter not start?',{ip:'2001:db8::107'}));
+      assert.equal(res.status,200);
+      assert.equal((await res.json()).answer,'Check the battery lights.');
+      assert.equal(count,2);
+    }finally{globalThis.fetch=old;}
+  });
+});
+
+test('safety-blocked Gemini replies do not trigger model fallback',async()=>{
+  await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
+    const old=globalThis.fetch;
+    let count=0;
+    globalThis.fetch=async()=>{
+      count++;
+      return {ok:true,status:200,json:async()=>({
+        candidates:[{finishReason:'SAFETY',content:{parts:[]}}]
+      })};
+    };
+    try {
+      const res=await handler(request('A general question about an engine part?',{ip:'2001:db8::108'}));
+      assert.equal(res.status,503);
+      assert.equal(count,1);
+    }finally{globalThis.fetch=old;}
+  });
+});
+
 test('invalid or oversized questions are rejected before AI requests',async()=>{
   await withEnv({AUTO_CHAT_ENABLED:'true',GEMINI_API_KEY:'test-key'},async()=>{
-    const bad=await handler(request('a',{ip:'2001:db8::104'}));
+    const bad=await handler(request('   ',{ip:'2001:db8::104'}));
     assert.equal(bad.status,400);
+    const empty=await handler(request('',{ip:'2001:db8::109'}));
+    assert.equal(empty.status,400);
     const long=await handler(request('x'.repeat(801),{ip:'2001:db8::105'}));
     assert.equal(long.status,400);
   });

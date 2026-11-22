@@ -118,6 +118,17 @@ The browser only accepts HTTPS `*.netlify.app` URLs with the exact function rout
 - For brake failure, steering faults, smoke, fuel leakage, overheating, stuck throttle, major wheel damage or EV high-voltage hazards, advice should be to stop and seek qualified assistance—not continue riding or undertake high-risk repairs.
 - The initial UI is text only. It does not upload vehicle photos or access camera/microphone. It does not pretend to connect to a mechanic or automatically send WhatsApp messages.
 
+### If the header stays on **Basic help**
+
+The browser intentionally shows basic guidance when the live AI fails. It does **not** prove that Netlify or Gemini is working.
+
+1. Open the Netlify project → **Logs → Functions → automobile-assistant** and ask a new question once.
+2. Look for the safe diagnostic labels: `AI not configured`, `Gemini HTTP failure` (including HTTP status and model), `Gemini request failed` (network/timeout), or `Gemini response unusable` (empty/token-limited output).
+3. Check that `GEMINI_API_KEY` is configured in Netlify and `AUTO_CHAT_ENABLED` is exactly `true`, and that the required model is available for the key's project and quota. Never copy or share the API key.
+4. When the **function source code** changes, deploy the Netlify function separately with `netlify deploy --prod --dir=netlify-site --functions=netlify/functions`. Merging to GitHub only publishes the storefront, not this manually deployed service.
+
+The server accepts short follow-up messages (including `No`) and tries its secondary Gemini model when the primary returns an empty or token-limited answer. Both attempts use a bounded timeout shorter than the browser wait. Safety-blocked responses are never retried with another model.
+
 ### Maintenance
 
 - The public widget: `public/automobile-assistant.html`, `public/automobile-assistant.js`, `public/automobile-assistant.css`.
