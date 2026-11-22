@@ -19,7 +19,7 @@
     const prefix = vehicleName ? 'For your ' + vehicleName + ': ' : '';
     const priorUsers = conversation.filter(item => item.role === 'user').map(item => item.text || '');
     const lastAssistant = [...conversation].reverse().find(item => item.role === 'assistant')?.text.toLowerCase() || '';
-    const followUp = (lastAssistant.match(/[^?]+\?/g) || []).at(-1) || '';
+    const followUp = (lastAssistant.match(/[^.!?\n]+\?/g) || []).at(-1) || '';
     const symptom = priorUsers.slice(-4).join(' ').toLowerCase();
     const context = (symptom + ' ' + q).trim();
     const isElectric = /\b(ev|electric (?:bike|car|scooter|vehicle)|e-scooter)\b|ather|ola s1|chetak electric/i.test(
@@ -63,6 +63,10 @@
       return prefix + '1. Check tyre pressure before riding, when the tyres are cold.\n2. Use a tyre-pressure gauge and the value on your vehicle label or in the owner manual. Front and rear values can differ.\nTell me the exact model and year if you need help finding the label.';
     }
 
+    if (/\b(tyre|tire)s?\b/.test(q) && /\b(check|inspect|look|maintenance)\b/.test(q)) {
+      return prefix + 'Check the tyre for cuts, bulges, nails and worn tread while parked. Check pressure when cold using the tyre-pressure label or owner manual. Do not ride if the tyre is flat, badly damaged or losing air quickly.';
+    }
+
     // A warning light is not the same as a dead headlight or a battery problem.
     if (/\b(check engine|engine warning|oil warning|red oil|warning light|abs light)\b/.test(q)) {
       return prefix + 'Which warning symbol is showing, and is it red or amber? If the red oil or brake warning stays on, or the engine is overheating, stop safely and arrange inspection. Do not assume a warning light means a specific part must be replaced.';
@@ -100,7 +104,7 @@
       return prefix + 'If there is unusual sound or slipping, note when it happens. Never touch the chain, belt or moving parts with the engine ON. A mechanic can inspect wear and adjustment. Does the problem happen while starting or while riding?';
     }
     if (/\b(battery|headlight|indicator|electric|charging|horn)\b/.test(q)) {
-      return prefix + 'Check whether the dashboard lights and horn work when the key is ON. If the lights dim strongly when starting, the battery may be weak, but it needs testing to confirm. Do not touch exposed wires. Which part is not working?';
+      return prefix + 'Check whether the dashboard lights and horn work when the key is ON. If the lights dim strongly when starting, the battery may be weak, but it needs testing to confirm. Do not touch bare wires or open an electric vehicle battery. Which part is not working?';
     }
     if (/\b(sound|noise|rattle|vibrat|squeak|knock)\b/.test(q)) {
       return prefix + 'When do you hear the sound: while starting, speeding up, braking or going over bumps? Tell me where it comes from too. Do not ride if there is strong shaking, brake trouble or a loose wheel. When do you hear the sound?';
