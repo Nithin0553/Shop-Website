@@ -24,7 +24,13 @@ git pull origin main
 netlify deploy --prod --dir=netlify-site --functions=netlify/functions
 ```
 
-No additional Gemini key or Netlify environment configuration is required if the existing function already works. The backend now aims for roughly 45–100 words, up to three short checks and one follow-up question, while retaining essential safety warnings.
+No additional Gemini key or Netlify environment configuration is required if the existing function already works.
+
+### Easy-to-understand customer answers
+
+For customers across different reading and technical backgrounds, the assistant now aims for **simple everyday Indian English**, or **friendly spoken Telugu/Hindi** when selected. It uses short sentences, explains unfamiliar vehicle terms in plain words, gives at most 2–3 simple safe checks, and asks only one question at a time. The basic offline answers follow the same simple style. Important safety warnings remain direct and clear.
+
+ The backend now aims for roughly 45–100 words, up to three short checks and one follow-up question, while retaining essential safety warnings.
 
 The chat has **two distinct modes**. **Basic guidance** is always available on GitHub Pages using curated rules for common questions, but it is not a general AI model and replies in English. **Online AI** answers more varied questions and can reply in Telugu/Hindi; it requires the optional separate Netlify Function described below.
 
